@@ -128,7 +128,6 @@ class SignUp extends React.Component<Props, State> {
           }
         })
         .catch((e) => {
-          console.log(e);
           this.setState({loading: false});
           if (e.response) {
             if (e.response.status === 400) {

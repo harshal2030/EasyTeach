@@ -7,7 +7,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
 import {registerProfile} from './global/actions/profile';
-import {fetchClass} from './global/actions/classes';
 
 import {checkTokenUrl} from './utils/urls';
 
@@ -26,7 +25,6 @@ interface Props {
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   registerProfile: typeof registerProfile;
-  fetchClass: Function;
 }
 
 const App = (props: Props): JSX.Element => {
@@ -46,11 +44,9 @@ const App = (props: Props): JSX.Element => {
           .then((res) => {
             if (res.status === 200) {
               props.registerProfile(res.data);
-              props.fetchClass(token);
             }
           })
           .catch((e) => {
-            console.log(e);
             if (e.response) {
               if (e.response.status === 401) {
                 return props.removeToken();
@@ -111,5 +107,4 @@ export default connect(mapStateToProps, {
   registerToken,
   removeToken,
   registerProfile,
-  fetchClass,
 })(App);

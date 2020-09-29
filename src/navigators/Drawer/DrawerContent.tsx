@@ -3,10 +3,11 @@ import {
   View,
   StyleSheet,
   ImageBackground,
-  Image,
   Text,
   ScrollView,
   TouchableOpacity,
+  FlatList,
+  Image,
 } from 'react-native';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -14,20 +15,46 @@ import Feather from 'react-native-vector-icons/Feather';
 import {Button, Avatar} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
+import axios from 'axios';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
-import {Class} from '../../global/actions/classes';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
+import {classUrl, mediaUrl} from '../../utils/urls';
 
 interface Props extends DrawerContentComponentProps {
   token: string | null;
   removeToken: typeof removeToken;
-  classes: Class[];
+}
+
+interface Class {
+  name: string;
+  about: string;
+  owner: string;
+  id: string;
+  photo: string;
+  collaborators: string[];
 }
 
 const DrawerContent = (props: Props): JSX.Element => {
+  const [classes, setClasses] = React.useState<Class[]>([]);
+
+  React.useEffect(() => {
+    console.log(props.token);
+    axios
+      .get<Class[]>(classUrl, {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      })
+      .then((res) => {
+        setClasses(res.data);
+      })
+      .catch(() => null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const logOut = async () => {
     await AsyncStorage.removeItem('token');
     props.removeToken();
@@ -41,16 +68,36 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarText,
     optionText,
     optionContainer,
+    avatarImageStyle,
   } = styles;
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View>
-          <Image
-            source={{uri: 'https://picsum.photos/200'}}
-            // eslint-disable-next-line react-native/no-inline-styles
-            style={{height: 60, width: 60}}
-          />
+        <View style={{alignItems: 'center'}}>
+          {classes === [] ? (
+            <Text>loading...</Text>
+          ) : (
+            <FlatList
+              data={classes}
+              keyExtractor={(_item, i) => i.toString()}
+              renderItem={({item}) => {
+                return (
+                  <Image
+                    source={{
+                      uri: `${mediaUrl}/class/avatar/${item.photo}`,
+                    }}
+                    style={avatarImageStyle}
+                    onError={(e) => console.log(e.type)}
+                  />
+                );
+              }}
+              ListFooterComponent={
+                <TouchableOpacity>
+                  <Feather name="plus" size={36} color={commonGrey} />
+                </TouchableOpacity>
+              }
+            />
+          )}
         </View>
 
         <View style={actionButtonContainer}>
@@ -113,6 +160,12 @@ const styles = StyleSheet.create({
     padding: 5,
     marginBottom: 5,
   },
+  avatarImageStyle: {
+    height: 50,
+    width: 50,
+    backgroundColor: 'red',
+    marginTop: 10,
+  },
   leftContainer: {
     width: 80,
     backgroundColor: commonBackground,
@@ -160,7 +213,6 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    classes: state.classes,
   };
 };
 
