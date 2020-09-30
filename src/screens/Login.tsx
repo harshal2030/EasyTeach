@@ -14,6 +14,7 @@ import {registerProfile} from '../global/actions/profile';
 import {commonBlue} from '../styles/colors';
 import {FormStyles} from '../styles/forms';
 import {RootStackParamList} from '../navigators/types';
+import {loginUrl} from '../utils/urls';
 
 type LoginNavigationProps = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -57,7 +58,7 @@ class Login extends React.Component<Props, State> {
     this.setState({loading: true}, () => {
       axios
         .post<{token: string; user: {username: string; name: string}}>(
-          'http://192.168.43.26:3000/users/login',
+          loginUrl,
           {
             user: {
               username,
@@ -75,7 +76,8 @@ class Login extends React.Component<Props, State> {
             this.props.registerProfile(res.data.user);
           }
         })
-        .catch(() => {
+        .catch((e) => {
+          console.log(e);
           this.setState({loading: false});
           Alert.alert('Invalid Credentials');
         });

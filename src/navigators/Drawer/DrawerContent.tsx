@@ -19,6 +19,7 @@ import axios from 'axios';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
+import {Class} from '../../global/actions/classes';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {classUrl, mediaUrl} from '../../utils/urls';
@@ -28,20 +29,10 @@ interface Props extends DrawerContentComponentProps {
   removeToken: typeof removeToken;
 }
 
-interface Class {
-  name: string;
-  about: string;
-  owner: string;
-  id: string;
-  photo: string;
-  collaborators: string[];
-}
-
 const DrawerContent = (props: Props): JSX.Element => {
   const [classes, setClasses] = React.useState<Class[]>([]);
 
   React.useEffect(() => {
-    console.log(props.token);
     axios
       .get<Class[]>(classUrl, {
         headers: {
@@ -58,6 +49,22 @@ const DrawerContent = (props: Props): JSX.Element => {
   const logOut = async () => {
     await AsyncStorage.removeItem('token');
     props.removeToken();
+  };
+
+  const renderSMClass = ({item}: {item: Class}) => {
+    return (
+      <View>
+        <Image
+          source={{
+            uri: `${mediaUrl}/class/avatar/${item.photo}`,
+          }}
+          style={avatarImageStyle}
+        />
+        <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
+          {item.name}
+        </Text>
+      </View>
+    );
   };
 
   const {
@@ -80,17 +87,7 @@ const DrawerContent = (props: Props): JSX.Element => {
             <FlatList
               data={classes}
               keyExtractor={(_item, i) => i.toString()}
-              renderItem={({item}) => {
-                return (
-                  <Image
-                    source={{
-                      uri: `${mediaUrl}/class/avatar/${item.photo}`,
-                    }}
-                    style={avatarImageStyle}
-                    onError={(e) => console.log(e.type)}
-                  />
-                );
-              }}
+              renderItem={renderSMClass}
               ListFooterComponent={
                 <TouchableOpacity>
                   <Feather name="plus" size={36} color={commonGrey} />

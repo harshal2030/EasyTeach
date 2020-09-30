@@ -18,6 +18,7 @@ import {commonBlue} from '../styles/colors';
 import {FormStyles} from '../styles/forms';
 
 import {RootStackParamList} from '../navigators/types';
+import {signUpUrl} from '../utils/urls';
 
 type SignUpNavProps = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
@@ -107,7 +108,7 @@ class SignUp extends React.Component<Props, State> {
     this.setState({loading: true}, () => {
       axios
         .post<{token: string; user: {name: string; username: string}}>(
-          'http://192.168.43.26:3000/users/create',
+          signUpUrl,
           {
             user: {
               name,
