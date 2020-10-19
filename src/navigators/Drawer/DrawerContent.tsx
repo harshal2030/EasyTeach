@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert,
 } from 'react-native';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -19,36 +20,42 @@ import axios from 'axios';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
-import {Class} from '../../global/actions/classes';
+import {Class, fetchClasses} from '../../global/actions/classes';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
-import {classUrl, mediaUrl} from '../../utils/urls';
+import {mediaUrl, logOutUrl} from '../../utils/urls';
 
 interface Props extends DrawerContentComponentProps {
   token: string | null;
   removeToken: typeof removeToken;
+  fetchClasses: Function;
+  classes: Class[];
+  classIsLoading: boolean;
+  classErrored: boolean;
 }
 
 const DrawerContent = (props: Props): JSX.Element => {
-  const [classes, setClasses] = React.useState<Class[]>([]);
-
   React.useEffect(() => {
-    axios
-      .get<Class[]>(classUrl, {
-        headers: {
-          Authorization: `Bearer ${props.token}`,
-        },
-      })
-      .then((res) => {
-        setClasses(res.data);
-      })
-      .catch(() => null);
+    props.fetchClasses(props.token!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const logOut = async () => {
-    await AsyncStorage.removeItem('token');
-    props.removeToken();
+    try {
+      await axios.post(
+        logOutUrl,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${props.token}`,
+          },
+        },
+      );
+      await AsyncStorage.removeItem('token');
+      props.removeToken();
+    } catch (e) {
+      Alert.alert('Error', 'Unable to logout please try again later');
+    }
   };
 
   const renderSMClass = ({item}: {item: Class}) => {
@@ -67,6 +74,29 @@ const DrawerContent = (props: Props): JSX.Element => {
     );
   };
 
+  const renderClasses = () => {
+    if (props.classErrored) {
+      return <Text>Errored</Text>;
+    }
+
+    if (props.classIsLoading) {
+      return <Text>Loading..</Text>;
+    }
+
+    return (
+      <FlatList
+        data={props.classes}
+        keyExtractor={(_item, i) => i.toString()}
+        renderItem={renderSMClass}
+        ListFooterComponent={
+          <TouchableOpacity>
+            <Feather name="plus" size={36} color={commonGrey} />
+          </TouchableOpacity>
+        }
+      />
+    );
+  };
+
   const {
     actionButtonContainer,
     classText,
@@ -80,22 +110,7 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center'}}>
-          {classes === [] ? (
-            <Text>loading...</Text>
-          ) : (
-            <FlatList
-              data={classes}
-              keyExtractor={(_item, i) => i.toString()}
-              renderItem={renderSMClass}
-              ListFooterComponent={
-                <TouchableOpacity>
-                  <Feather name="plus" size={36} color={commonGrey} />
-                </TouchableOpacity>
-              }
-            />
-          )}
-        </View>
+        <View style={{alignItems: 'center'}}>{renderClasses()}</View>
 
         <View style={actionButtonContainer}>
           <Button
@@ -164,7 +179,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   leftContainer: {
-    width: 80,
+    width: 95,
     backgroundColor: commonBackground,
     justifyContent: 'space-between',
     padding: 10,
@@ -210,7 +225,12 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
+    classes: state.classes,
+    classIsLoading: state.classIsLoading,
+    classErrored: state.classHasErrored,
   };
 };
 
-export default connect(mapStateToProps, {removeToken})(DrawerContent);
+export default connect(mapStateToProps, {removeToken, fetchClasses})(
+  DrawerContent,
+);

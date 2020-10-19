@@ -5,18 +5,29 @@ import {Class} from './actions/classes';
 
 import {tokenReducer} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
-import {classReducer} from './reducers/classReducer';
+import {
+  classReducer,
+  classHasErrored,
+  classIsLoading,
+  classes,
+} from './reducers/classReducer';
 
 export interface StoreState {
   token: string | null;
   profile: {name: string; username: string};
-  classes: Class | null;
+  currentClass: Class | null;
+  classes: Class[];
+  classIsLoading: boolean;
+  classHasErrored: boolean;
 }
 
 export const reducers = combineReducers<StoreState>({
   token: tokenReducer,
   profile: profileReducer,
-  classes: classReducer,
+  currentClass: classReducer,
+  classHasErrored,
+  classIsLoading,
+  classes,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));

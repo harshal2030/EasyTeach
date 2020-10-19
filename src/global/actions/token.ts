@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 enum ActionTypes {
-  registerToken,
-  removeToken,
+  registerToken = 'registerToken',
+  removeToken = 'removeToken',
 }
 
 interface RegisterTokenAction {

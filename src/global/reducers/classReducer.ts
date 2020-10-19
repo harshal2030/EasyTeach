@@ -1,6 +1,43 @@
-import {ActionTypes, registerClassAction, Class} from '../actions/classes';
+import {
+  ActionTypes,
+  registerClassAction,
+  Class,
+  classHasErroredAction,
+  classLoadingAction,
+  classFetchedAction,
+} from '../actions/classes';
 
-export const classReducer = (
+const classHasErrored = (
+  state: boolean = false,
+  action: classHasErroredAction,
+) => {
+  switch (action.type) {
+    case ActionTypes.classesHasErrored:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+const classIsLoading = (state: boolean = true, action: classLoadingAction) => {
+  switch (action.type) {
+    case ActionTypes.classesLoading:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+const classes = (state: Class[] = [], action: classFetchedAction) => {
+  switch (action.type) {
+    case ActionTypes.classesFetchSuccess:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+const classReducer = (
   state: Class | null = null,
   action: registerClassAction,
 ) => {
@@ -11,3 +48,5 @@ export const classReducer = (
       return state;
   }
 };
+
+export {classReducer, classHasErrored, classes, classIsLoading};

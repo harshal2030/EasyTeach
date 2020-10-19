@@ -13,9 +13,9 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 
 const DrawerNavigator = (): JSX.Element => {
   return (
-    // eslint-disable-next-line react-native/no-inline-styles
     <Drawer.Navigator
-      drawerStyle={{width: '85%'}}
+      // eslint-disable-next-line react-native/no-inline-styles
+      drawerStyle={{width: '90%'}}
       drawerContent={(props) => <DrawerContent {...props} />}>
       <Drawer.Screen name="Home" component={Home} />
     </Drawer.Navigator>
