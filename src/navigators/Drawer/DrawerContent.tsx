@@ -10,6 +10,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
@@ -17,6 +18,8 @@ import {Button, Avatar} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
+
+import {JoinClass} from '../../components/modals';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
@@ -35,6 +38,8 @@ interface Props extends DrawerContentComponentProps {
 }
 
 const DrawerContent = (props: Props): JSX.Element => {
+  const [modalVisible, alterModal] = React.useState(false);
+
   React.useEffect(() => {
     props.fetchClasses(props.token!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,7 +94,7 @@ const DrawerContent = (props: Props): JSX.Element => {
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         ListFooterComponent={
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => alterModal(true)}>
             <Feather name="plus" size={36} color={commonGrey} />
           </TouchableOpacity>
         }
@@ -156,6 +161,12 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
         </ScrollView>
       </View>
+
+      <Modal
+        isVisible={modalVisible}
+        onBackButtonPress={() => alterModal(false)}>
+        <JoinClass />
+      </Modal>
     </View>
   );
 };
