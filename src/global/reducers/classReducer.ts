@@ -5,6 +5,7 @@ import {
   classHasErroredAction,
   classLoadingAction,
   classFetchedAction,
+  addedClassAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -28,10 +29,15 @@ const classIsLoading = (state: boolean = true, action: classLoadingAction) => {
   }
 };
 
-const classes = (state: Class[] = [], action: classFetchedAction) => {
+const classes = (
+  state: Class[] = [],
+  action: classFetchedAction | addedClassAction,
+) => {
   switch (action.type) {
     case ActionTypes.classesFetchSuccess:
       return action.payload;
+    case ActionTypes.addClass:
+      return [...state, action.payload];
     default:
       return state;
   }

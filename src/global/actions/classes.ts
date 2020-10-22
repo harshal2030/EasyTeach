@@ -8,12 +8,14 @@ enum ActionTypes {
   classesHasErrored = 'classes_has_errored',
   classesLoading = 'classes_loading',
   classesFetchSuccess = 'classes_fetched_success',
+  addClass = 'add_class',
 }
 
 interface Class {
   name: string;
   about: string;
   owner: string;
+  subject: string;
   id: string;
   photo: string;
   collaborators: string[];
@@ -38,6 +40,11 @@ interface classLoadingAction {
 interface classFetchedAction {
   type: ActionTypes.classesFetchSuccess;
   payload: Class[];
+}
+
+interface addedClassAction {
+  type: ActionTypes.addClass;
+  payload: Class;
 }
 
 // for getting list of classes enrolled by user or owned
@@ -80,6 +87,13 @@ const fetchClasses = (token: string) => {
   };
 };
 
+const addClass = (room: Class): addedClassAction => {
+  return {
+    type: ActionTypes.addClass,
+    payload: room,
+  };
+};
+
 // For registering the current class
 const registerCurrentClass = (currentClass: Class): registerClassAction => {
   return {
@@ -94,7 +108,9 @@ export {
   registerCurrentClass,
   ActionTypes,
   fetchClasses,
+  addClass,
   classHasErroredAction,
   classLoadingAction,
   classFetchedAction,
+  addedClassAction,
 };

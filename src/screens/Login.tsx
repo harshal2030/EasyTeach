@@ -76,8 +76,7 @@ class Login extends React.Component<Props, State> {
             this.props.registerProfile(res.data.user);
           }
         })
-        .catch((e) => {
-          console.log(e);
+        .catch(() => {
           this.setState({loading: false});
           Alert.alert('Invalid Credentials');
         });

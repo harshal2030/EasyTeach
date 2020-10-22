@@ -13,6 +13,7 @@ import {checkTokenUrl} from './utils/urls';
 import Login from './screens/Login';
 import SignUp from './screens/SignUp';
 import Drawer from './navigators/Drawer';
+import JoinClass from './screens/JoinClass';
 
 import {RootStackParamList} from './navigators/types';
 import {commonBlue} from './styles/colors';
@@ -91,7 +92,10 @@ const App = (props: Props): JSX.Element => {
           <Stack.Screen name="Login" component={Login} />
         </>
       ) : (
-        <Stack.Screen name="Drawer" component={Drawer} />
+        <>
+          <Stack.Screen name="Drawer" component={Drawer} />
+          <Stack.Screen name="JoinClass" component={JoinClass} />
+        </>
       )}
     </Stack.Navigator>
   );

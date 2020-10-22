@@ -10,16 +10,12 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import Modal from 'react-native-modal';
-import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button, Avatar} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
-
-import {JoinClass} from '../../components/modals';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
@@ -28,18 +24,28 @@ import {Class, fetchClasses} from '../../global/actions/classes';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {mediaUrl, logOutUrl} from '../../utils/urls';
 
-interface Props extends DrawerContentComponentProps {
+import {DrawerContentComponentProps} from '@react-navigation/drawer';
+import {CompositeNavigationProp} from '@react-navigation/native';
+import {DrawerNavigationProp} from '@react-navigation/drawer';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList, DrawerParamList} from '../types';
+
+type HomeScreenNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'Home'>,
+  StackNavigationProp<RootStackParamList>
+>;
+
+type Props = DrawerContentComponentProps & {
   token: string | null;
   removeToken: typeof removeToken;
   fetchClasses: Function;
   classes: Class[];
   classIsLoading: boolean;
   classErrored: boolean;
-}
+  navigation: HomeScreenNavigationProp;
+};
 
 const DrawerContent = (props: Props): JSX.Element => {
-  const [modalVisible, alterModal] = React.useState(false);
-
   React.useEffect(() => {
     props.fetchClasses(props.token!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,7 +100,14 @@ const DrawerContent = (props: Props): JSX.Element => {
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         ListFooterComponent={
-          <TouchableOpacity onPress={() => alterModal(true)}>
+          <TouchableOpacity
+            style={{alignSelf: 'center'}}
+            onPress={() => {
+              return (
+                props.navigation.closeDrawer(),
+                props.navigation.navigate('JoinClass')
+              );
+            }}>
             <Feather name="plus" size={36} color={commonGrey} />
           </TouchableOpacity>
         }
@@ -115,7 +128,9 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center'}}>{renderClasses()}</View>
+        <View style={{alignItems: 'center', height: '85%'}}>
+          {renderClasses()}
+        </View>
 
         <View style={actionButtonContainer}>
           <Button
@@ -161,12 +176,6 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
         </ScrollView>
       </View>
-
-      <Modal
-        isVisible={modalVisible}
-        onBackButtonPress={() => alterModal(false)}>
-        <JoinClass />
-      </Modal>
     </View>
   );
 };
@@ -178,19 +187,19 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     alignItems: 'center',
-    height: 110,
+    height: '15%',
     justifyContent: 'space-between',
     padding: 5,
     marginBottom: 5,
   },
   avatarImageStyle: {
-    height: 50,
-    width: 50,
+    height: 60,
+    width: 60,
     backgroundColor: 'red',
     marginTop: 10,
   },
   leftContainer: {
-    width: 95,
+    width: 90,
     backgroundColor: commonBackground,
     justifyContent: 'space-between',
     padding: 10,
