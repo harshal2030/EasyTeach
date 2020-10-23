@@ -36,12 +36,15 @@ const App = (props: Props): JSX.Element => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
         props.registerToken(token);
-        Axios.get<{name: string; username: string}>(checkTokenUrl, {
-          timeout: 20000,
-          headers: {
-            Authorization: `Bearer ${token}`,
+        Axios.get<{name: string; username: string; avatar: string}>(
+          checkTokenUrl,
+          {
+            timeout: 20000,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        })
+        )
           .then((res) => {
             if (res.status === 200) {
               props.registerProfile(res.data);

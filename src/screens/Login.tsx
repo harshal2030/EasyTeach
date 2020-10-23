@@ -57,7 +57,10 @@ class Login extends React.Component<Props, State> {
 
     this.setState({loading: true}, () => {
       axios
-        .post<{token: string; user: {username: string; name: string}}>(
+        .post<{
+          token: string;
+          user: {username: string; name: string; avatar: string};
+        }>(
           loginUrl,
           {
             user: {

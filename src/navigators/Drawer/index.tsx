@@ -4,7 +4,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import DrawerContent from './DrawerContent';
 import {DrawerParamList} from '../types';
 
-import Home from '../../screens/Home';
+import Home from '../bottom-tabs/Home';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 

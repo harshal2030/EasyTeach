@@ -14,7 +14,7 @@ import {
 
 export interface StoreState {
   token: string | null;
-  profile: {name: string; username: string};
+  profile: {name: string; username: string; avatar: string};
   currentClass: Class | null;
   classes: Class[];
   classIsLoading: boolean;

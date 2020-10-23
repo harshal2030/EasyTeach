@@ -19,7 +19,11 @@ import axios from 'axios';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
-import {Class, fetchClasses} from '../../global/actions/classes';
+import {
+  Class,
+  fetchClasses,
+  registerCurrentClass,
+} from '../../global/actions/classes';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {mediaUrl, logOutUrl} from '../../utils/urls';
@@ -42,7 +46,14 @@ type Props = DrawerContentComponentProps & {
   classes: Class[];
   classIsLoading: boolean;
   classErrored: boolean;
+  currentClass: Class | null;
+  registerCurrentClass: typeof registerCurrentClass;
   navigation: HomeScreenNavigationProp;
+  profile: {
+    username: string;
+    name: string;
+    avatar: string;
+  };
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -50,6 +61,12 @@ const DrawerContent = (props: Props): JSX.Element => {
     props.fetchClasses(props.token!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const {currentClass} = props;
+  let isOwner = false;
+  if (currentClass) {
+    isOwner = props.profile.username === currentClass.owner.username;
+  }
 
   const logOut = async () => {
     try {
@@ -71,7 +88,7 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <View>
+      <TouchableOpacity onPress={() => props.registerCurrentClass(item)}>
         <Image
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
@@ -81,7 +98,7 @@ const DrawerContent = (props: Props): JSX.Element => {
         <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
           {item.name}
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -91,7 +108,7 @@ const DrawerContent = (props: Props): JSX.Element => {
     }
 
     if (props.classIsLoading) {
-      return <Text>Loading..</Text>;
+      return <Text>Loading...</Text>;
     }
 
     return (
@@ -150,9 +167,15 @@ const DrawerContent = (props: Props): JSX.Element => {
       <View style={styles.rightContainer}>
         <ScrollView>
           <ImageBackground
-            source={{uri: 'https://picsum.photos/200'}}
+            source={{
+              uri: currentClass
+                ? `${mediaUrl}/class/avatar/${currentClass.photo}`
+                : 'none',
+            }}
             style={mainImage}>
-            <Text style={classText}>The Class</Text>
+            <Text style={classText}>
+              {currentClass ? currentClass.name : 'Current Class appears here'}
+            </Text>
           </ImageBackground>
 
           <View style={avatarContainer}>
@@ -160,16 +183,24 @@ const DrawerContent = (props: Props): JSX.Element => {
               size={40}
               rounded
               source={{
-                uri: 'https://picsum.photos/200',
+                uri: currentClass
+                  ? `${mediaUrl}/avatar/${currentClass.owner.avatar}`
+                  : `${mediaUrl}/avatar/default.png`,
               }}
             />
-            <Text style={avatarText}>The Teacher</Text>
+            <Text style={avatarText}>
+              {currentClass
+                ? currentClass.owner.name
+                : 'Class owner appears here'}
+            </Text>
           </View>
 
           <View style={optionContainer}>
-            <TouchableOpacity>
-              <Text style={optionText}>Resources</Text>
-            </TouchableOpacity>
+            {isOwner && (
+              <TouchableOpacity>
+                <Text style={optionText}>Resources</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity>
               <Text style={optionText}>Questions</Text>
             </TouchableOpacity>
@@ -195,7 +226,7 @@ const styles = StyleSheet.create({
   avatarImageStyle: {
     height: 60,
     width: 60,
-    backgroundColor: 'red',
+    backgroundColor: commonGrey,
     marginTop: 10,
   },
   leftContainer: {
@@ -212,12 +243,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     padding: 5,
-    backgroundColor: 'rgba(237, 240, 242, 0.5)',
+    backgroundColor: 'rgba(237, 240, 242, 0.8)',
   },
   mainImage: {
     height: 200,
     width: '100%',
     justifyContent: 'flex-end',
+    backgroundColor: commonGrey,
   },
   avatarContainer: {
     flexDirection: 'row',
@@ -248,9 +280,13 @@ const mapStateToProps = (state: StoreState) => {
     classes: state.classes,
     classIsLoading: state.classIsLoading,
     classErrored: state.classHasErrored,
+    currentClass: state.currentClass,
+    profile: state.profile,
   };
 };
 
-export default connect(mapStateToProps, {removeToken, fetchClasses})(
-  DrawerContent,
-);
+export default connect(mapStateToProps, {
+  removeToken,
+  fetchClasses,
+  registerCurrentClass,
+})(DrawerContent);

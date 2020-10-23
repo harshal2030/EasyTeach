@@ -5,6 +5,7 @@ const logOutUrl = `${root}/users/logout`;
 const checkTokenUrl = `${root}/users/token`;
 const classUrl = `${root}/class`;
 const mediaUrl = `${root}/media`;
+const studentUrl = `${root}/student`;
 
 export {
   root,
@@ -14,4 +15,5 @@ export {
   classUrl,
   mediaUrl,
   logOutUrl,
+  studentUrl,
 };

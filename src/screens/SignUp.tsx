@@ -107,7 +107,10 @@ class SignUp extends React.Component<Props, State> {
 
     this.setState({loading: true}, () => {
       axios
-        .post<{token: string; user: {name: string; username: string}}>(
+        .post<{
+          token: string;
+          user: {name: string; username: string; avatar: string};
+        }>(
           signUpUrl,
           {
             user: {

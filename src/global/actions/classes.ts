@@ -9,16 +9,22 @@ enum ActionTypes {
   classesLoading = 'classes_loading',
   classesFetchSuccess = 'classes_fetched_success',
   addClass = 'add_class',
+  classOwner = 'class_owner',
 }
 
 interface Class {
   name: string;
   about: string;
-  owner: string;
+  owner: {
+    username: string;
+    avatar: string;
+    name: string;
+  };
   subject: string;
   id: string;
   photo: string;
   collaborators: string[];
+  joinCode: string;
 }
 
 // return action types of each action
@@ -79,6 +85,9 @@ const fetchClasses = (token: string) => {
           Authorization: `Bearer ${token}`,
         },
       });
+      if (classes.data.length !== 0) {
+        dispatch(registerCurrentClass(classes.data[0]));
+      }
       dispatch(classesLoading(false));
       dispatch(classesFetchedSuccess(classes.data));
     } catch (e) {
