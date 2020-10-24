@@ -16,6 +16,8 @@ import {Button, Avatar} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
+import Octicons from 'react-native-vector-icons/Octicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
@@ -23,6 +25,7 @@ import {
   Class,
   fetchClasses,
   registerCurrentClass,
+  removeCurrentClass,
 } from '../../global/actions/classes';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
@@ -54,6 +57,7 @@ type Props = DrawerContentComponentProps & {
     name: string;
     avatar: string;
   };
+  removeCurrentClass: typeof removeCurrentClass;
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -64,13 +68,17 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const {currentClass} = props;
   let isOwner = false;
+  let FontAwesome = null;
   if (currentClass) {
     isOwner = props.profile.username === currentClass.owner.username;
+    FontAwesome = isOwner
+      ? require('react-native-vector-icons/FontAwesome').default
+      : null;
   }
 
   const logOut = async () => {
     try {
-      await axios.post(
+      const res = await axios.post(
         logOutUrl,
         {},
         {
@@ -79,8 +87,10 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
+      console.log(res.data, res.status);
       await AsyncStorage.removeItem('token');
       props.removeToken();
+      props.removeCurrentClass();
     } catch (e) {
       Alert.alert('Error', 'Unable to logout please try again later');
     }
@@ -139,8 +149,9 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarContainer,
     avatarText,
     optionText,
-    optionContainer,
+    optionListContainer,
     avatarImageStyle,
+    optionContainer,
   } = styles;
   return (
     <View style={styles.mainContainer}>
@@ -195,15 +206,23 @@ const DrawerContent = (props: Props): JSX.Element => {
             </Text>
           </View>
 
-          <View style={optionContainer}>
+          <View style={optionListContainer}>
+            <TouchableOpacity style={optionContainer}>
+              <Entypo name="home" color="#34495e" size={23} />
+              <Text style={optionText}> Home</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={optionContainer}>
+              <Octicons name="checklist" color="#34495e" size={25} />
+              <Text style={optionText}> Tests</Text>
+            </TouchableOpacity>
+
             {isOwner && (
-              <TouchableOpacity>
-                <Text style={optionText}>Resources</Text>
+              <TouchableOpacity style={optionContainer}>
+                <FontAwesome name="sliders" color="#34495e" size={23} />
+                <Text style={optionText}> Manage</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity>
-              <Text style={optionText}>Questions</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
@@ -264,12 +283,16 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   optionText: {
-    fontSize: 20,
-    color: '#757D75',
-    marginTop: 10,
-    marginBottom: 10,
+    fontSize: 24,
+    color: '#34495e',
   },
   optionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  optionListContainer: {
     padding: 20,
   },
 });
@@ -289,4 +312,5 @@ export default connect(mapStateToProps, {
   removeToken,
   fetchClasses,
   registerCurrentClass,
+  removeCurrentClass,
 })(DrawerContent);

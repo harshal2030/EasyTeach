@@ -6,6 +6,7 @@ import {
   classLoadingAction,
   classFetchedAction,
   addedClassAction,
+  removeClassAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -45,10 +46,12 @@ const classes = (
 
 const classReducer = (
   state: Class | null = null,
-  action: registerClassAction,
+  action: registerClassAction | removeClassAction,
 ) => {
   switch (action.type) {
     case ActionTypes.registerCurrentClass:
+      return action.payload;
+    case ActionTypes.removeCurrentClass:
       return action.payload;
     default:
       return state;

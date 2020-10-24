@@ -70,7 +70,6 @@ class JoinClass extends React.Component<Props, State> {
     ImagePicker.openPicker({
       width: 200,
       height: 200,
-      compressImageQuality: 1,
       cropping: true,
     })
       .then((image) => {

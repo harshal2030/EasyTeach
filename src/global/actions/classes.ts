@@ -5,6 +5,7 @@ import {classUrl} from '../../utils/urls';
 /* eslint-disable no-undef */
 enum ActionTypes {
   registerCurrentClass = 'registerCurrentClass',
+  removeCurrentClass = 'remove_current_class',
   classesHasErrored = 'classes_has_errored',
   classesLoading = 'classes_loading',
   classesFetchSuccess = 'classes_fetched_success',
@@ -31,6 +32,11 @@ interface Class {
 interface registerClassAction {
   type: ActionTypes.registerCurrentClass;
   payload: Class;
+}
+
+interface removeClassAction {
+  type: ActionTypes.removeCurrentClass;
+  payload: null;
 }
 
 interface classHasErroredAction {
@@ -111,9 +117,18 @@ const registerCurrentClass = (currentClass: Class): registerClassAction => {
   };
 };
 
+const removeCurrentClass = (): removeClassAction => {
+  return {
+    type: ActionTypes.removeCurrentClass,
+    payload: null,
+  };
+};
+
 export {
   Class,
   registerClassAction,
+  removeClassAction,
+  removeCurrentClass,
   registerCurrentClass,
   ActionTypes,
   fetchClasses,
