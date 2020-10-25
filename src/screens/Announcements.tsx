@@ -40,7 +40,7 @@ const Home = (props: Props): JSX.Element => {
       return (
         <Text>
           We're having trouble in connecting to service. Please consider
-          checking you network or try again
+          checking your network or try again
         </Text>
       );
     }
