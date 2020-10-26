@@ -31,6 +31,7 @@
     "react-native-snackbar": "^2.2.3",
     "react-native-vector-icons": "^7.1.0",
     "react-redux": "^7.2.1",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "validator": "^13.1.17"

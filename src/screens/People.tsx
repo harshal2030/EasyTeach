@@ -12,7 +12,7 @@ import SnackBar from 'react-native-snackbar';
 import {
   DrawerParamList,
   RootStackParamList,
-  BottomTabParamList,
+  BottomTabHomeParamList,
 } from '../navigators/types';
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -20,7 +20,7 @@ import {mediaUrl, studentUrl} from '../utils/urls';
 import {FlatList} from 'react-native-gesture-handler';
 
 type NavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<BottomTabParamList, 'People'>,
+  BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
   CompositeNavigationProp<
     DrawerNavigationProp<DrawerParamList>,
     StackNavigationProp<RootStackParamList>

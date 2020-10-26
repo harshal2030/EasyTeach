@@ -3,12 +3,12 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-import {BottomTabParamList} from '../types';
+import {BottomTabHomeParamList} from '../types';
 import Announcements from '../../screens/Announcements';
 import People from '../../screens/People';
 import {commonBlue} from '../../styles/colors';
 
-const Tab = createBottomTabNavigator<BottomTabParamList>();
+const Tab = createBottomTabNavigator<BottomTabHomeParamList>();
 
 const Home = () => {
   return (

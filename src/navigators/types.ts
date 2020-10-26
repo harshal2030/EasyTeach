@@ -1,18 +1,30 @@
+/* eslint-disable no-undef */
 type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
   Drawer: undefined;
   JoinClass: undefined;
+  Quiz: undefined;
 };
 
-type BottomTabParamList = {
+type BottomTabHomeParamList = {
   Announcements: undefined;
   People: undefined;
 };
 
-type DrawerParamList = {
-  Home: undefined;
+type BottomTabTestParamList = {
+  TestHome: undefined;
+  TestScored: undefined;
 };
 
-// eslint-disable-next-line no-undef
-export {RootStackParamList, DrawerParamList, BottomTabParamList};
+type DrawerParamList = {
+  Home: undefined;
+  Test: undefined;
+};
+
+export {
+  RootStackParamList,
+  DrawerParamList,
+  BottomTabHomeParamList,
+  BottomTabTestParamList,
+};

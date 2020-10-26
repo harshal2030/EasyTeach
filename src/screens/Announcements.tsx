@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, ActivityIndicator} from 'react-native';
 import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -10,13 +10,14 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {
   RootStackParamList,
   DrawerParamList,
-  BottomTabParamList,
+  BottomTabHomeParamList,
 } from '../navigators/types';
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
+import {commonBlue} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<BottomTabParamList, 'People'>,
+  BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
   CompositeNavigationProp<
     DrawerNavigationProp<DrawerParamList>,
     StackNavigationProp<RootStackParamList>
@@ -27,15 +28,21 @@ interface Props {
   profile: {
     name: string;
     username: string;
+    avatar: string;
   };
   navigation: NavigationProp;
   currentClass: Class | null;
   classHasErrored: boolean;
   classes: Class[];
+  classIsLoading: boolean;
 }
 
 const Home = (props: Props): JSX.Element => {
   const renderContent = () => {
+    if (props.classIsLoading) {
+      return <ActivityIndicator color={commonBlue} animating size="large" />;
+    }
+
     if (props.classHasErrored) {
       return (
         <Text>
@@ -65,7 +72,7 @@ const Home = (props: Props): JSX.Element => {
     <View>
       <Header
         centerComponent={{
-          text: 'Home',
+          text: props.currentClass ? props.currentClass!.name : 'Home',
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
         leftComponent={{
@@ -75,7 +82,15 @@ const Home = (props: Props): JSX.Element => {
           onPress: () => props.navigation.openDrawer(),
         }}
       />
-      <View style={{padding: 20}}>{renderContent()}</View>
+      <View
+        style={{
+          padding: 20,
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {renderContent()}
+      </View>
     </View>
   );
 };
@@ -85,6 +100,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     currentClass: state.currentClass,
     classHasErrored: state.classHasErrored,
+    classIsLoading: state.classIsLoading,
     classes: state.classes,
   };
 };

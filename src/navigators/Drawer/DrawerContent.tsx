@@ -207,12 +207,16 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
 
           <View style={optionListContainer}>
-            <TouchableOpacity style={optionContainer}>
+            <TouchableOpacity
+              style={optionContainer}
+              onPress={() => props.navigation.navigate('Home')}>
               <Entypo name="home" color="#34495e" size={23} />
               <Text style={optionText}> Home</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={optionContainer}>
+            <TouchableOpacity
+              style={optionContainer}
+              onPress={() => props.navigation.navigate('Test')}>
               <Octicons name="checklist" color="#34495e" size={25} />
               <Text style={optionText}> Tests</Text>
             </TouchableOpacity>

@@ -5,6 +5,7 @@ import DrawerContent from './DrawerContent';
 import {DrawerParamList} from '../types';
 
 import Home from '../bottom-tabs/Home';
+import TestTabs from '../bottom-tabs/TestTabs';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -17,6 +18,7 @@ const DrawerNavigator = (): JSX.Element => {
       // @ts-ignore
       drawerContent={(props) => <DrawerContent {...props} />}>
       <Drawer.Screen name="Home" component={Home} />
+      <Drawer.Screen name="Test" component={TestTabs} />
     </Drawer.Navigator>
   );
 };
