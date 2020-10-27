@@ -12,68 +12,95 @@ interface Props {
     question: string;
     options: string[];
     queId: string;
+    selected: number | null;
   }[];
   navigation: StackNavigationProp<RootStackParamList>;
 }
 
-const Quiz = (props: Props) => {
-  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
-  const {buttonContainer} = styles;
+interface State {
+  currentIndex: number;
+  questions: {
+    question: string;
+    options: string[];
+    queId: string;
+    selected: number | null;
+  }[];
+}
 
-  return (
-    <View>
-      <Header
-        centerComponent={{
-          text: 'Quiz',
-          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-        }}
-        leftComponent={{
-          icon: 'arrow-back',
-          color: '#ffff',
-          size: 26,
-          onPress: () => props.navigation.goBack(),
-        }}
-      />
+class Quiz extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
 
-      <View style={buttonContainer}>
-        <Button
-          title="Previous"
-          disabled={currentIndex === 0}
-          onPress={() => setCurrentIndex(currentIndex - 1)}
+    this.state = {
+      currentIndex: 0,
+      questions: this.props.questions,
+    };
+  }
+
+  updateSelected = (i: number) => {
+    const {currentIndex, questions} = this.state;
+    const temp = [...questions];
+    temp[currentIndex].selected = i;
+    this.setState({questions: temp});
+  };
+
+  render() {
+    const {
+      buttonContainer,
+      buttonContainerStyle,
+      buttonStyle,
+      textStyle,
+    } = styles;
+
+    const {questions} = this.props;
+    const {currentIndex} = this.state;
+    return (
+      <View>
+        <Header
+          centerComponent={{
+            text: 'Quiz',
+            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+          }}
+          leftComponent={{
+            icon: 'arrow-back',
+            color: '#ffff',
+            size: 26,
+            onPress: () => this.props.navigation.goBack(),
+          }}
         />
-        <Button title="Submit" />
-        <Button
-          title="Next"
-          disabled={currentIndex === props.questions.length - 1}
-          onPress={() => setCurrentIndex(currentIndex + 1)}
-        />
+
+        <View style={buttonContainer}>
+          <Button
+            title="Previous"
+            disabled={currentIndex === 0}
+            onPress={() => this.setState({currentIndex: currentIndex - 1})}
+          />
+          <Button title="Submit" />
+          <Button
+            title="Next"
+            disabled={currentIndex === questions.length - 1}
+            onPress={() => this.setState({currentIndex: currentIndex + 1})}
+          />
+        </View>
+
+        <ScrollView style={{padding: 20}}>
+          <Text style={{fontSize: 18, fontWeight: '500'}}>
+            {questions[currentIndex].question}
+          </Text>
+          <ButtonGroup
+            buttons={questions[currentIndex].options}
+            onPress={this.updateSelected}
+            buttonContainerStyle={buttonContainerStyle}
+            buttonStyle={buttonStyle}
+            textStyle={textStyle}
+            vertical
+            selectedIndex={this.state.questions[currentIndex].selected}
+          />
+        </ScrollView>
       </View>
-
-      <ScrollView style={{padding: 20}}>
-        <Text style={{fontSize: 16, fontWeight: '500'}}>
-          {props.questions[currentIndex].question}
-        </Text>
-        <ButtonGroup
-          buttons={props.questions[currentIndex].options}
-          onPress={() => console.log('pressed')}
-          buttonContainerStyle={{
-            flex: 1,
-            height: '100%',
-          }}
-          buttonStyle={{
-            padding: 10,
-          }}
-          textStyle={{
-            fontSize: 18,
-            fontWeight: '600',
-          }}
-          vertical
-          selectedIndex={0}
-        />
-      </ScrollView>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -81,6 +108,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     padding: 20,
+  },
+  buttonContainerStyle: {
+    flex: 1,
+    height: '100%',
+  },
+  buttonStyle: {
+    padding: 10,
+  },
+  textStyle: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
 

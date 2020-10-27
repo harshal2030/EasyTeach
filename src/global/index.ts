@@ -20,7 +20,12 @@ export interface StoreState {
   classes: Class[];
   classIsLoading: boolean;
   classHasErrored: boolean;
-  questions: {queId: string; options: string[]; question: string}[];
+  questions: {
+    queId: string;
+    options: string[];
+    question: string;
+    selected: null | number;
+  }[];
 }
 
 export const reducers = combineReducers<StoreState>({
