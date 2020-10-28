@@ -11,7 +11,6 @@ import {
   classIsLoading,
   classes,
 } from './reducers/classReducer';
-import {queReducer} from './reducers/queReducer';
 
 export interface StoreState {
   token: string | null;
@@ -20,19 +19,12 @@ export interface StoreState {
   classes: Class[];
   classIsLoading: boolean;
   classHasErrored: boolean;
-  questions: {
-    queId: string;
-    options: string[];
-    question: string;
-    selected: null | number;
-  }[];
 }
 
 export const reducers = combineReducers<StoreState>({
   token: tokenReducer,
   profile: profileReducer,
   currentClass: classReducer,
-  questions: queReducer,
   classHasErrored,
   classIsLoading,
   classes,

@@ -1,19 +1,11 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {Header, Button, ButtonGroup} from 'react-native-elements';
-import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-import {StoreState} from '../global';
 import {RootStackParamList} from '../navigators/types';
 
 interface Props {
-  questions: {
-    question: string;
-    options: string[];
-    queId: string;
-    selected: number | null;
-  }[];
   navigation: StackNavigationProp<RootStackParamList>;
 }
 
@@ -33,7 +25,45 @@ class Quiz extends React.Component<Props, State> {
 
     this.state = {
       currentIndex: 0,
-      questions: this.props.questions,
+      questions: [
+        {
+          queId: '1',
+          question:
+            'This is question one fasdfasdfasdfasdfasdfasdfasdfasdfasdfasf.',
+          options: ['op1', 'op2', 'op3', 'op4'],
+          selected: null,
+        },
+        {
+          queId: '2',
+          question: 'This is question two.',
+          options: ['tw1', 'tw2', 'tw3', 'tw4'],
+          selected: null,
+        },
+        {
+          queId: '3',
+          question: 'This is question three.',
+          options: ['th1', 'th2', 'th3', 'th4'],
+          selected: null,
+        },
+        {
+          queId: '4',
+          question: 'This is question four.',
+          options: ['fo1', 'fo2', 'fo3', 'fo4'],
+          selected: null,
+        },
+        {
+          queId: '5',
+          question: 'This is question five.',
+          options: ['fi1', 'fi2', 'fi3', 'fi4'],
+          selected: null,
+        },
+        {
+          queId: '6',
+          question: 'This is question six.',
+          options: ['si1', 'si2', 'si3', 'si4'],
+          selected: null,
+        },
+      ],
     };
   }
 
@@ -52,10 +82,9 @@ class Quiz extends React.Component<Props, State> {
       textStyle,
     } = styles;
 
-    const {questions} = this.props;
-    const {currentIndex} = this.state;
+    const {currentIndex, questions} = this.state;
     return (
-      <View>
+      <View style={{flex: 1}}>
         <Header
           centerComponent={{
             text: 'Quiz',
@@ -83,7 +112,7 @@ class Quiz extends React.Component<Props, State> {
           />
         </View>
 
-        <ScrollView style={{padding: 20}}>
+        <ScrollView style={{padding: 15}}>
           <Text style={{fontSize: 18, fontWeight: '500'}}>
             {questions[currentIndex].question}
           </Text>
@@ -93,6 +122,7 @@ class Quiz extends React.Component<Props, State> {
             buttonContainerStyle={buttonContainerStyle}
             buttonStyle={buttonStyle}
             textStyle={textStyle}
+            containerStyle={{marginBottom: 100}}
             vertical
             selectedIndex={this.state.questions[currentIndex].selected}
           />
@@ -122,10 +152,4 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = (state: StoreState) => {
-  return {
-    questions: state.questions,
-  };
-};
-
-export default connect(mapStateToProps)(Quiz);
+export default Quiz;

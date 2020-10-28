@@ -51,7 +51,7 @@ class JoinClass extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selected: 0,
+      selected: 1,
       photo: {
         uri: 'none',
         type: '',

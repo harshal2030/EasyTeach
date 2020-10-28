@@ -66,10 +66,16 @@ const Home = (props: Props): JSX.Element => {
         </>
       );
     }
+
+    return (
+      <Text>
+        Announcements are Under Construction! Thanks for your patience
+      </Text>
+    );
   };
 
   return (
-    <View>
+    <View style={{flex: 1}}>
       <Header
         centerComponent={{
           text: props.currentClass ? props.currentClass!.name : 'Home',

@@ -15,6 +15,7 @@ type BottomTabHomeParamList = {
 type BottomTabTestParamList = {
   TestHome: undefined;
   TestScored: undefined;
+  CreateTest: undefined;
 };
 
 type DrawerParamList = {
