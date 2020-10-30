@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
 import {registerProfile} from './global/actions/profile';
+import {Class} from './global/actions/classes';
 
 import {checkTokenUrl} from './utils/urls';
 
@@ -24,6 +25,8 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 interface Props {
   token: string | null;
+  profile: {name: string; username: string; avatar: string};
+  currentClass: Class | null;
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   registerProfile: typeof registerProfile;
@@ -88,6 +91,14 @@ const App = (props: Props): JSX.Element => {
     );
   }
 
+  let isOwner = false;
+  let CreateTest = null;
+
+  if (props.currentClass) {
+    isOwner = props.profile.username === props.currentClass.owner.username;
+    CreateTest = isOwner ? require('./screens/CreateTest').default : null;
+  }
+
   return (
     <Stack.Navigator headerMode="none">
       {props.token === null ? (
@@ -100,15 +111,18 @@ const App = (props: Props): JSX.Element => {
           <Stack.Screen name="Drawer" component={Drawer} />
           <Stack.Screen name="JoinClass" component={JoinClass} />
           <Stack.Screen name="Quiz" component={Quiz} />
+          {isOwner && <Stack.Screen name="CreateTest" component={CreateTest} />}
         </>
       )}
     </Stack.Navigator>
   );
 };
 
-const mapStateToProps = (state: StoreState): {token: string | null} => {
+const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
+    profile: state.profile,
+    currentClass: state.currentClass,
   };
 };
 

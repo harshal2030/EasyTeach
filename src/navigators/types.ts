@@ -5,6 +5,7 @@ type RootStackParamList = {
   Drawer: undefined;
   JoinClass: undefined;
   Quiz: undefined;
+  CreateTest: undefined;
 };
 
 type BottomTabHomeParamList = {
@@ -15,7 +16,6 @@ type BottomTabHomeParamList = {
 type BottomTabTestParamList = {
   TestHome: undefined;
   TestScored: undefined;
-  CreateTest: undefined;
 };
 
 type DrawerParamList = {
