@@ -4,7 +4,7 @@ import {Header, Button, Text} from 'react-native-elements';
 
 interface Props {
   onBackPress: () => any;
-  onSubmitPress: () => any;
+  onImportPress: () => any;
 }
 
 const ImportExcel = (props: Props) => {
@@ -39,6 +39,7 @@ const ImportExcel = (props: Props) => {
             color: '#fff',
           }}
           containerStyle={{marginTop: 20}}
+          onPress={props.onImportPress}
         />
       </View>
     </View>

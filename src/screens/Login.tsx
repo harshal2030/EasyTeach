@@ -12,7 +12,7 @@ import {registerToken} from '../global/actions/token';
 import {registerProfile} from '../global/actions/profile';
 
 import {commonBlue} from '../styles/colors';
-import {FormStyles} from '../styles/forms';
+import {FormStyles} from '../styles/styles';
 import {RootStackParamList} from '../navigators/types';
 import {loginUrl} from '../utils/urls';
 

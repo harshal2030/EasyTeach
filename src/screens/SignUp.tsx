@@ -15,7 +15,7 @@ import {usernamePattern} from '../utils/regexPatterns';
 import {TextLink} from '../components/common';
 
 import {commonBlue} from '../styles/colors';
-import {FormStyles} from '../styles/forms';
+import {FormStyles} from '../styles/styles';
 
 import {RootStackParamList} from '../navigators/types';
 import {signUpUrl} from '../utils/urls';
