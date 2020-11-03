@@ -1,4 +1,20 @@
 /* eslint-disable no-undef */
+
+interface QuizRes {
+  classId: string;
+  quizId: string;
+  createdAt: Date;
+  releaseScore: boolean;
+  timePeriod: [
+    {value: Date; inclusive: boolean},
+    {value: Date; inclusive: boolean},
+  ];
+  title: string;
+  description: string;
+  randomOp: boolean;
+  randomQue: boolean;
+}
+
 type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
@@ -14,8 +30,8 @@ type BottomTabHomeParamList = {
 };
 
 type BottomTabTestParamList = {
-  TestHome: undefined;
-  TestScored: undefined;
+  TestHome: undefined | QuizRes;
+  TestScored: undefined | QuizRes;
 };
 
 type DrawerParamList = {
@@ -28,4 +44,5 @@ export {
   DrawerParamList,
   BottomTabHomeParamList,
   BottomTabTestParamList,
+  QuizRes,
 };

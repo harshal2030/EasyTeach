@@ -1,8 +1,8 @@
 import React from 'react';
-import {StyleSheet} from 'react-native';
-import {Header, Button} from 'react-native-elements';
+import {StyleSheet, View} from 'react-native';
+import {Header, Button, Text} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {CompositeNavigationProp} from '@react-navigation/native';
+import {CompositeNavigationProp, RouteProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {connect} from 'react-redux';
@@ -16,6 +16,7 @@ import {
   BottomTabTestParamList,
 } from '../navigators/types';
 import {commonBlue, commonGrey} from '../styles/colors';
+import {ContainerStyles} from '../styles/styles';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
@@ -25,10 +26,13 @@ type NavigationProp = CompositeNavigationProp<
   >
 >;
 
+type TestRouteProp = RouteProp<BottomTabTestParamList, 'TestHome'>;
+
 interface Props {
   navigation: NavigationProp;
   profile: {name: string; username: string; avatar: string};
   currentClass: Class | null;
+  route: TestRouteProp;
 }
 
 const Test = (props: Props) => {
@@ -38,27 +42,31 @@ const Test = (props: Props) => {
   }
   return (
     <>
-      <Header
-        centerComponent={{
-          text: 'Test',
-          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-        }}
-        leftComponent={{
-          icon: 'menu',
-          color: '#ffff',
-          size: 26,
-        }}
-      />
+      <View style={ContainerStyles.parent}>
+        <Header
+          centerComponent={{
+            text: 'Test',
+            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+          }}
+          leftComponent={{
+            icon: 'menu',
+            color: '#ffff',
+            size: 26,
+          }}
+        />
 
-      <Button
-        title="Open Quiz"
-        onPress={() => props.navigation.navigate('Quiz')}
-      />
+        <View style={ContainerStyles.padder}>
+          <View>
+            <Text>This is title</Text>
+          </View>
+        </View>
+      </View>
 
       {isOwner && (
         <Button
           icon={<Octicons name="plus" size={26} color={commonBlue} />}
           containerStyle={styles.FABContainer}
+          // eslint-disable-next-line react-native/no-inline-styles
           buttonStyle={{backgroundColor: '#ffff'}}
           onPress={() => props.navigation.navigate('CreateTest')}
         />

@@ -1,23 +1,35 @@
 import React from 'react';
-import {View, ScrollView, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  InteractionManager,
+} from 'react-native';
 import {Header, Input, Text, Button, CheckBox} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import SnackBar from 'react-native-snackbar';
 import Modal from 'react-native-modal';
 import DocumentPicker from 'react-native-document-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-
+import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
+import axios from 'axios';
+import {connect} from 'react-redux';
 import {ImportExcel} from '../components/main';
-import {RootStackParamList} from '../navigators/types';
+import {RootStackParamList, QuizRes} from '../navigators/types';
 import {Chip} from '../components/common';
 
+import {StoreState} from '../global';
+import {Class} from '../global/actions/classes';
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBackground, commonGrey} from '../styles/colors';
+import {quizUrl} from '../utils/urls';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
 
 interface Props {
   navigation: NavigationProp;
+  token: string | null;
+  currentClass: Class | null;
 }
 
 interface State {
@@ -33,10 +45,9 @@ interface State {
   description: string;
   title: string;
   questions: string;
-  startDatePicker: boolean;
-  startTimePicker: boolean;
-  stopDatePicker: boolean;
-  stopTimePicker: boolean;
+  type: 0 | 1;
+  mode: 'date' | 'time';
+  showPicker: boolean;
   timeRange: [Date, Date];
 }
 
@@ -65,9 +76,13 @@ class CreateTest extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const today = new Date();
+    today.setSeconds(0, 0);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setSeconds(0, 0);
 
     this.state = {
-      modalVisible: true,
+      modalVisible: false,
       file: {
         name: '',
         type: '',
@@ -78,14 +93,95 @@ class CreateTest extends React.Component<Props, State> {
       randomQue: false,
       description: '',
       title: '',
-      questions: '',
-      startDatePicker: false,
-      startTimePicker: false,
-      stopDatePicker: false,
-      stopTimePicker: false,
-      timeRange: [today, new Date(today.getDate() + 1)],
+      questions: '1',
+      type: 0,
+      mode: 'date',
+      showPicker: false,
+      timeRange: [today, tomorrow],
     };
   }
+
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() =>
+      this.setState({modalVisible: true}),
+    );
+  }
+
+  quizRequest = () => {
+    const {
+      questions,
+      title,
+      description,
+      timeRange,
+      releaseScore,
+      randomQue,
+      randomOp,
+    } = this.state;
+
+    const start = timeRange[0].getTime(),
+      stop = timeRange[1].getTime();
+
+    const ques = parseInt(questions, 10);
+
+    if (ques <= 0) {
+      return SnackBar.show({
+        text: 'You must at least have one question in test.',
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    if (title.trim().length <= 0) {
+      return SnackBar.show({
+        text: "What's the title?",
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    if (start > stop) {
+      return SnackBar.show({
+        text: 'Invalid time range.',
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    axios
+      .post<QuizRes>(
+        `${quizUrl}/${this.props.currentClass!.id}`,
+        {
+          questions: ques,
+          title,
+          description,
+          timePeriod: timeRange,
+          releaseScore,
+          randomQue,
+          randomOp,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token!}`,
+          },
+        },
+      )
+      .then((res) => {
+        if (res.status === 201) {
+          // @ts-ignore
+          return this.props.navigation.navigate('Drawer', {
+            screen: 'Test',
+            params: {
+              screen: 'TestHome',
+              params: res.data,
+            },
+          });
+        }
+        throw new Error();
+      })
+      .catch(() =>
+        SnackBar.show({
+          text: 'Unable to create Test. Please try again later.',
+          duration: SnackBar.LENGTH_SHORT,
+        }),
+      );
+  };
 
   ImportSheet = async () => {
     try {
@@ -107,6 +203,31 @@ class CreateTest extends React.Component<Props, State> {
     }
   };
 
+  handleDate = (e: Event, dateTime?: Date) => {
+    const {timeRange, mode, type} = this.state;
+    const temp: [Date, Date] = [...timeRange];
+
+    if (!dateTime) {
+      return this.setState({showPicker: false});
+    }
+
+    if (mode === 'date') {
+      temp[type] = dateTime;
+      temp[type].setSeconds(0, 0);
+      this.setState({
+        showPicker: true,
+        timeRange: temp,
+        mode: 'time',
+      });
+    }
+
+    if (mode === 'time') {
+      temp[type].setHours(dateTime.getHours(), dateTime.getMinutes());
+      temp[type].setSeconds(0, 0);
+      this.setState({mode: 'date', timeRange: temp, showPicker: false});
+    }
+  };
+
   render() {
     const {
       questions,
@@ -116,11 +237,10 @@ class CreateTest extends React.Component<Props, State> {
       randomOp,
       randomQue,
       file,
-      startDatePicker,
-      startTimePicker,
-      stopDatePicker,
-      stopTimePicker,
+      showPicker,
       timeRange,
+      type,
+      mode,
     } = this.state;
 
     return (
@@ -138,7 +258,9 @@ class CreateTest extends React.Component<Props, State> {
           }}
         />
 
-        <ScrollView style={ContainerStyles.padder}>
+        <ScrollView
+          style={ContainerStyles.padder}
+          keyboardShouldPersistTaps="handled">
           <Text h4 h4Style={TextStyles.h4Style}>
             Question Sheet
           </Text>
@@ -178,14 +300,30 @@ class CreateTest extends React.Component<Props, State> {
             Time Range
           </Text>
           <View style={styles.timeRangeParent}>
-            <TouchableOpacity style={styles.timeRangeChild}>
-              <Text style={styles.timeRangeText}>27-10-2020 9:30 AM</Text>
+            <TouchableOpacity
+              style={styles.timeRangeChild}
+              onPress={() => this.setState({type: 0, showPicker: true})}>
+              <Text style={styles.timeRangeText}>
+                {timeRange[0].toString()}
+              </Text>
               <Text style={{color: commonGrey}}>Start Accepting Response</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.timeRangeChild}>
-              <Text style={styles.timeRangeText}>28-10-2020 9:30 PM</Text>
+            <TouchableOpacity
+              style={styles.timeRangeChild}
+              onPress={() => this.setState({type: 1, showPicker: true})}>
+              <Text style={styles.timeRangeText}>
+                {timeRange[1].toString()}
+              </Text>
               <Text style={{color: commonGrey}}>Stop Accepting Response</Text>
             </TouchableOpacity>
+
+            {showPicker && (
+              <DateTimePicker
+                value={timeRange[type]}
+                mode={mode}
+                onChange={this.handleDate}
+              />
+            )}
           </View>
 
           <CheckBoxComponent
@@ -209,7 +347,11 @@ class CreateTest extends React.Component<Props, State> {
             desc="Randomize order of options specified in question sheet"
           />
 
-          <Button title="Create Test" containerStyle={styles.buttonStyle} />
+          <Button
+            title="Create Test"
+            containerStyle={styles.buttonStyle}
+            onPress={this.quizRequest}
+          />
         </ScrollView>
 
         <Modal
@@ -263,4 +405,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateTest;
+const mapStateToProps = (state: StoreState) => {
+  return {
+    token: state.token,
+    currentClass: state.currentClass,
+  };
+};
+
+export default connect(mapStateToProps)(CreateTest);
