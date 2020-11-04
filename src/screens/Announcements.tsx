@@ -7,6 +7,8 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 
+import {ContainerStyles} from '../styles/styles';
+
 import {
   RootStackParamList,
   DrawerParamList,
@@ -75,7 +77,7 @@ const Home = (props: Props): JSX.Element => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={ContainerStyles.parent}>
       <Header
         centerComponent={{
           text: props.currentClass ? props.currentClass!.name : 'Home',

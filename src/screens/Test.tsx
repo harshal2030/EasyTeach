@@ -1,12 +1,14 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Header, Button, Text} from 'react-native-elements';
+import {Header, Button} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp, RouteProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {connect} from 'react-redux';
 import Octicons from 'react-native-vector-icons/Octicons';
+
+import {Card} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -41,25 +43,21 @@ const Test = (props: Props) => {
     isOwner = props.profile.username === props.currentClass.owner.username;
   }
   return (
-    <>
-      <View style={ContainerStyles.parent}>
-        <Header
-          centerComponent={{
-            text: 'Test',
-            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-          }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-          }}
-        />
+    <View style={[ContainerStyles.parent, {backgroundColor: '#ffff'}]}>
+      <Header
+        centerComponent={{
+          text: 'Test',
+          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+        }}
+        leftComponent={{
+          icon: 'menu',
+          color: '#ffff',
+          size: 26,
+        }}
+      />
 
-        <View style={ContainerStyles.padder}>
-          <View>
-            <Text>This is title</Text>
-          </View>
-        </View>
+      <View style={ContainerStyles.padder}>
+        <Card />
       </View>
 
       {isOwner && (
@@ -71,15 +69,8 @@ const Test = (props: Props) => {
           onPress={() => props.navigation.navigate('CreateTest')}
         />
       )}
-    </>
+    </View>
   );
-};
-
-const mapStateToProps = (state: StoreState) => {
-  return {
-    profile: state.profile,
-    currentClass: state.currentClass,
-  };
 };
 
 const styles = StyleSheet.create({
@@ -106,5 +97,12 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 });
+
+const mapStateToProps = (state: StoreState) => {
+  return {
+    profile: state.profile,
+    currentClass: state.currentClass,
+  };
+};
 
 export default connect(mapStateToProps)(Test);

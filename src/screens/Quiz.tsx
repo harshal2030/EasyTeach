@@ -4,6 +4,7 @@ import {Header, Button, ButtonGroup} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 
 import {RootStackParamList} from '../navigators/types';
+import {ContainerStyles} from '../styles/styles';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -84,7 +85,7 @@ class Quiz extends React.Component<Props, State> {
 
     const {currentIndex, questions} = this.state;
     return (
-      <View style={{flex: 1}}>
+      <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
             text: 'Quiz',
@@ -112,7 +113,7 @@ class Quiz extends React.Component<Props, State> {
           />
         </View>
 
-        <ScrollView style={{padding: 15}}>
+        <ScrollView style={ContainerStyles.padder}>
           <Text style={{fontSize: 18, fontWeight: '500'}}>
             {questions[currentIndex].question}
           </Text>
