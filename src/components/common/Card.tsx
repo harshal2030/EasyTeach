@@ -1,20 +1,26 @@
 import React from 'react';
-import {View, StyleSheet, TouchableHighlight} from 'react-native';
+import {View, StyleSheet, TouchableHighlight, ViewStyle} from 'react-native';
 import {Text} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 
-const Card = () => {
+type Props = {
+  title: string;
+  onPress?(): any;
+  containerStyle?: ViewStyle;
+};
+
+const Card = (props: Props) => {
   return (
     <TouchableHighlight
-      style={styles.main}
-      onPress={() => console.log('touchable')}
+      style={[styles.main, props.containerStyle]}
+      onPress={props.onPress}
       underlayColor={greyWithAlpha(0.4)}>
       <View>
         <View style={styles.iconTextContainer}>
           <MaterialIcons name="assignment" size={26} />
           <Text style={styles.titleStyle} numberOfLines={1}>
-            This is title
+            {props.title}
           </Text>
         </View>
 
@@ -33,6 +39,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     backgroundColor: commonBackground,
+    marginVertical: 5,
   },
   iconTextContainer: {
     alignItems: 'center',
