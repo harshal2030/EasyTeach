@@ -92,6 +92,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
+      console.log(e);
       Alert.alert('Error', 'Unable to logout please try again later');
     }
   };
@@ -226,7 +227,9 @@ const DrawerContent = (props: Props): JSX.Element => {
             )}
 
             {isOwner && (
-              <TouchableOpacity style={optionContainer}>
+              <TouchableOpacity
+                style={optionContainer}
+                onPress={() => props.navigation.navigate('Manage')}>
                 <FontAwesome name="sliders" color="#34495e" size={23} />
                 <Text style={optionText}> Manage</Text>
               </TouchableOpacity>

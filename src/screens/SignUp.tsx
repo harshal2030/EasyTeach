@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
+import {removeCurrentClass} from '../global/actions/classes';
 import {registerProfile} from '../global/actions/profile';
 import {usernamePattern} from '../utils/regexPatterns';
 
@@ -27,6 +28,7 @@ type Props = {
   registerToken: typeof registerToken;
   token: string;
   registerProfile: typeof registerProfile;
+  removeCurrentClass: typeof removeCurrentClass;
 };
 
 interface State {
@@ -56,6 +58,10 @@ class SignUp extends React.Component<Props, State> {
       mailErr: '',
       passErr: '',
     };
+  }
+
+  componentDidMount() {
+    this.props.removeCurrentClass();
   }
 
   storeToken = async (token: string): Promise<void> => {
@@ -216,6 +222,8 @@ const mapStateToProps = (state: StoreState): {token: string} => {
   };
 };
 
-export default connect(mapStateToProps, {registerToken, registerProfile})(
-  SignUp,
-);
+export default connect(mapStateToProps, {
+  registerToken,
+  registerProfile,
+  removeCurrentClass,
+})(SignUp);

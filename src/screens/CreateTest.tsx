@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   InteractionManager,
 } from 'react-native';
-import {Header, Input, Text, Button, CheckBox} from 'react-native-elements';
+import {Header, Input, Text, Button} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import SnackBar from 'react-native-snackbar';
 import Modal from 'react-native-modal';
@@ -14,15 +14,17 @@ import DocumentPicker from 'react-native-document-picker';
 import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import {connect} from 'react-redux';
+
 import {ImportExcel} from '../components/main';
-import {RootStackParamList, QuizRes} from '../navigators/types';
-import {Chip} from '../components/common';
+import {RootStackParamList} from '../navigators/types';
+import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
 import {TextStyles, ContainerStyles} from '../styles/styles';
-import {commonBackground, commonGrey} from '../styles/colors';
+import {commonGrey} from '../styles/colors';
 import {quizUrl} from '../utils/urls';
+import {QuizRes} from '../utils/API';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
 
@@ -50,27 +52,6 @@ interface State {
   showPicker: boolean;
   timeRange: [Date, Date];
 }
-
-const CheckBoxComponent = (props: {
-  checked: boolean;
-  title: string;
-  desc?: string;
-  onPress(): any;
-}) => {
-  return (
-    <>
-      <CheckBox
-        checked={props.checked}
-        title={props.title}
-        textStyle={styles.checkBoxText}
-        onPress={props.onPress}
-        iconRight
-        containerStyle={styles.checkBoxContainer}
-      />
-      <Text style={styles.checkBoxDesc}>{props.desc}</Text>
-    </>
-  );
-};
 
 class CreateTest extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -326,21 +307,21 @@ class CreateTest extends React.Component<Props, State> {
             )}
           </View>
 
-          <CheckBoxComponent
+          <CheckBox
             checked={releaseScore}
             onPress={() => this.setState({releaseScore: !releaseScore})}
             title="Show Score"
             desc="You can change it later, used to show score after test completion"
           />
 
-          <CheckBoxComponent
+          <CheckBox
             checked={randomQue}
             title="Randomize Question"
             onPress={() => this.setState({randomQue: !randomQue})}
             desc="Randomize questions order, it will select questions randomly if specified No. of Question is less than that of Question Sheet"
           />
 
-          <CheckBoxComponent
+          <CheckBox
             checked={randomOp}
             title="Randomize Options"
             onPress={() => this.setState({randomOp: !randomOp})}
@@ -388,20 +369,6 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     marginVertical: 30,
-  },
-  checkBoxText: {
-    ...TextStyles.h4Style,
-    marginLeft: 0,
-  },
-  checkBoxContainer: {
-    backgroundColor: commonBackground,
-    padding: 0,
-    marginLeft: 0,
-  },
-  checkBoxDesc: {
-    color: commonGrey,
-    marginLeft: 5,
-    fontSize: 12,
   },
 });
 

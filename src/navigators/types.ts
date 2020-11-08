@@ -23,6 +23,7 @@ type BottomTabTestParamList = {
 type DrawerParamList = {
   Home: undefined;
   Test: undefined;
+  Manage: undefined;
 };
 
 export {

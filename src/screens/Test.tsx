@@ -54,6 +54,7 @@ interface State {
 
 class Test extends React.Component<Props, State> {
   isOwner: boolean = false;
+  subscribe: (() => void) | undefined;
   constructor(props: Props) {
     super(props);
 
@@ -76,6 +77,15 @@ class Test extends React.Component<Props, State> {
     if (this.props.currentClass) {
       this.fetchData();
     }
+
+    this.subscribe = this.props.navigation.addListener(
+      'focus',
+      this.updateDataOnFocus,
+    );
+  }
+
+  componentWillUnmount() {
+    this.subscribe!();
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -85,6 +95,19 @@ class Test extends React.Component<Props, State> {
         this.props.currentClass?.owner.username === this.props.profile.username;
     }
   }
+
+  updateDataOnFocus = () => {
+    if (this.props.route.params) {
+      const data: QuizData = [...this.state.quizzes];
+      const testExists = data[0].data.findIndex(
+        (val) => val.quizId === this.props.route.params!.quizId,
+      );
+      if (testExists === -1) {
+        data[0].data = [this.props.route.params, ...data[0].data];
+        this.setState({quizzes: data});
+      }
+    }
+  };
 
   fetchData = () => {
     axios
@@ -107,7 +130,13 @@ class Test extends React.Component<Props, State> {
   };
 
   renderItem = ({item}: {item: QuizRes}) => {
-    return <Card title={item.title} containerStyle={{margin: 10}} />;
+    return (
+      <Card
+        title={item.title}
+        containerStyle={{margin: 10}}
+        expiredOn={new Date(item.timePeriod[1].value)}
+      />
+    );
   };
 
   renderContent = () => {
@@ -133,13 +162,14 @@ class Test extends React.Component<Props, State> {
     return (
       <SectionList
         sections={quizzes}
+        style={{width: '100%'}}
         stickySectionHeadersEnabled
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.renderItem}
         renderSectionHeader={({section: {title}}) => (
           <Text style={styles.sectionHeader}>{title}</Text>
         )}
-        ListFooterComponent={<View style={{marginVertical: 54}} />}
+        ListFooterComponent={<View style={{marginVertical: 15}} />}
       />
     );
   };
@@ -159,7 +189,9 @@ class Test extends React.Component<Props, State> {
           }}
         />
 
-        <View>{this.renderContent()}</View>
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          {this.renderContent()}
+        </View>
 
         {this.isOwner && (
           <Button

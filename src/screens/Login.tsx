@@ -9,6 +9,7 @@ import axios from 'axios';
 import {TextLink} from '../components/common';
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
+import {removeCurrentClass} from '../global/actions/classes';
 import {registerProfile} from '../global/actions/profile';
 
 import {commonBlue} from '../styles/colors';
@@ -23,6 +24,7 @@ type Props = {
   token: string | null;
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
+  removeCurrentClass: typeof removeCurrentClass;
 };
 
 type State = {
@@ -40,6 +42,10 @@ class Login extends React.Component<Props, State> {
       password: '',
       loading: false,
     };
+  }
+
+  componentDidMount() {
+    this.props.removeCurrentClass();
   }
 
   storeToken = async (token: string): Promise<void> => {
@@ -136,6 +142,8 @@ const mapStateToProps = (state: StoreState): {token: string | null} => {
   };
 };
 
-export default connect(mapStateToProps, {registerToken, registerProfile})(
-  Login,
-);
+export default connect(mapStateToProps, {
+  registerToken,
+  registerProfile,
+  removeCurrentClass,
+})(Login);

@@ -4,23 +4,23 @@ import {
   StyleSheet,
   Text,
   KeyboardAvoidingView,
-  ScrollView,
-  ImageBackground,
-  TouchableOpacity,
   Platform,
   Alert,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import {ImageOrVideo} from 'react-native-image-crop-picker';
 import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import ImagePicker from 'react-native-image-crop-picker';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '../navigators/types';
 import SnackBar from 'react-native-snackbar';
 
-import {greyWithAlpha} from '../styles/colors';
+import {PhotoPicker} from '../components/common';
+
+import {CommonSetting} from '../components/main';
 import {classUrl} from '../utils/urls';
 
 import {Class, addClass} from '../global/actions/classes';
@@ -65,54 +65,6 @@ class JoinClass extends React.Component<Props, State> {
   }
 
   private sheet: RBSheet | null = null;
-
-  private openPicker = () => {
-    ImagePicker.openPicker({
-      width: 200,
-      height: 200,
-      cropping: true,
-    })
-      .then((image) => {
-        this.sheet!.close();
-        this.setState({
-          photo: {
-            uri: image.path,
-            type: image.mime,
-          },
-        });
-      })
-      .catch(() => {
-        SnackBar.show({
-          text: 'Unable to pick Image.',
-          duration: SnackBar.LENGTH_SHORT,
-        });
-        this.sheet!.close();
-      });
-  };
-
-  private openCamera = () => {
-    ImagePicker.openCamera({
-      width: 200,
-      height: 200,
-      cropping: true,
-    })
-      .then((image) => {
-        this.sheet!.close();
-        this.setState({
-          photo: {
-            uri: image.path,
-            type: image.mime,
-          },
-        });
-      })
-      .catch(() => {
-        SnackBar.show({
-          text: 'Unable to pick image',
-          duration: SnackBar.LENGTH_SHORT,
-        });
-        this.sheet!.close();
-      });
-  };
 
   private joinClassRequest = () => {
     this.setState({loading: true});
@@ -220,25 +172,15 @@ class JoinClass extends React.Component<Props, State> {
   }
 
   private createClass() {
-    const {className, about, subject, loading} = this.state;
-    const {createClassContainer, classImage, imageOverlay} = styles;
+    const {className, about, subject, loading, photo} = this.state;
     return (
-      <ScrollView
-        style={createClassContainer}
-        keyboardShouldPersistTaps="handled">
-        <View>
-          <ImageBackground
-            style={classImage}
-            source={{uri: this.state.photo.uri}}>
-            <TouchableOpacity
-              style={imageOverlay}
-              onPress={() => this.sheet!.open()}>
-              <MaterialIcons name="camera-alt" color="#000" size={28} />
-            </TouchableOpacity>
-          </ImageBackground>
-        </View>
-
-        <View>
+      <ScrollView>
+        <CommonSetting
+          buttonLoading={loading}
+          onButtonPress={this.createClassRequest}
+          buttonProps={{title: 'Create Class'}}
+          imageSource={{uri: photo.uri}}
+          onImagePress={() => this.sheet!.open()}>
           <Input
             label="Class Name"
             value={className}
@@ -256,19 +198,31 @@ class JoinClass extends React.Component<Props, State> {
             value={subject}
             onChangeText={(text) => this.setState({subject: text})}
           />
-
-          <Button
-            title="Create Class"
-            loading={loading}
-            onPress={this.createClassRequest}
-          />
-        </View>
+        </CommonSetting>
       </ScrollView>
     );
   }
 
+  private onImage = (image: ImageOrVideo) => {
+    this.sheet!.close();
+    this.setState({
+      photo: {
+        uri: image.path,
+        type: image.mime,
+      },
+    });
+  };
+
+  private onImageError = () => {
+    SnackBar.show({
+      text: 'Unable to pick image',
+      duration: SnackBar.LENGTH_SHORT,
+    });
+    this.sheet!.close();
+  };
+
   render() {
-    const {mainContainer, RBContainer, RBOptionContainer, RBTextStyle} = styles;
+    const {mainContainer, RBContainer} = styles;
     const {loading} = this.state;
 
     return (
@@ -298,34 +252,13 @@ class JoinClass extends React.Component<Props, State> {
 
         {this.state.selected === 0 ? this.joinClass() : this.createClass()}
 
-        <RBSheet
-          height={150}
-          ref={(ref) => (this.sheet = ref)}
-          closeOnPressMask
-          closeOnDragDown
-          customStyles={{
-            container: {
-              borderTopWidth: 1,
-              borderTopLeftRadius: 10,
-              borderTopRightRadius: 10,
-              borderColor: 'transparent',
-            },
-          }}>
-          <View>
-            <TouchableOpacity
-              style={RBOptionContainer}
-              onPress={this.openPicker}>
-              <MaterialIcons name="image" color="#000" size={24} />
-              <Text style={RBTextStyle}>Pick from Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={RBOptionContainer}
-              onPress={this.openCamera}>
-              <MaterialIcons name="camera" color="#000" size={24} />
-              <Text style={RBTextStyle}>Shoot from Camera</Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
+        <PhotoPicker
+          sheetRef={(ref) => (this.sheet = ref)}
+          onCameraImage={this.onImage}
+          onPickerImage={this.onImage}
+          onCameraError={this.onImageError}
+          onPickerError={this.onImageError}
+        />
       </View>
     );
   }
@@ -351,38 +284,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     marginBottom: 20,
-  },
-  createClassContainer: {
-    marginTop: 30,
-    padding: 10,
-  },
-  classImage: {
-    height: 100,
-    width: 100,
-    borderWidth: 1,
-    borderRadius: 50,
-    borderColor: 'transparent',
-    overflow: 'hidden',
-    alignSelf: 'center',
-  },
-  imageOverlay: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: 50,
-    borderColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: greyWithAlpha(0.3),
-  },
-  RBOptionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  RBTextStyle: {
-    fontSize: 20,
-    fontWeight: '400',
   },
 });
 

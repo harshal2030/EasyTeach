@@ -11,6 +11,7 @@ enum ActionTypes {
   classesFetchSuccess = 'classes_fetched_success',
   addClass = 'add_class',
   classOwner = 'class_owner',
+  updateClass = 'update_class',
 }
 
 interface Class {
@@ -26,6 +27,7 @@ interface Class {
   photo: string;
   collaborators: string[];
   joinCode: string;
+  lockJoin: boolean;
 }
 
 // return action types of each action
@@ -56,6 +58,11 @@ interface classFetchedAction {
 
 interface addedClassAction {
   type: ActionTypes.addClass;
+  payload: Class;
+}
+
+interface updatedClassAction {
+  type: ActionTypes.updateClass;
   payload: Class;
 }
 
@@ -124,6 +131,13 @@ const removeCurrentClass = (): removeClassAction => {
   };
 };
 
+const updateClasses = (classToUpdate: Class): updatedClassAction => {
+  return {
+    type: ActionTypes.updateClass,
+    payload: classToUpdate,
+  };
+};
+
 export {
   Class,
   registerClassAction,
@@ -137,4 +151,6 @@ export {
   classLoadingAction,
   classFetchedAction,
   addedClassAction,
+  updateClasses,
+  updatedClassAction,
 };

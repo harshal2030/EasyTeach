@@ -7,6 +7,7 @@ import {
   classFetchedAction,
   addedClassAction,
   removeClassAction,
+  updatedClassAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -32,13 +33,22 @@ const classIsLoading = (state: boolean = true, action: classLoadingAction) => {
 
 const classes = (
   state: Class[] = [],
-  action: classFetchedAction | addedClassAction,
+  action: classFetchedAction | addedClassAction | updatedClassAction,
 ) => {
   switch (action.type) {
     case ActionTypes.classesFetchSuccess:
       return action.payload;
     case ActionTypes.addClass:
       return [...state, action.payload];
+    case ActionTypes.updateClass:
+      const temp = [...state];
+      const classToUpdate = temp.findIndex(
+        (cls) => cls.id === action.payload.id,
+      );
+      if (classToUpdate !== -1) {
+        temp[classToUpdate] = action.payload;
+      }
+      return temp;
     default:
       return state;
   }

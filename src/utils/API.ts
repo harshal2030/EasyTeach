@@ -5,8 +5,8 @@ interface QuizRes {
   createdAt: Date;
   releaseScore: boolean;
   timePeriod: [
-    {value: Date; inclusive: boolean},
-    {value: Date; inclusive: boolean},
+    {value: string; inclusive: boolean},
+    {value: string; inclusive: boolean},
   ];
   title: string;
   description: string;

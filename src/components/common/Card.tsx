@@ -3,11 +3,13 @@ import {View, StyleSheet, TouchableHighlight, ViewStyle} from 'react-native';
 import {Text} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
+import {formatDate} from '../../utils/functions';
 
 type Props = {
   title: string;
   onPress?(): any;
   containerStyle?: ViewStyle;
+  expiredOn: Date;
 };
 
 const Card = (props: Props) => {
@@ -25,7 +27,7 @@ const Card = (props: Props) => {
         </View>
 
         <Text style={styles.timeText} numberOfLines={1}>
-          Expires On: 11-11-2020 4:10:00 AM
+          Expires On: {formatDate(props.expiredOn)}
         </Text>
       </View>
     </TouchableHighlight>
