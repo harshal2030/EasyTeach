@@ -115,6 +115,7 @@ class ManageClass extends React.Component<Props, State> {
       text: 'Unable to pick image.',
       duration: SnackBar.LENGTH_SHORT,
     });
+    this.sheet!.close();
   };
 
   updateClass = () => {

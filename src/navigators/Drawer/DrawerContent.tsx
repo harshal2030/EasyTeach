@@ -166,6 +166,10 @@ const DrawerContent = (props: Props): JSX.Element => {
             icon={<Ionicons name="settings" size={36} color={commonGrey} />}
             type="clear"
             TouchableComponent={TouchableOpacity}
+            onPress={() => {
+              props.navigation.closeDrawer();
+              props.navigation.navigate('Settings');
+            }}
           />
 
           <Button

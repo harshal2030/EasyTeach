@@ -42,7 +42,7 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       // @ts-ignore
       drawerContent={(pprops) => <DrawerContent {...pprops} />}>
       <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Test" component={TestTabs} />
+      {props.currentClass && <Drawer.Screen name="Test" component={TestTabs} />}
       {isOwner && <Drawer.Screen name="Manage" component={ManageClass} />}
     </Drawer.Navigator>
   );

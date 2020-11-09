@@ -72,12 +72,15 @@ const People = (props: Props) => {
             Authorization: `Bearer ${props.token}`,
           },
         })
-        .then(() =>
+        .then(() => {
           SnackBar.show({
             text: `${name} removed successfully from the class`,
             duration: SnackBar.LENGTH_SHORT,
-          }),
-        )
+          });
+
+          const newPeople = people.filter((ppl) => ppl.username !== username);
+          setPeople(newPeople);
+        })
         .catch(() =>
           SnackBar.show({
             text: `Unable to remove ${name} at the moment`,

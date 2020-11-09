@@ -8,6 +8,7 @@ type RootStackParamList = {
   JoinClass: undefined;
   Quiz: undefined;
   CreateTest: undefined;
+  Settings: undefined;
 };
 
 type BottomTabHomeParamList = {
