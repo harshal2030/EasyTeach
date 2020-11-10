@@ -8,7 +8,7 @@ type Props = {
   avatar: string;
   name: string;
   username: string;
-  rightComponent?: JSX.Element;
+  rightComponent?: JSX.Element | null;
 };
 
 const HeadCom = (props: Props) => {

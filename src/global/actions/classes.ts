@@ -12,6 +12,7 @@ enum ActionTypes {
   addClass = 'add_class',
   classOwner = 'class_owner',
   updateClass = 'update_class',
+  removeClass = 'remove_class',
 }
 
 interface Class {
@@ -36,7 +37,7 @@ interface registerClassAction {
   payload: Class;
 }
 
-interface removeClassAction {
+interface removeCurrentClassAction {
   type: ActionTypes.removeCurrentClass;
   payload: null;
 }
@@ -64,6 +65,11 @@ interface addedClassAction {
 interface updatedClassAction {
   type: ActionTypes.updateClass;
   payload: Class;
+}
+
+interface removeClassAction {
+  type: ActionTypes.removeClass;
+  payload: string;
 }
 
 // for getting list of classes enrolled by user or owned
@@ -124,7 +130,7 @@ const registerCurrentClass = (currentClass: Class): registerClassAction => {
   };
 };
 
-const removeCurrentClass = (): removeClassAction => {
+const removeCurrentClass = (): removeCurrentClassAction => {
   return {
     type: ActionTypes.removeCurrentClass,
     payload: null,
@@ -138,12 +144,21 @@ const updateClasses = (classToUpdate: Class): updatedClassAction => {
   };
 };
 
+const removeClass = (classToRemoveId: string): removeClassAction => {
+  return {
+    type: ActionTypes.removeClass,
+    payload: classToRemoveId,
+  };
+};
+
 export {
   Class,
   registerClassAction,
   removeClassAction,
   removeCurrentClass,
   registerCurrentClass,
+  removeClass,
+  removeCurrentClassAction,
   ActionTypes,
   fetchClasses,
   addClass,

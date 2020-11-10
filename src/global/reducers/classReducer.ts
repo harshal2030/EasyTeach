@@ -6,8 +6,9 @@ import {
   classLoadingAction,
   classFetchedAction,
   addedClassAction,
-  removeClassAction,
+  removeCurrentClassAction,
   updatedClassAction,
+  removeClassAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -31,10 +32,13 @@ const classIsLoading = (state: boolean = true, action: classLoadingAction) => {
   }
 };
 
-const classes = (
-  state: Class[] = [],
-  action: classFetchedAction | addedClassAction | updatedClassAction,
-) => {
+type ClassesAction =
+  | classFetchedAction
+  | addedClassAction
+  | updatedClassAction
+  | removeClassAction;
+
+const classes = (state: Class[] = [], action: ClassesAction) => {
   switch (action.type) {
     case ActionTypes.classesFetchSuccess:
       return action.payload;
@@ -49,6 +53,8 @@ const classes = (
         temp[classToUpdate] = action.payload;
       }
       return temp;
+    case ActionTypes.removeClass:
+      return state.filter((cls) => cls.id !== action.payload);
     default:
       return state;
   }
@@ -56,7 +62,7 @@ const classes = (
 
 const classReducer = (
   state: Class | null = null,
-  action: registerClassAction | removeClassAction,
+  action: registerClassAction | removeCurrentClassAction,
 ) => {
   switch (action.type) {
     case ActionTypes.registerCurrentClass:

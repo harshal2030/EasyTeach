@@ -99,7 +99,11 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <TouchableOpacity onPress={() => props.registerCurrentClass(item)}>
+      <TouchableOpacity
+        onPress={() => {
+          props.navigation.closeDrawer();
+          props.registerCurrentClass(item);
+        }}>
         <Image
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,

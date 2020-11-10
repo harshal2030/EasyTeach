@@ -29,8 +29,7 @@ class Quiz extends React.Component<Props, State> {
       questions: [
         {
           queId: '1',
-          question:
-            'This is question one fasdfasdfasdfasdfasdfasdfasdfasdfasdfasf.',
+          question: 'This is question one.',
           options: ['op1', 'op2', 'op3', 'op4'],
           selected: null,
         },
