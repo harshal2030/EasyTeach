@@ -9,10 +9,14 @@ import SnackBar from 'react-native-snackbar';
 import {HeadCom} from '../components/common';
 
 import {StoreState} from '../global';
-import {Class, removeClass} from '../global/actions/classes';
+import {
+  Class,
+  removeClass,
+  registerCurrentClass,
+} from '../global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
-import {classUrl, mediaUrl, studentUrl} from '../utils/urls';
+import {mediaUrl, studentUrl} from '../utils/urls';
 import {ContainerStyles} from '../styles/styles';
 import {flatRed, commonBlue} from '../styles/colors';
 
@@ -29,6 +33,7 @@ type Props = {
   classHasErrored: boolean;
   currentClass: Class | null;
   removeClass: typeof removeClass;
+  registerCurrentClass: typeof registerCurrentClass;
 };
 
 class Settings extends React.PureComponent<Props> {
@@ -59,48 +64,14 @@ class Settings extends React.PureComponent<Props> {
       });
   };
 
-  deleteClass = (classId: string, className: string) => {
-    axios
-      .delete(`${classUrl}/${classId}`, {
-        headers: {
-          Authorization: `Bearer ${this.props.token}`,
-        },
-      })
-      .then(() => {
-        this.props.removeClass(classId);
-        SnackBar.show({
-          text: `${className} has been deleted`,
-          duration: SnackBar.LENGTH_SHORT,
-        });
-      })
-      .catch((e) => {
-        console.log(e);
-        SnackBar.show({
-          text: "Can't delete class. Please try again later",
-          duration: SnackBar.LENGTH_SHORT,
-          backgroundColor: flatRed,
-          textColor: '#ffff',
-        });
-      });
-  };
-
-  confirmUnenroll = (classId: string, className: string, isOwner: boolean) => {
-    const message = isOwner
-      ? `Are you sure to delete ${className}`
-      : `Are you sure to Unenroll from ${className}`;
-    Alert.alert('Confirm', message, [
+  confirmUnenroll = (classId: string, className: string) => {
+    Alert.alert('Confirm', `Are you sure to Unenroll from ${className}`, [
       {
         text: 'Cancel',
       },
       {
         text: 'Yes',
-        onPress: () => {
-          if (isOwner) {
-            this.deleteClass(classId, className);
-          } else {
-            this.unEnrollClass(classId, className);
-          }
-        },
+        onPress: () => this.unEnrollClass(classId, className),
       },
     ]);
   };
@@ -124,7 +95,17 @@ class Settings extends React.PureComponent<Props> {
         <Button
           title={isOwner ? 'Manage' : 'Unenroll'}
           type="outline"
-          onPress={() => this.confirmUnenroll(item.id, item.name, isOwner)}
+          onPress={() => {
+            if (isOwner) {
+              // @ts-ignore
+              this.props.navigation.navigate('Drawer', {
+                screen: 'Manage',
+              });
+              this.props.registerCurrentClass(item);
+            } else {
+              this.confirmUnenroll(item.id, item.name);
+            }
+          }}
           buttonStyle={{borderColor: isOwner ? commonBlue : flatRed}}
           titleStyle={{color: isOwner ? commonBlue : flatRed}}
         />
@@ -211,4 +192,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {removeClass})(Settings);
+export default connect(mapStateToProps, {removeClass, registerCurrentClass})(
+  Settings,
+);
