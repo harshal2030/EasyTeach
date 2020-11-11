@@ -10,6 +10,7 @@ import {Class} from '../../global/actions/classes';
 
 import Home from '../bottom-tabs/Home';
 import TestTabs from '../bottom-tabs/TestTabs';
+import Settings from '../../screens/Settings';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -44,6 +45,7 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       <Drawer.Screen name="Home" component={Home} />
       {props.currentClass && <Drawer.Screen name="Test" component={TestTabs} />}
       {isOwner && <Drawer.Screen name="Manage" component={ManageClass} />}
+      <Drawer.Screen name="Settings" component={Settings} />
     </Drawer.Navigator>
   );
 };

@@ -7,8 +7,14 @@ type RootStackParamList = {
   Drawer: undefined;
   JoinClass: undefined;
   Quiz: undefined;
-  CreateTest: undefined;
-  Settings: undefined;
+  CreateTest: {
+    file?: {
+      name: string;
+      uri: string;
+      type: string;
+    };
+    quizId?: string;
+  };
 };
 
 type BottomTabHomeParamList = {
@@ -25,6 +31,7 @@ type DrawerParamList = {
   Home: undefined;
   Test: undefined;
   Manage: undefined;
+  Settings: undefined;
 };
 
 export {

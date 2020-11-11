@@ -4,43 +4,37 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  InteractionManager,
+  ActivityIndicator,
 } from 'react-native';
-import {Header, Input, Text, Button} from 'react-native-elements';
+import {Header, Input, Text, Button, Icon} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
 import SnackBar from 'react-native-snackbar';
-import Modal from 'react-native-modal';
-import DocumentPicker from 'react-native-document-picker';
 import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import {connect} from 'react-redux';
 
-import {ImportExcel} from '../components/main';
 import {RootStackParamList} from '../navigators/types';
 import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
 import {TextStyles, ContainerStyles} from '../styles/styles';
-import {commonGrey} from '../styles/colors';
+import {commonBlue, commonGrey} from '../styles/colors';
 import {quizUrl} from '../utils/urls';
 import {QuizRes} from '../utils/API';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
+type RouteProps = RouteProp<RootStackParamList, 'CreateTest'>;
 
 interface Props {
   navigation: NavigationProp;
   token: string | null;
   currentClass: Class | null;
+  route: RouteProps;
 }
 
 interface State {
-  modalVisible: boolean;
-  file: {
-    name: string;
-    type: string;
-    uri: string;
-  };
   releaseScore: boolean;
   randomQue: boolean;
   randomOp: boolean;
@@ -51,6 +45,8 @@ interface State {
   mode: 'date' | 'time';
   showPicker: boolean;
   timeRange: [Date, Date];
+  loading: boolean;
+  errored: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -63,12 +59,6 @@ class CreateTest extends React.Component<Props, State> {
     tomorrow.setSeconds(0, 0);
 
     this.state = {
-      modalVisible: false,
-      file: {
-        name: '',
-        type: '',
-        uri: '',
-      },
       releaseScore: true,
       randomOp: false,
       randomQue: false,
@@ -79,14 +69,54 @@ class CreateTest extends React.Component<Props, State> {
       mode: 'date',
       showPicker: false,
       timeRange: [today, tomorrow],
+      loading: false,
+      errored: false,
     };
   }
 
   componentDidMount() {
-    InteractionManager.runAfterInteractions(() =>
-      this.setState({modalVisible: true}),
-    );
+    this.getQuizDetail();
   }
+
+  getQuizDetail = () => {
+    const {quizId} = this.props.route.params;
+    if (quizId) {
+      this.setState({loading: true});
+      axios
+        .get<QuizRes>(`${quizUrl}/${this.props.currentClass!.id}/${quizId}`, {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        })
+        .then((res) => {
+          const {
+            title,
+            description,
+            releaseScore,
+            randomOp,
+            randomQue,
+            questions,
+            timePeriod,
+          } = res.data;
+          this.setState({
+            title,
+            description,
+            releaseScore,
+            randomOp,
+            randomQue,
+            questions: questions.toString(),
+            timeRange: [
+              new Date(timePeriod[0].value),
+              new Date(timePeriod[1].value),
+            ],
+            loading: false,
+          });
+        })
+        .catch(() => {
+          this.setState({errored: true, loading: false});
+        });
+    }
+  };
 
   quizRequest = () => {
     const {
@@ -164,26 +194,6 @@ class CreateTest extends React.Component<Props, State> {
       );
   };
 
-  ImportSheet = async () => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-      });
-
-      this.setState({
-        file: {name: res.name, type: res.type, uri: res.uri},
-        modalVisible: false,
-      });
-    } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
-        SnackBar.show({
-          text: 'Unable to get the sheet.',
-          duration: SnackBar.LENGTH_SHORT,
-        });
-      }
-    }
-  };
-
   handleDate = (e: Event, dateTime?: Date) => {
     const {timeRange, mode, type} = this.state;
     const temp: [Date, Date] = [...timeRange];
@@ -217,12 +227,32 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomOp,
       randomQue,
-      file,
       showPicker,
       timeRange,
       type,
       mode,
+      loading,
+      errored,
     } = this.state;
+
+    if (errored) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text>
+            We're having trouble in fetching content for you. Please try again
+            later.
+          </Text>
+        </View>
+      );
+    }
+
+    if (loading) {
+      return (
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" animating color={commonBlue} />
+        </View>
+      );
+    }
 
     return (
       <View style={ContainerStyles.parent}>
@@ -235,25 +265,26 @@ class CreateTest extends React.Component<Props, State> {
             icon: 'arrow-back',
             color: '#ffff',
             size: 26,
-            onPress: () => this.setState({modalVisible: true}),
+            onPress: () => this.props.navigation.goBack(),
           }}
         />
 
         <ScrollView
           style={ContainerStyles.padder}
           keyboardShouldPersistTaps="handled">
-          <Text h4 h4Style={TextStyles.h4Style}>
-            Question Sheet
-          </Text>
-          <Chip
-            text={file.name}
-            onCrossPress={() =>
-              this.setState({
-                file: {name: '', type: '', uri: ''},
-                modalVisible: true,
-              })
-            }
-          />
+          {!this.props.route.params.quizId && (
+            <>
+              <Text h4 h4Style={TextStyles.h4Style}>
+                Question Sheet
+              </Text>
+              <Chip
+                text={this.props.route.params.file!.name}
+                rightIcon={
+                  <Icon name="microsoft-excel" type="material-community" />
+                }
+              />
+            </>
+          )}
 
           <Input
             label="No. of questions"
@@ -334,19 +365,6 @@ class CreateTest extends React.Component<Props, State> {
             onPress={this.quizRequest}
           />
         </ScrollView>
-
-        <Modal
-          isVisible={this.state.modalVisible}
-          animationIn="slideInLeft"
-          animationOut="slideOutLeft"
-          onBackButtonPress={() => this.props.navigation.goBack()}
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{margin: 0}}>
-          <ImportExcel
-            onBackPress={() => this.props.navigation.goBack()}
-            onImportPress={this.ImportSheet}
-          />
-        </Modal>
       </View>
     );
   }

@@ -9,7 +9,8 @@ type Props = {
   title: string;
   onPress?(): any;
   containerStyle?: ViewStyle;
-  expiredOn: Date;
+  expiresOn: Date;
+  rightComponent?: JSX.Element | null;
 };
 
 const Card = (props: Props) => {
@@ -18,17 +19,21 @@ const Card = (props: Props) => {
       style={[styles.main, props.containerStyle]}
       onPress={props.onPress}
       underlayColor={greyWithAlpha(0.4)}>
-      <View>
-        <View style={styles.iconTextContainer}>
-          <MaterialIcons name="assignment" size={26} />
-          <Text style={styles.titleStyle} numberOfLines={1}>
-            {props.title}
+      <View style={styles.contentContainer}>
+        <View>
+          <View style={styles.iconTextContainer}>
+            <MaterialIcons name="assignment" size={26} />
+            <Text style={styles.titleStyle} numberOfLines={1}>
+              {props.title}
+            </Text>
+          </View>
+
+          <Text style={styles.timeText} numberOfLines={1}>
+            Expires On: {formatDate(props.expiresOn)}
           </Text>
         </View>
 
-        <Text style={styles.timeText} numberOfLines={1}>
-          Expires On: {formatDate(props.expiredOn)}
-        </Text>
+        {props.rightComponent}
       </View>
     </TouchableHighlight>
   );
@@ -42,6 +47,10 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: commonBackground,
     marginVertical: 5,
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   iconTextContainer: {
     alignItems: 'center',

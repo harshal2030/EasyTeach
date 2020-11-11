@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {View, StyleSheet, Alert} from 'react-native';
+import {View, StyleSheet, Alert, FlatList} from 'react-native';
 import {Avatar, Header, ListItem, Text} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -17,7 +17,6 @@ import {
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
 import {mediaUrl, studentUrl} from '../utils/urls';
-import {FlatList} from 'react-native-gesture-handler';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,

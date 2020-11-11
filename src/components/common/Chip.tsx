@@ -1,11 +1,10 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {greyWithAlpha} from '../../styles/colors';
-import Entypo from 'react-native-vector-icons/Entypo';
 
 interface Props {
   text: string;
-  onCrossPress: () => any;
+  rightIcon?: JSX.Element;
 }
 
 const Chip = (props: Props) => {
@@ -14,7 +13,7 @@ const Chip = (props: Props) => {
       <Text style={{alignSelf: 'center'}} numberOfLines={1}>
         {props.text}
       </Text>
-      <Entypo name="circle-with-cross" size={18} onPress={props.onCrossPress} />
+      {props.rightIcon}
     </View>
   );
 };

@@ -2,6 +2,7 @@
 interface QuizRes {
   classId: string;
   quizId: string;
+  questions: number;
   createdAt: Date;
   releaseScore: boolean;
   timePeriod: [

@@ -16,7 +16,6 @@ import SignUp from './screens/SignUp';
 import Drawer from './navigators/Drawer';
 import JoinClass from './screens/JoinClass';
 import Quiz from './screens/Quiz';
-import Settings from './screens/Settings';
 
 import {RootStackParamList} from './navigators/types';
 import {commonBlue} from './styles/colors';
@@ -112,7 +111,6 @@ const App = (props: Props): JSX.Element => {
           <Stack.Screen name="Drawer" component={Drawer} />
           <Stack.Screen name="JoinClass" component={JoinClass} />
           <Stack.Screen name="Quiz" component={Quiz} />
-          <Stack.Screen name="Settings" component={Settings} />
           {isOwner && <Stack.Screen name="CreateTest" component={CreateTest} />}
         </>
       )}
