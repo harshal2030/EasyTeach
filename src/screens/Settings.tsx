@@ -3,6 +3,8 @@ import axios from 'axios';
 import {View, FlatList, ActivityIndicator, Alert} from 'react-native';
 import {Header, ListItem, Avatar, Button, Text} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {CompositeNavigationProp} from '@react-navigation/native';
+import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
@@ -15,13 +17,18 @@ import {
   registerCurrentClass,
 } from '../global/actions/classes';
 
-import {RootStackParamList} from '../navigators/types';
+import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {mediaUrl, studentUrl} from '../utils/urls';
 import {ContainerStyles} from '../styles/styles';
 import {flatRed, commonBlue} from '../styles/colors';
 
+type NavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<DrawerParamList, 'Settings'>,
+  StackNavigationProp<RootStackParamList>
+>;
+
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Settings'>;
+  navigation: NavigationProp;
   token: string | null;
   profile: {
     name: string;
@@ -97,10 +104,7 @@ class Settings extends React.PureComponent<Props> {
           type="outline"
           onPress={() => {
             if (isOwner) {
-              // @ts-ignore
-              this.props.navigation.navigate('Drawer', {
-                screen: 'Manage',
-              });
+              this.props.navigation.navigate('Manage');
               this.props.registerCurrentClass(item);
             } else {
               this.confirmUnenroll(item.id, item.name);

@@ -8,8 +8,12 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {connect} from 'react-redux';
 import Octicons from 'react-native-vector-icons/Octicons';
+import DocumentPicker from 'react-native-document-picker';
+import SnackBar from 'react-native-snackbar';
+import Modal from 'react-native-modal';
 
 import {Card} from '../components/common';
+import {ImportExcel} from '../components/main';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -50,6 +54,7 @@ interface State {
   quizzes: QuizData;
   loading: boolean;
   errored: boolean;
+  modalVisible: boolean;
 }
 
 class Test extends React.Component<Props, State> {
@@ -65,6 +70,7 @@ class Test extends React.Component<Props, State> {
       ],
       loading: true,
       errored: false,
+      modalVisible: false,
     };
 
     if (props.currentClass) {
@@ -134,7 +140,18 @@ class Test extends React.Component<Props, State> {
       <Card
         title={item.title}
         containerStyle={{margin: 10}}
-        expiredOn={new Date(item.timePeriod[1].value)}
+        expiresOn={new Date(item.timePeriod[1].value)}
+        rightComponent={
+          <Octicons
+            name="gear"
+            size={16}
+            onPress={() =>
+              this.props.navigation.navigate('CreateTest', {
+                quizId: item.quizId,
+              })
+            }
+          />
+        }
       />
     );
   };
@@ -174,6 +191,30 @@ class Test extends React.Component<Props, State> {
     );
   };
 
+  ImportSheet = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+      });
+
+      this.setState({modalVisible: false});
+      this.props.navigation.navigate('CreateTest', {
+        file: {
+          name: res.name,
+          type: res.type,
+          uri: res.uri,
+        },
+      });
+    } catch (e) {
+      if (!DocumentPicker.isCancel(e)) {
+        SnackBar.show({
+          text: 'Unable to get the sheet.',
+          duration: SnackBar.LENGTH_SHORT,
+        });
+      }
+    }
+  };
+
   render() {
     return (
       <View style={[ContainerStyles.parent, {backgroundColor: '#ffff'}]}>
@@ -186,6 +227,7 @@ class Test extends React.Component<Props, State> {
             icon: 'menu',
             color: '#ffff',
             size: 26,
+            onPress: () => this.props.navigation.openDrawer(),
           }}
         />
 
@@ -199,9 +241,21 @@ class Test extends React.Component<Props, State> {
             containerStyle={styles.FABContainer}
             // eslint-disable-next-line react-native/no-inline-styles
             buttonStyle={{backgroundColor: '#ffff'}}
-            onPress={() => this.props.navigation.navigate('CreateTest')}
+            onPress={() => this.setState({modalVisible: true})}
           />
         )}
+        <Modal
+          isVisible={this.state.modalVisible}
+          animationIn="slideInLeft"
+          animationOut="slideOutLeft"
+          onBackButtonPress={() => this.props.navigation.goBack()}
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{margin: 0}}>
+          <ImportExcel
+            onBackPress={() => this.setState({modalVisible: false})}
+            onImportPress={this.ImportSheet}
+          />
+        </Modal>
       </View>
     );
   }

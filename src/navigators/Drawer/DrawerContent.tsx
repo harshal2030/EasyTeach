@@ -101,7 +101,6 @@ const DrawerContent = (props: Props): JSX.Element => {
     return (
       <TouchableOpacity
         onPress={() => {
-          props.navigation.closeDrawer();
           props.registerCurrentClass(item);
         }}>
         <Image
