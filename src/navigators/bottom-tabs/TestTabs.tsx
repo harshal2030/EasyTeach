@@ -25,7 +25,7 @@ const TestTab = () => {
       />
       <Tab.Screen
         name="TestExpired"
-        component={Test}
+        component={require('../../screens/Expired').default}
         options={{
           tabBarLabel: 'Expired',
           tabBarIcon: ({color}) => (
@@ -35,7 +35,7 @@ const TestTab = () => {
       />
       <Tab.Screen
         name="TestScored"
-        component={Test}
+        component={require('../../screens/Scored').default}
         options={{
           tabBarLabel: 'Scored',
           tabBarIcon: ({color}) => (
