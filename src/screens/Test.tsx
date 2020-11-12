@@ -1,6 +1,5 @@
 import React from 'react';
-import axios from 'axios';
-import {StyleSheet, View, SectionList, ActivityIndicator} from 'react-native';
+import {StyleSheet, View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, Button, Text} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp, RouteProp} from '@react-navigation/native';
@@ -17,6 +16,7 @@ import {ImportExcel} from '../components/main';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
+import {QuizRes, fetchQuiz} from '../global/actions/quiz';
 import {
   RootStackParamList,
   DrawerParamList,
@@ -24,8 +24,6 @@ import {
 } from '../navigators/types';
 import {commonBlue, commonGrey} from '../styles/colors';
 import {ContainerStyles} from '../styles/styles';
-import {quizUrl} from '../utils/urls';
-import {QuizRes} from '../utils/API';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
@@ -43,33 +41,22 @@ interface Props {
   profile: {name: string; username: string; avatar: string};
   currentClass: Class | null;
   route: TestRouteProp;
+  quizErrored: boolean;
+  quizLoading: boolean;
+  quizzes: QuizRes[];
+  fetchQuiz(token: string, classId: string, quizType?: string): void;
 }
 
-type QuizData = [
-  {title: 'Live'; data: QuizRes[]},
-  {title: 'Expired'; data: QuizRes[]},
-];
-
 interface State {
-  quizzes: QuizData;
-  loading: boolean;
-  errored: boolean;
   modalVisible: boolean;
 }
 
 class Test extends React.Component<Props, State> {
   isOwner: boolean = false;
-  subscribe: (() => void) | undefined;
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      quizzes: [
-        {title: 'Live', data: []},
-        {title: 'Expired', data: []},
-      ],
-      loading: true,
-      errored: false,
       modalVisible: false,
     };
 
@@ -81,59 +68,17 @@ class Test extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.currentClass) {
-      this.fetchData();
+      this.props.fetchQuiz(this.props.token!, this.props.currentClass.id);
     }
-
-    this.subscribe = this.props.navigation.addListener(
-      'focus',
-      this.updateDataOnFocus,
-    );
-  }
-
-  componentWillUnmount() {
-    this.subscribe!();
   }
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchData();
+      this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
       this.isOwner =
         this.props.currentClass?.owner.username === this.props.profile.username;
     }
   }
-
-  updateDataOnFocus = () => {
-    if (this.props.route.params) {
-      const data: QuizData = [...this.state.quizzes];
-      const testExists = data[0].data.findIndex(
-        (val) => val.quizId === this.props.route.params!.quizId,
-      );
-      if (testExists === -1) {
-        data[0].data = [this.props.route.params, ...data[0].data];
-        this.setState({quizzes: data});
-      }
-    }
-  };
-
-  fetchData = () => {
-    axios
-      .get<{live: QuizRes[]; expired: QuizRes[]}>(
-        `${quizUrl}/${this.props.currentClass!.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      )
-      .then((res) => {
-        const data: QuizData = [
-          {title: 'Live', data: res.data.live},
-          {title: 'Expired', data: res.data.expired},
-        ];
-        this.setState({quizzes: data, loading: false});
-      })
-      .catch(() => this.setState({errored: true, loading: false}));
-  };
 
   renderItem = ({item}: {item: QuizRes}) => {
     return (
@@ -157,9 +102,9 @@ class Test extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {errored, loading, quizzes} = this.state;
+    const {quizErrored, quizLoading, quizzes} = this.props;
 
-    if (errored) {
+    if (quizErrored) {
       return (
         <Text>
           We're having trouble fetching latest data for you. Please try again
@@ -168,24 +113,20 @@ class Test extends React.Component<Props, State> {
       );
     }
 
-    if (loading) {
+    if (quizLoading) {
       return <ActivityIndicator color={commonBlue} size="large" animating />;
     }
 
-    if (quizzes[0].data.length === 0 && quizzes[1].data.length === 0) {
+    if (quizzes.length === 0 && quizzes.length === 0) {
       return <Text>Nothing to show here right now</Text>;
     }
 
     return (
-      <SectionList
-        sections={quizzes}
+      <FlatList
+        data={quizzes}
         style={{width: '100%'}}
-        stickySectionHeadersEnabled
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.renderItem}
-        renderSectionHeader={({section: {title}}) => (
-          <Text style={styles.sectionHeader}>{title}</Text>
-        )}
         ListFooterComponent={<View style={{marginVertical: 15}} />}
       />
     );
@@ -309,7 +250,10 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     profile: state.profile,
     currentClass: state.currentClass,
+    quizLoading: state.quizLoading,
+    quizErrored: state.quizErrored,
+    quizzes: state.quizzes,
   };
 };
 
-export default connect(mapStateToProps)(Test);
+export default connect(mapStateToProps, {fetchQuiz})(Test);

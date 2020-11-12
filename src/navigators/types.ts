@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-import {QuizRes} from '../utils/API';
-
 type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
@@ -23,8 +21,9 @@ type BottomTabHomeParamList = {
 };
 
 type BottomTabTestParamList = {
-  TestHome: undefined | QuizRes;
-  TestScored: undefined | QuizRes;
+  TestHome: undefined;
+  TestScored: undefined;
+  TestExpired: undefined;
 };
 
 type DrawerParamList = {

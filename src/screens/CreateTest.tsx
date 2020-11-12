@@ -19,10 +19,11 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
+import {QuizRes} from '../global/actions/quiz';
+
 import {TextStyles, ContainerStyles} from '../styles/styles';
-import {commonBlue, commonGrey} from '../styles/colors';
+import {commonBlue, commonGrey, flatRed} from '../styles/colors';
 import {quizUrl} from '../utils/urls';
-import {QuizRes} from '../utils/API';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
 type RouteProps = RouteProp<RootStackParamList, 'CreateTest'>;
@@ -180,7 +181,7 @@ class CreateTest extends React.Component<Props, State> {
             screen: 'Test',
             params: {
               screen: 'TestHome',
-              params: res.data,
+              params: 'live',
             },
           });
         }
@@ -190,6 +191,7 @@ class CreateTest extends React.Component<Props, State> {
         SnackBar.show({
           text: 'Unable to create Test. Please try again later.',
           duration: SnackBar.LENGTH_SHORT,
+          backgroundColor: flatRed,
         }),
       );
   };
