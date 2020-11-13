@@ -11,12 +11,6 @@ import {Class} from './global/actions/classes';
 
 import {checkTokenUrl} from './utils/urls';
 
-import Login from './screens/Login';
-import SignUp from './screens/SignUp';
-import Drawer from './navigators/Drawer';
-import JoinClass from './screens/JoinClass';
-import Quiz from './screens/Quiz';
-
 import {RootStackParamList} from './navigators/types';
 import {commonBlue} from './styles/colors';
 import Axios from 'axios';
@@ -92,26 +86,44 @@ const App = (props: Props): JSX.Element => {
   }
 
   let isOwner = false;
-  let CreateTest = null;
 
   if (props.currentClass) {
     isOwner = props.profile.username === props.currentClass.owner.username;
-    CreateTest = isOwner ? require('./screens/CreateTest').default : null;
   }
 
   return (
     <Stack.Navigator headerMode="none">
       {props.token === null ? (
         <>
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen
+            name="SignUp"
+            component={require('./screens/SignUp').default}
+          />
+          <Stack.Screen
+            name="Login"
+            component={require('./screens/Login').default}
+          />
         </>
       ) : (
         <>
-          <Stack.Screen name="Drawer" component={Drawer} />
-          <Stack.Screen name="JoinClass" component={JoinClass} />
-          <Stack.Screen name="Quiz" component={Quiz} />
-          {isOwner && <Stack.Screen name="CreateTest" component={CreateTest} />}
+          <Stack.Screen
+            name="Drawer"
+            component={require('./navigators/Drawer').default}
+          />
+          <Stack.Screen
+            name="JoinClass"
+            component={require('./screens/JoinClass').default}
+          />
+          <Stack.Screen
+            name="Quiz"
+            component={require('./screens/Quiz').default}
+          />
+          {isOwner && (
+            <Stack.Screen
+              name="CreateTest"
+              component={require('./screens/CreateTest').default}
+            />
+          )}
         </>
       )}
     </Stack.Navigator>

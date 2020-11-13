@@ -4,8 +4,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import {BottomTabHomeParamList} from '../types';
-import Announcements from '../../screens/Announcements';
-import People from '../../screens/People';
 import {commonBlue} from '../../styles/colors';
 
 const Tab = createBottomTabNavigator<BottomTabHomeParamList>();
@@ -17,7 +15,7 @@ const Home = () => {
       tabBarOptions={{activeTintColor: commonBlue}}>
       <Tab.Screen
         name="Announcements"
-        component={Announcements}
+        component={require('../../screens/Announcements').default}
         options={{
           tabBarLabel: 'Announcements',
           tabBarIcon: ({color}) => (
@@ -27,7 +25,7 @@ const Home = () => {
       />
       <Tab.Screen
         name="People"
-        component={People}
+        component={require('../../screens/People').default}
         options={{
           tabBarLabel: 'People',
           tabBarIcon: ({color}) => (

@@ -5,8 +5,10 @@ import {connect} from 'react-redux';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import SnackBar from 'react-native-snackbar';
 
 import {CommonTest} from '../components/main';
+import {Card} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -18,6 +20,7 @@ import {
   DrawerParamList,
   BottomTabTestParamList,
 } from '../navigators/types';
+import {flatRed} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
@@ -89,6 +92,23 @@ class Expired extends React.Component<Props, State> {
       });
   };
 
+  renderItem = ({item}: {item: QuizRes}) => {
+    return (
+      <Card
+        title={item.title}
+        containerStyle={{margin: 10}}
+        expiresOn={new Date(item.timePeriod[1].value)}
+        onPress={() =>
+          SnackBar.show({
+            text: 'This test has expired.',
+            duration: SnackBar.LENGTH_SHORT,
+            backgroundColor: flatRed,
+          })
+        }
+      />
+    );
+  };
+
   render() {
     const {navigation, currentClass, profile} = this.props;
     const {loading, errored, data} = this.state;
@@ -97,8 +117,9 @@ class Expired extends React.Component<Props, State> {
         navigation={navigation}
         dataLoading={loading}
         dataErrored={errored}
+        renderItem={this.renderItem}
         data={data}
-        headerText="Scored"
+        headerText="Expired"
         currentClassOwner={currentClass!.owner.name}
         user={profile.username}
       />

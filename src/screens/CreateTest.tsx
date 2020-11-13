@@ -306,6 +306,7 @@ class CreateTest extends React.Component<Props, State> {
           <Input
             label="Description"
             value={description}
+            inputStyle={{maxHeight: 100}}
             multiline
             onChangeText={(text) => this.setState({description: text})}
           />

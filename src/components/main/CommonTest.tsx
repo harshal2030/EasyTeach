@@ -10,7 +10,6 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-import {Card} from '../common';
 import {ImportExcel} from './ImportExcel';
 
 import {
@@ -38,6 +37,7 @@ interface Props {
   dataLoading: boolean;
   data: QuizRes[];
   headerText: string;
+  renderItem({item, index}: {item: QuizRes; index: number}): JSX.Element;
 }
 
 interface State {
@@ -55,27 +55,6 @@ class CommonTest extends React.Component<Props, State> {
 
     this.isOwner = props.user === props.currentClassOwner;
   }
-
-  renderItem = ({item}: {item: QuizRes}) => {
-    return (
-      <Card
-        title={item.title}
-        containerStyle={{margin: 10}}
-        expiresOn={new Date(item.timePeriod[1].value)}
-        rightComponent={
-          <Octicons
-            name="gear"
-            size={16}
-            onPress={() =>
-              this.props.navigation.navigate('CreateTest', {
-                quizId: item.quizId,
-              })
-            }
-          />
-        }
-      />
-    );
-  };
 
   renderContent = () => {
     const {dataErrored, dataLoading, data} = this.props;
@@ -102,7 +81,7 @@ class CommonTest extends React.Component<Props, State> {
         data={data}
         style={{width: '100%'}}
         keyExtractor={(_item, i) => i.toString()}
-        renderItem={this.renderItem}
+        renderItem={this.props.renderItem}
         ListFooterComponent={<View style={{marginVertical: 15}} />}
       />
     );
@@ -165,7 +144,7 @@ class CommonTest extends React.Component<Props, State> {
           isVisible={this.state.modalVisible}
           animationIn="slideInLeft"
           animationOut="slideOutLeft"
-          onBackButtonPress={() => this.props.navigation.goBack()}
+          onBackButtonPress={() => this.setState({modalVisible: false})}
           // eslint-disable-next-line react-native/no-inline-styles
           style={{margin: 0}}>
           <ImportExcel

@@ -64,13 +64,13 @@ const PhotoPicker = (props: Props) => {
 
 PhotoPicker.defaultProps = {
   cameraProps: {
-    height: 200,
-    width: 200,
+    height: 800,
+    width: 800,
     cropping: true,
   },
   pickerProps: {
-    height: 200,
-    width: 200,
+    height: 800,
+    width: 800,
     cropping: true,
   },
 };

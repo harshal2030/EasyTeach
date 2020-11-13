@@ -8,10 +8,6 @@ import {DrawerParamList} from '../types';
 import {StoreState} from '../../global';
 import {Class} from '../../global/actions/classes';
 
-import Home from '../bottom-tabs/Home';
-import TestTabs from '../bottom-tabs/TestTabs';
-import Settings from '../../screens/Settings';
-
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 type Props = {
@@ -28,11 +24,9 @@ const DrawerNavigator = (props: Props): JSX.Element => {
   const isLargeScreen = width >= 768;
 
   let isOwner = false;
-  let ManageClass = null;
 
   if (props.currentClass) {
     isOwner = props.profile.username === props.currentClass.owner.username;
-    ManageClass = isOwner ? require('../../screens/ManageClass').default : null;
   }
   return (
     <Drawer.Navigator
@@ -42,10 +36,26 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       drawerType={isLargeScreen ? 'permanent' : 'front'}
       // @ts-ignore
       drawerContent={(pprops) => <DrawerContent {...pprops} />}>
-      <Drawer.Screen name="Home" component={Home} />
-      {props.currentClass && <Drawer.Screen name="Test" component={TestTabs} />}
-      {isOwner && <Drawer.Screen name="Manage" component={ManageClass} />}
-      <Drawer.Screen name="Settings" component={Settings} />
+      <Drawer.Screen
+        name="Home"
+        component={require('../bottom-tabs/Home').default}
+      />
+      {props.currentClass && (
+        <Drawer.Screen
+          name="Test"
+          component={require('../bottom-tabs/TestTabs').default}
+        />
+      )}
+      {isOwner && (
+        <Drawer.Screen
+          name="Manage"
+          component={require('../../screens/ManageClass').default}
+        />
+      )}
+      <Drawer.Screen
+        name="Settings"
+        component={require('../../screens/Settings').default}
+      />
     </Drawer.Navigator>
   );
 };

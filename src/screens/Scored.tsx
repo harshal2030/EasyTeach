@@ -7,6 +7,7 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 
 import {CommonTest} from '../components/main';
+import {Card} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -89,6 +90,16 @@ class Scored extends React.Component<Props, State> {
       });
   };
 
+  renderItem = ({item}: {item: QuizRes}) => {
+    return (
+      <Card
+        title={item.title}
+        containerStyle={{margin: 10}}
+        expiresOn={new Date(item.timePeriod[1].value)}
+      />
+    );
+  };
+
   render() {
     const {navigation, currentClass, profile} = this.props;
     const {loading, errored, data} = this.state;
@@ -101,6 +112,7 @@ class Scored extends React.Component<Props, State> {
         headerText="Scored"
         currentClassOwner={currentClass!.owner.name}
         user={profile.username}
+        renderItem={this.renderItem}
       />
     );
   }

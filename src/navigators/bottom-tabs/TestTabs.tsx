@@ -5,7 +5,6 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 
 import {BottomTabTestParamList} from '../types';
-import Test from '../../screens/Test';
 import {commonBlue} from '../../styles/colors';
 
 const Tab = createBottomTabNavigator<BottomTabTestParamList>();
@@ -15,7 +14,7 @@ const TestTab = () => {
     <Tab.Navigator tabBarOptions={{activeTintColor: commonBlue}}>
       <Tab.Screen
         name="TestHome"
-        component={Test}
+        component={require('../../screens/Test').default}
         options={{
           tabBarLabel: 'Live',
           tabBarIcon: ({color}) => (

@@ -1,11 +1,14 @@
 import React from 'react';
+import Octicons from 'react-native-vector-icons/Octicons';
+import Modal from 'react-native-modal';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {connect} from 'react-redux';
 
-import {CommonTest} from '../components/main';
+import {Card} from '../components/common';
+import {CommonTest, QuizInfo} from '../components/main';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -35,9 +38,19 @@ interface Props {
   fetchQuiz(token: string, classId: string, quizType?: string): void;
 }
 
-class Test extends React.Component<Props> {
+interface State {
+  modalVisible: boolean;
+  quiz: QuizRes | null;
+}
+
+class Test extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
+
+    this.state = {
+      modalVisible: false,
+      quiz: null,
+    };
   }
 
   componentDidMount() {
@@ -52,6 +65,28 @@ class Test extends React.Component<Props> {
     }
   }
 
+  renderItem = ({item}: {item: QuizRes}) => {
+    return (
+      <Card
+        title={item.title}
+        containerStyle={{margin: 10}}
+        onPress={() => this.setState({modalVisible: true, quiz: item})}
+        expiresOn={new Date(item.timePeriod[1].value)}
+        rightComponent={
+          <Octicons
+            name="gear"
+            size={16}
+            onPress={() =>
+              this.props.navigation.navigate('CreateTest', {
+                quizId: item.quizId,
+              })
+            }
+          />
+        }
+      />
+    );
+  };
+
   render() {
     const {
       navigation,
@@ -63,15 +98,33 @@ class Test extends React.Component<Props> {
     } = this.props;
 
     return (
-      <CommonTest
-        navigation={navigation}
-        dataLoading={quizLoading}
-        dataErrored={quizErrored}
-        data={quizzes}
-        headerText="Live"
-        currentClassOwner={currentClass!.owner.name}
-        user={profile.username}
-      />
+      <>
+        <CommonTest
+          navigation={navigation}
+          dataLoading={quizLoading}
+          dataErrored={quizErrored}
+          data={quizzes}
+          headerText="Live"
+          renderItem={this.renderItem}
+          currentClassOwner={currentClass!.owner.name}
+          user={profile.username}
+        />
+
+        <Modal
+          isVisible={this.state.modalVisible}
+          style={{margin: 0}}
+          hideModalContentWhileAnimating
+          onBackButtonPress={() => this.setState({modalVisible: false})}>
+          <QuizInfo
+            quiz={this.state.quiz!}
+            onButtonPress={() => {
+              this.setState({modalVisible: false});
+              this.props.navigation.navigate('Quiz');
+            }}
+            onBackPress={() => this.setState({modalVisible: false})}
+          />
+        </Modal>
+      </>
     );
   }
 }
