@@ -3,6 +3,7 @@ import {
   quizErroredAction,
   quizLoadingAction,
   quizFetchedAction,
+  quizAddedAction,
   QuizRes,
 } from '../actions/quiz';
 
@@ -24,10 +25,15 @@ const quizLoading = (state: boolean = true, action: quizLoadingAction) => {
   }
 };
 
-const quizzes = (state: QuizRes[] = [], action: quizFetchedAction) => {
+const quizzes = (
+  state: QuizRes[] = [],
+  action: quizFetchedAction | quizAddedAction,
+) => {
   switch (action.type) {
     case ActionTypes.quizFetched:
       return action.payload;
+    case ActionTypes.addQuiz:
+      return [action.payload, ...state];
     default:
       return state;
   }

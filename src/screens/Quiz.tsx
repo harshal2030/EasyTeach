@@ -1,23 +1,45 @@
 import React from 'react';
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import axios from 'axios';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
 import {Header, Button, ButtonGroup} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
+import {connect} from 'react-redux';
+
+import {StoreState} from '../global';
+import {Class} from '../global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
+import {quizUrl} from '../utils/urls';
+import {commonBlue} from '../styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList>;
+  route: RouteProp<RootStackParamList, 'Quiz'>;
+  token: string | null;
+  currentClass: Class | null;
 }
+
+type Questions = {
+  question: string;
+  options: string[];
+  queId: string;
+  selected: number | null;
+};
 
 interface State {
   currentIndex: number;
-  questions: {
-    question: string;
-    options: string[];
-    queId: string;
-    selected: number | null;
-  }[];
+  questions: Questions[];
+  loading: boolean;
+  errored: boolean;
 }
 
 class Quiz extends React.Component<Props, State> {
@@ -26,46 +48,46 @@ class Quiz extends React.Component<Props, State> {
 
     this.state = {
       currentIndex: 0,
-      questions: [
-        {
-          queId: '1',
-          question: 'This is question one.',
-          options: ['op1', 'op2', 'op3', 'op4'],
-          selected: null,
-        },
-        {
-          queId: '2',
-          question: 'This is question two.',
-          options: ['tw1', 'tw2', 'tw3', 'tw4'],
-          selected: null,
-        },
-        {
-          queId: '3',
-          question: 'This is question three.',
-          options: ['th1', 'th2', 'th3', 'th4'],
-          selected: null,
-        },
-        {
-          queId: '4',
-          question: 'This is question four.',
-          options: ['fo1', 'fo2', 'fo3', 'fo4'],
-          selected: null,
-        },
-        {
-          queId: '5',
-          question: 'This is question five.',
-          options: ['fi1', 'fi2', 'fi3', 'fi4'],
-          selected: null,
-        },
-        {
-          queId: '6',
-          question: 'This is question six.',
-          options: ['si1', 'si2', 'si3', 'si4'],
-          selected: null,
-        },
-      ],
+      questions: [],
+      loading: true,
+      errored: false,
     };
   }
+
+  componentDidMount() {
+    this.fetchQues();
+  }
+
+  fetchQues = () => {
+    const {quizId} = this.props.route.params;
+    const {id} = this.props.currentClass!;
+
+    axios
+      .get<{questions: Questions[]; totalScore: number; quizId: string}>(
+        `${quizUrl}/que/${id}/${quizId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token!}`,
+          },
+        },
+      )
+      .then((res) => {
+        this.setState({loading: false, questions: res.data.questions});
+      })
+      .catch((e) => {
+        this.setState({errored: true, loading: false});
+        if (e.response) {
+          if (e.response.status === 400) {
+            Alert.alert('Oops!', e.response.data.error, [
+              {
+                text: 'Ok',
+                onPress: () => this.props.navigation.goBack(),
+              },
+            ]);
+          }
+        }
+      });
+  };
 
   updateSelected = (i: number) => {
     const {currentIndex, questions} = this.state;
@@ -74,15 +96,90 @@ class Quiz extends React.Component<Props, State> {
     this.setState({questions: temp});
   };
 
-  render() {
+  postResponse = () => {
+    const {currentClass, route, token} = this.props;
+    const marked = this.state.questions.map((val) => {
+      return {
+        queId: val.queId,
+        response: val.selected ? val.options[val.selected] : val.selected,
+      };
+    });
+
+    axios
+      .post(
+        `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
+        {response: marked},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then((res) => console.log(res.data))
+      .catch((e) => console.log(e));
+  };
+
+  renderContent = () => {
+    const {loading, errored, questions, currentIndex} = this.state;
     const {
       buttonContainer,
       buttonContainerStyle,
-      buttonStyle,
       textStyle,
+      buttonStyle,
     } = styles;
 
-    const {currentIndex, questions} = this.state;
+    if (errored) {
+      return (
+        <Text>
+          We're having trouble in fetching resources. Please try again later
+        </Text>
+      );
+    }
+
+    if (loading) {
+      return <ActivityIndicator size="large" color={commonBlue} animating />;
+    }
+
+    if (questions.length === 0) {
+      return <Text>No questions on this test</Text>;
+    }
+
+    return (
+      <>
+        <View style={buttonContainer}>
+          <Button
+            title="Previous"
+            disabled={currentIndex === 0}
+            onPress={() => this.setState({currentIndex: currentIndex - 1})}
+          />
+          <Button title="Submit" onPress={this.postResponse} />
+          <Button
+            title="Next"
+            disabled={currentIndex === questions.length - 1}
+            onPress={() => this.setState({currentIndex: currentIndex + 1})}
+          />
+        </View>
+
+        <ScrollView style={[ContainerStyles.padder, {width: '100%'}]}>
+          <Text style={{fontSize: 18, fontWeight: '500'}}>
+            {questions[currentIndex].question}
+          </Text>
+          <ButtonGroup
+            buttons={questions[currentIndex].options}
+            onPress={this.updateSelected}
+            buttonContainerStyle={buttonContainerStyle}
+            buttonStyle={buttonStyle}
+            textStyle={textStyle}
+            containerStyle={{marginBottom: 100}}
+            vertical
+            selectedIndex={this.state.questions[currentIndex].selected}
+          />
+        </ScrollView>
+      </>
+    );
+  };
+
+  render() {
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -98,35 +195,9 @@ class Quiz extends React.Component<Props, State> {
           }}
         />
 
-        <View style={buttonContainer}>
-          <Button
-            title="Previous"
-            disabled={currentIndex === 0}
-            onPress={() => this.setState({currentIndex: currentIndex - 1})}
-          />
-          <Button title="Submit" />
-          <Button
-            title="Next"
-            disabled={currentIndex === questions.length - 1}
-            onPress={() => this.setState({currentIndex: currentIndex + 1})}
-          />
+        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          {this.renderContent()}
         </View>
-
-        <ScrollView style={ContainerStyles.padder}>
-          <Text style={{fontSize: 18, fontWeight: '500'}}>
-            {questions[currentIndex].question}
-          </Text>
-          <ButtonGroup
-            buttons={questions[currentIndex].options}
-            onPress={this.updateSelected}
-            buttonContainerStyle={buttonContainerStyle}
-            buttonStyle={buttonStyle}
-            textStyle={textStyle}
-            containerStyle={{marginBottom: 100}}
-            vertical
-            selectedIndex={this.state.questions[currentIndex].selected}
-          />
-        </ScrollView>
       </View>
     );
   }
@@ -152,4 +223,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Quiz;
+const mapStateToProps = (state: StoreState) => {
+  return {
+    token: state.token,
+    currentClass: state.currentClass,
+  };
+};
+
+export default connect(mapStateToProps)(Quiz);

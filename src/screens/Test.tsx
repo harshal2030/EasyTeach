@@ -119,7 +119,9 @@ class Test extends React.Component<Props, State> {
             quiz={this.state.quiz!}
             onButtonPress={() => {
               this.setState({modalVisible: false});
-              this.props.navigation.navigate('Quiz');
+              this.props.navigation.navigate('Quiz', {
+                quizId: this.state.quiz!.quizId,
+              });
             }}
             onBackPress={() => this.setState({modalVisible: false})}
           />

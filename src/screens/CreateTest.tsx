@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {Header, Input, Text, Button, Icon} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -19,7 +20,7 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes} from '../global/actions/quiz';
+import {QuizRes, addQuiz} from '../global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
@@ -33,6 +34,7 @@ interface Props {
   token: string | null;
   currentClass: Class | null;
   route: RouteProps;
+  addQuiz: typeof addQuiz;
 }
 
 interface State {
@@ -156,34 +158,43 @@ class CreateTest extends React.Component<Props, State> {
       });
     }
 
+    const data = new FormData();
+
+    data.append(
+      'info',
+      JSON.stringify({
+        questions: ques,
+        title,
+        description,
+        timePeriod: timeRange,
+        releaseScore,
+        randomQue,
+        randomOp,
+      }),
+    );
+
+    const {file} = this.props.route.params;
+
+    data.append('sheet', {
+      // @ts-ignore
+      name: file!.name || 'sheet.xlsx',
+      type: file!.type,
+      uri:
+        Platform.OS === 'android'
+          ? file!.uri
+          : file!.uri.replace('file://', ''),
+    });
+
     axios
-      .post<QuizRes>(
-        `${quizUrl}/${this.props.currentClass!.id}`,
-        {
-          questions: ques,
-          title,
-          description,
-          timePeriod: timeRange,
-          releaseScore,
-          randomQue,
-          randomOp,
+      .post<QuizRes>(`${quizUrl}/${this.props.currentClass!.id}`, data, {
+        headers: {
+          Authorization: `Bearer ${this.props.token!}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token!}`,
-          },
-        },
-      )
+      })
       .then((res) => {
         if (res.status === 201) {
-          // @ts-ignore
-          return this.props.navigation.navigate('Drawer', {
-            screen: 'Test',
-            params: {
-              screen: 'TestHome',
-              params: 'live',
-            },
-          });
+          this.props.addQuiz(res.data);
+          return this.props.navigation.goBack();
         }
         throw new Error();
       })
@@ -196,7 +207,7 @@ class CreateTest extends React.Component<Props, State> {
       );
   };
 
-  handleDate = (e: Event, dateTime?: Date) => {
+  handleDate = (_e: Event, dateTime?: Date) => {
     const {timeRange, mode, type} = this.state;
     const temp: [Date, Date] = [...timeRange];
 
@@ -400,4 +411,4 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps)(CreateTest);
+export default connect(mapStateToProps, {addQuiz})(CreateTest);

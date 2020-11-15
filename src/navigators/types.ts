@@ -4,7 +4,9 @@ type RootStackParamList = {
   SignUp: undefined;
   Drawer: undefined;
   JoinClass: undefined;
-  Quiz: undefined;
+  Quiz: {
+    quizId: string;
+  };
   CreateTest: {
     file?: {
       name: string;
@@ -13,6 +15,7 @@ type RootStackParamList = {
     };
     quizId?: string;
   };
+  ShowScore: undefined;
 };
 
 type BottomTabHomeParamList = {

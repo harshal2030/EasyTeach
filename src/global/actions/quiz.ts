@@ -43,6 +43,11 @@ interface quizFetchedAction {
   payload: QuizRes[];
 }
 
+interface quizAddedAction {
+  type: ActionTypes.addQuiz;
+  payload: QuizRes;
+}
+
 const quizHasErrored = (errored: boolean): quizErroredAction => {
   return {
     type: ActionTypes.quizFetchErrored,
@@ -92,10 +97,19 @@ const fetchQuiz = (
   };
 };
 
+const addQuiz = (quiz: QuizRes): quizAddedAction => {
+  return {
+    type: ActionTypes.addQuiz,
+    payload: quiz,
+  };
+};
+
 export {
   QuizRes,
   ActionTypes,
   fetchQuiz,
+  addQuiz,
+  quizAddedAction,
   quizErroredAction,
   quizFetchedAction,
   quizLoadingAction,

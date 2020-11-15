@@ -124,6 +124,12 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/CreateTest').default}
             />
           )}
+          {props.currentClass && (
+            <Stack.Screen
+              name="ShowScore"
+              component={require('./screens/ShowScore').default}
+            />
+          )}
         </>
       )}
     </Stack.Navigator>

@@ -96,6 +96,7 @@ class Scored extends React.Component<Props, State> {
         title={item.title}
         containerStyle={{margin: 10}}
         expiresOn={new Date(item.timePeriod[1].value)}
+        onPress={() => this.props.navigation.navigate('ShowScore')}
       />
     );
   };
