@@ -15,7 +15,9 @@ type RootStackParamList = {
     };
     quizId?: string;
   };
-  ShowScore: undefined;
+  ShowScore: {
+    quizId: string;
+  };
 };
 
 type BottomTabHomeParamList = {

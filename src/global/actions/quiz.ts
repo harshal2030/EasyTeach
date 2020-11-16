@@ -26,6 +26,7 @@ interface QuizRes {
   description: string;
   randomOp: boolean;
   randomQue: boolean;
+  multipleSubmit: boolean;
 }
 
 interface quizErroredAction {
@@ -46,6 +47,16 @@ interface quizFetchedAction {
 interface quizAddedAction {
   type: ActionTypes.addQuiz;
   payload: QuizRes;
+}
+
+interface quizAlterAction {
+  type: ActionTypes.alterQuiz;
+  payload: QuizRes;
+}
+
+interface quizRemoveAction {
+  type: ActionTypes.removeQuiz;
+  payload: string;
 }
 
 const quizHasErrored = (errored: boolean): quizErroredAction => {
@@ -104,11 +115,29 @@ const addQuiz = (quiz: QuizRes): quizAddedAction => {
   };
 };
 
+const updateQuiz = (quiz: QuizRes): quizAlterAction => {
+  return {
+    type: ActionTypes.alterQuiz,
+    payload: quiz,
+  };
+};
+
+const removeQuiz = (quizId: string): quizRemoveAction => {
+  return {
+    type: ActionTypes.removeQuiz,
+    payload: quizId,
+  };
+};
+
 export {
   QuizRes,
   ActionTypes,
   fetchQuiz,
   addQuiz,
+  updateQuiz,
+  removeQuiz,
+  quizRemoveAction,
+  quizAlterAction,
   quizAddedAction,
   quizErroredAction,
   quizFetchedAction,

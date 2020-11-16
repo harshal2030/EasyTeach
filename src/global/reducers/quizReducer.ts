@@ -4,6 +4,8 @@ import {
   quizLoadingAction,
   quizFetchedAction,
   quizAddedAction,
+  quizAlterAction,
+  quizRemoveAction,
   QuizRes,
 } from '../actions/quiz';
 
@@ -25,15 +27,29 @@ const quizLoading = (state: boolean = true, action: quizLoadingAction) => {
   }
 };
 
-const quizzes = (
-  state: QuizRes[] = [],
-  action: quizFetchedAction | quizAddedAction,
-) => {
+type quizAction =
+  | quizFetchedAction
+  | quizAddedAction
+  | quizAlterAction
+  | quizRemoveAction;
+
+const quizzes = (state: QuizRes[] = [], action: quizAction) => {
   switch (action.type) {
     case ActionTypes.quizFetched:
       return action.payload;
     case ActionTypes.addQuiz:
       return [action.payload, ...state];
+    case ActionTypes.alterQuiz:
+      const index = state.findIndex(
+        (val) => val.quizId === action.payload.quizId,
+      );
+      let temp = [...state];
+      if (index !== -1) {
+        temp[index] = action.payload;
+      }
+      return temp;
+    case ActionTypes.removeQuiz:
+      return state.filter((val) => val.quizId !== action.payload);
     default:
       return state;
   }

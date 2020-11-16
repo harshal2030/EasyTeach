@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
+  Alert,
 } from 'react-native';
 import {Header, Input, Text, Button, Icon} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -20,7 +21,7 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes, addQuiz} from '../global/actions/quiz';
+import {QuizRes, addQuiz, updateQuiz, removeQuiz} from '../global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
@@ -35,12 +36,15 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
+  updateQuiz: typeof updateQuiz;
+  removeQuiz: typeof removeQuiz;
 }
 
 interface State {
   releaseScore: boolean;
   randomQue: boolean;
   randomOp: boolean;
+  multipleSubmit: boolean;
   description: string;
   title: string;
   questions: string;
@@ -50,6 +54,7 @@ interface State {
   timeRange: [Date, Date];
   loading: boolean;
   errored: boolean;
+  APILoading: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -65,6 +70,7 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore: true,
       randomOp: false,
       randomQue: false,
+      multipleSubmit: false,
       description: '',
       title: '',
       questions: '1',
@@ -74,6 +80,7 @@ class CreateTest extends React.Component<Props, State> {
       timeRange: [today, tomorrow],
       loading: false,
       errored: false,
+      APILoading: false,
     };
   }
 
@@ -100,6 +107,7 @@ class CreateTest extends React.Component<Props, State> {
             randomQue,
             questions,
             timePeriod,
+            multipleSubmit,
           } = res.data;
           this.setState({
             title,
@@ -113,6 +121,7 @@ class CreateTest extends React.Component<Props, State> {
               new Date(timePeriod[1].value),
             ],
             loading: false,
+            multipleSubmit,
           });
         })
         .catch(() => {
@@ -121,7 +130,7 @@ class CreateTest extends React.Component<Props, State> {
     }
   };
 
-  quizRequest = () => {
+  updateQuiz = () => {
     const {
       questions,
       title,
@@ -130,6 +139,84 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
+      multipleSubmit,
+    } = this.state;
+    const {currentClass, route} = this.props;
+
+    const start = timeRange[0].getTime(),
+      stop = timeRange[1].getTime();
+
+    const ques = parseInt(questions, 10);
+
+    if (ques <= 0) {
+      return SnackBar.show({
+        text: 'You must at least have one question in test.',
+        duration: SnackBar.LENGTH_SHORT,
+        backgroundColor: flatRed,
+      });
+    }
+
+    if (title.trim().length <= 0) {
+      return SnackBar.show({
+        text: "What's the title?",
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    if (start > stop) {
+      return SnackBar.show({
+        text: 'Invalid time range.',
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    this.setState({APILoading: true});
+    axios
+      .put<QuizRes>(
+        `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
+        {
+          questions: ques,
+          title,
+          description,
+          timePeriod: timeRange,
+          releaseScore,
+          randomQue,
+          randomOp,
+          multipleSubmit,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          this.props.updateQuiz(res.data);
+          this.setState({APILoading: false});
+          this.props.navigation.goBack();
+        }
+      })
+      .catch(() => {
+        this.setState({APILoading: false});
+        SnackBar.show({
+          text: 'Unable to update quiz, Please try again later',
+          duration: SnackBar.LENGTH_SHORT,
+          backgroundColor: flatRed,
+        });
+      });
+  };
+
+  postQuiz = () => {
+    const {
+      questions,
+      title,
+      description,
+      timeRange,
+      releaseScore,
+      randomQue,
+      randomOp,
+      multipleSubmit,
     } = this.state;
 
     const start = timeRange[0].getTime(),
@@ -170,6 +257,7 @@ class CreateTest extends React.Component<Props, State> {
         releaseScore,
         randomQue,
         randomOp,
+        multipleSubmit,
       }),
     );
 
@@ -185,6 +273,7 @@ class CreateTest extends React.Component<Props, State> {
           : file!.uri.replace('file://', ''),
     });
 
+    this.setState({APILoading: true});
     axios
       .post<QuizRes>(`${quizUrl}/${this.props.currentClass!.id}`, data, {
         headers: {
@@ -192,19 +281,67 @@ class CreateTest extends React.Component<Props, State> {
         },
       })
       .then((res) => {
+        this.setState({APILoading: false});
         if (res.status === 201) {
           this.props.addQuiz(res.data);
           return this.props.navigation.goBack();
         }
         throw new Error();
       })
-      .catch(() =>
+      .catch(() => {
+        this.setState({APILoading: false});
         SnackBar.show({
           text: 'Unable to create Test. Please try again later.',
           duration: SnackBar.LENGTH_SHORT,
           backgroundColor: flatRed,
-        }),
-      );
+        });
+      });
+  };
+
+  quizRequest = () => {
+    if (this.props.route.params.quizId) {
+      this.updateQuiz();
+    } else {
+      this.postQuiz();
+    }
+  };
+
+  deleteQuiz = () => {
+    const deleteReq = () => {
+      const {currentClass, route} = this.props;
+
+      this.setState({APILoading: true});
+      axios
+        .delete(`${quizUrl}/${currentClass!.id}/${route.params.quizId}`, {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        })
+        .then(() => {
+          this.props.removeQuiz(route.params.quizId!);
+          this.setState({APILoading: false});
+          this.props.navigation.goBack();
+        })
+        .catch((e) => {
+          console.log(e);
+          this.setState({APILoading: false});
+          SnackBar.show({
+            text: 'Unable to delete Test. Please try again later.',
+            duration: SnackBar.LENGTH_SHORT,
+            backgroundColor: flatRed,
+          });
+        });
+    };
+
+    Alert.alert('Confirm', 'Are you sure to delete this test', [
+      {
+        text: 'Cancel',
+      },
+      {
+        text: 'Yes',
+        onPress: deleteReq,
+      },
+    ]);
   };
 
   handleDate = (_e: Event, dateTime?: Date) => {
@@ -241,11 +378,13 @@ class CreateTest extends React.Component<Props, State> {
       randomOp,
       randomQue,
       showPicker,
+      multipleSubmit,
       timeRange,
       type,
       mode,
       loading,
       errored,
+      APILoading,
     } = this.state;
 
     if (errored) {
@@ -271,7 +410,7 @@ class CreateTest extends React.Component<Props, State> {
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: 'Create Test',
+            text: this.props.route.params.quizId ? 'Edit Test' : 'Create Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -279,6 +418,7 @@ class CreateTest extends React.Component<Props, State> {
             color: '#ffff',
             size: 26,
             onPress: () => this.props.navigation.goBack(),
+            disabled: APILoading,
           }}
         />
 
@@ -373,11 +513,31 @@ class CreateTest extends React.Component<Props, State> {
             desc="Randomize order of options specified in question sheet"
           />
 
-          <Button
-            title="Create Test"
-            containerStyle={styles.buttonStyle}
-            onPress={this.quizRequest}
+          <CheckBox
+            checked={multipleSubmit}
+            title="Allow multiple submission"
+            onPress={() => this.setState({multipleSubmit: !multipleSubmit})}
+            desc="If enabled, test can be submitted multiple time"
           />
+
+          <View style={{flexDirection: 'row'}}>
+            <Button
+              title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
+              containerStyle={styles.buttonStyle}
+              onPress={this.quizRequest}
+              loading={APILoading}
+            />
+
+            {this.props.route.params.quizId && (
+              <Button
+                title="Delete"
+                containerStyle={styles.buttonStyle}
+                buttonStyle={{backgroundColor: flatRed}}
+                onPress={this.deleteQuiz}
+                loading={APILoading}
+              />
+            )}
+          </View>
         </ScrollView>
       </View>
     );
@@ -401,6 +561,8 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     marginVertical: 30,
+    flex: 1,
+    marginHorizontal: 10,
   },
 });
 
@@ -411,4 +573,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addQuiz})(CreateTest);
+export default connect(mapStateToProps, {addQuiz, removeQuiz, updateQuiz})(
+  CreateTest,
+);
