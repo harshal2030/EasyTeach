@@ -29,6 +29,14 @@ interface QuizRes {
   multipleSubmit: boolean;
 }
 
+interface Result {
+  correct: number;
+  incorrect: number;
+  totalQues: number;
+  totalScore: number;
+  userScored: number;
+}
+
 interface quizErroredAction {
   type: ActionTypes.quizFetchErrored;
   payload: boolean;
@@ -142,4 +150,5 @@ export {
   quizErroredAction,
   quizFetchedAction,
   quizLoadingAction,
+  Result,
 };

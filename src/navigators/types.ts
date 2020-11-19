@@ -17,6 +17,8 @@ type RootStackParamList = {
   };
   ShowScore: {
     quizId: string;
+    title: string;
+    questions: number;
   };
 };
 

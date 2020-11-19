@@ -7,6 +7,7 @@ const classUrl = `${root}/class`;
 const mediaUrl = `${root}/media`;
 const studentUrl = `${root}/student`;
 const quizUrl = `${root}/quiz`;
+const resultUrl = `${root}/result`;
 
 export {
   root,
@@ -18,4 +19,5 @@ export {
   logOutUrl,
   studentUrl,
   quizUrl,
+  resultUrl,
 };

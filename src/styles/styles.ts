@@ -23,6 +23,10 @@ const TextStyles = StyleSheet.create({
     color: commonGrey,
     fontSize: 16,
   },
+  headingStyle: {
+    fontSize: 24,
+    fontWeight: '800',
+  },
 });
 
 const ContainerStyles = StyleSheet.create({
@@ -32,6 +36,11 @@ const ContainerStyles = StyleSheet.create({
   parent: {
     flex: 1,
     backgroundColor: commonBackground,
+  },
+  centerElements: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

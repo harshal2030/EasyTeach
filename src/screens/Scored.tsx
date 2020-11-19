@@ -99,6 +99,8 @@ class Scored extends React.Component<Props, State> {
         onPress={() =>
           this.props.navigation.navigate('ShowScore', {
             quizId: item.quizId,
+            title: item.title,
+            questions: item.questions,
           })
         }
       />
