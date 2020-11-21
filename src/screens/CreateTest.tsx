@@ -44,7 +44,6 @@ interface State {
   releaseScore: boolean;
   randomQue: boolean;
   randomOp: boolean;
-  multipleSubmit: boolean;
   description: string;
   title: string;
   questions: string;
@@ -70,7 +69,6 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore: true,
       randomOp: false,
       randomQue: false,
-      multipleSubmit: false,
       description: '',
       title: '',
       questions: '1',
@@ -107,7 +105,6 @@ class CreateTest extends React.Component<Props, State> {
             randomQue,
             questions,
             timePeriod,
-            multipleSubmit,
           } = res.data;
           this.setState({
             title,
@@ -121,7 +118,6 @@ class CreateTest extends React.Component<Props, State> {
               new Date(timePeriod[1].value),
             ],
             loading: false,
-            multipleSubmit,
           });
         })
         .catch(() => {
@@ -139,7 +135,6 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
-      multipleSubmit,
     } = this.state;
     const {currentClass, route} = this.props;
 
@@ -182,7 +177,6 @@ class CreateTest extends React.Component<Props, State> {
           releaseScore,
           randomQue,
           randomOp,
-          multipleSubmit,
         },
         {
           headers: {
@@ -216,7 +210,6 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
-      multipleSubmit,
     } = this.state;
 
     const start = timeRange[0].getTime(),
@@ -257,7 +250,6 @@ class CreateTest extends React.Component<Props, State> {
         releaseScore,
         randomQue,
         randomOp,
-        multipleSubmit,
       }),
     );
 
@@ -378,7 +370,6 @@ class CreateTest extends React.Component<Props, State> {
       randomOp,
       randomQue,
       showPicker,
-      multipleSubmit,
       timeRange,
       type,
       mode,
@@ -511,13 +502,6 @@ class CreateTest extends React.Component<Props, State> {
             title="Randomize Options"
             onPress={() => this.setState({randomOp: !randomOp})}
             desc="Randomize order of options specified in question sheet"
-          />
-
-          <CheckBox
-            checked={multipleSubmit}
-            title="Allow multiple submission"
-            onPress={() => this.setState({multipleSubmit: !multipleSubmit})}
-            desc="If enabled, test can be submitted multiple time"
           />
 
           <View style={{flexDirection: 'row'}}>

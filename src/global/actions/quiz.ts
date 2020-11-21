@@ -26,7 +26,6 @@ interface QuizRes {
   description: string;
   randomOp: boolean;
   randomQue: boolean;
-  multipleSubmit: boolean;
 }
 
 interface Result {

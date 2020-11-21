@@ -52,8 +52,10 @@ class CommonTest extends React.Component<Props, State> {
     this.state = {
       modalVisible: false,
     };
+  }
 
-    this.isOwner = props.user === props.currentClassOwner;
+  componentDidUpdate() {
+    this.isOwner = this.props.currentClassOwner === this.props.user;
   }
 
   renderContent = () => {
