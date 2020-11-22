@@ -39,8 +39,9 @@ interface Props {
   classIsLoading: boolean;
 }
 
-const Home = (props: Props): JSX.Element => {
-  const renderContent = () => {
+class Home extends React.Component<Props> {
+  renderContent = () => {
+    const {props} = this;
     if (props.classIsLoading) {
       return <ActivityIndicator color={commonBlue} animating size="large" />;
     }
@@ -76,32 +77,36 @@ const Home = (props: Props): JSX.Element => {
     );
   };
 
-  return (
-    <View style={ContainerStyles.parent}>
-      <Header
-        centerComponent={{
-          text: props.currentClass ? props.currentClass!.name : 'Home',
-          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-        }}
-        leftComponent={{
-          icon: 'menu',
-          color: '#ffff',
-          size: 26,
-          onPress: () => props.navigation.openDrawer(),
-        }}
-      />
-      <View
-        style={{
-          padding: 20,
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        {renderContent()}
+  render() {
+    return (
+      <View style={ContainerStyles.parent}>
+        <Header
+          centerComponent={{
+            text: this.props.currentClass
+              ? this.props.currentClass!.name
+              : 'Home',
+            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+          }}
+          leftComponent={{
+            icon: 'menu',
+            color: '#ffff',
+            size: 26,
+            onPress: () => this.props.navigation.openDrawer(),
+          }}
+        />
+        <View
+          style={{
+            padding: 20,
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          {this.renderContent()}
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
 const mapStateToProps = (state: StoreState) => {
   return {
