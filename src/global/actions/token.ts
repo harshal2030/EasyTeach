@@ -2,6 +2,7 @@
 enum ActionTypes {
   registerToken = 'registerToken',
   removeToken = 'removeToken',
+  registerFCM = 'registerFCM',
 }
 
 interface RegisterTokenAction {
@@ -12,6 +13,14 @@ interface RegisterTokenAction {
 interface RemoveTokenAction {
   type: ActionTypes.removeToken;
   payload: null;
+}
+
+interface RegisterFCMAction {
+  type: ActionTypes.registerFCM;
+  payload: {
+    os: string;
+    fcmToken: string;
+  };
 }
 
 const registerToken = (token: string): RegisterTokenAction => {
@@ -28,9 +37,21 @@ const removeToken = (): RemoveTokenAction => {
   };
 };
 
+const registerFCM = (fcm: {
+  os: string;
+  fcmToken: string;
+}): RegisterFCMAction => {
+  return {
+    type: ActionTypes.registerFCM,
+    payload: fcm,
+  };
+};
+
 export {
   registerToken,
   removeToken,
+  registerFCM,
+  RegisterFCMAction,
   ActionTypes,
   RegisterTokenAction,
   RemoveTokenAction,

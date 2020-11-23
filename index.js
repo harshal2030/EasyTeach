@@ -12,9 +12,11 @@ import {enableScreens} from 'react-native-screens';
 import {store} from './src/global';
 import PushNotification from 'react-native-push-notification';
 
+import {registerFCM} from './src/global/actions/token';
+
 PushNotification.configure({
   onRegister: (token) => {
-    console.log(token.token);
+    store.dispatch(registerFCM({os: token.os, fcmToken: token.token}));
   },
 
   onNotification: (notification) => {
