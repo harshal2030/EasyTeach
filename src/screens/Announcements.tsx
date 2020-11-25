@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ActivityIndicator} from 'react-native';
+import {View, Text, ActivityIndicator, FlatList} from 'react-native';
 import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -7,16 +7,20 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-import {ContainerStyles} from '../styles/styles';
+import {MsgCard} from '../components/common';
 
+import {StoreState} from '../global';
+import {Class} from '../global/actions/classes';
+import {fetchMsgs, Msg} from '../global/actions/msgs';
+
+import {ContainerStyles} from '../styles/styles';
 import {
   RootStackParamList,
   DrawerParamList,
   BottomTabHomeParamList,
 } from '../navigators/types';
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
 import {commonBlue} from '../styles/colors';
+import {mediaUrl} from '../utils/urls';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
@@ -37,14 +41,39 @@ interface Props {
   classHasErrored: boolean;
   classes: Class[];
   classIsLoading: boolean;
+  token: string | null;
+  fetchMsgs(token: string, classId: string): void;
+  msgs: Msg[];
+  msgErrored: boolean;
+  msgLoading: boolean;
 }
 
 class Home extends React.Component<Props> {
+  constructor(props: Props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    if (this.props.currentClass) {
+      this.props.fetchMsgs(this.props.token!, this.props.currentClass.id);
+    }
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    const {currentClass} = this.props;
+
+    const prevClassId = prevProps.currentClass
+      ? prevProps.currentClass.id
+      : null;
+
+    const currentClassId = currentClass ? currentClass.id : null;
+    if (currentClassId !== prevClassId) {
+      this.props.fetchMsgs(this.props.token!, currentClassId!);
+    }
+  }
+
   renderContent = () => {
     const {props} = this;
-    if (props.classIsLoading) {
-      return <ActivityIndicator color={commonBlue} animating size="large" />;
-    }
 
     if (props.classHasErrored) {
       return (
@@ -53,6 +82,10 @@ class Home extends React.Component<Props> {
           checking your network or try again
         </Text>
       );
+    }
+
+    if (props.classIsLoading) {
+      return <ActivityIndicator color={commonBlue} animating size="large" />;
     }
 
     if (props.classes.length === 0) {
@@ -71,15 +104,28 @@ class Home extends React.Component<Props> {
     }
 
     return (
-      <Text>
-        Announcements are Under Construction! Thanks for your patience
-      </Text>
+      <FlatList
+        data={this.props.msgs}
+        keyExtractor={(_item, i) => i.toString()}
+        inverted
+        renderItem={({item}) => {
+          return (
+            <MsgCard
+              avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
+              name={item.user.name}
+              username={item.user.username}
+              message={item.message}
+              createdAt={item.createdAt}
+            />
+          );
+        }}
+      />
     );
   };
 
   render() {
     return (
-      <View style={ContainerStyles.parent}>
+      <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
         <Header
           centerComponent={{
             text: this.props.currentClass
@@ -96,10 +142,7 @@ class Home extends React.Component<Props> {
         />
         <View
           style={{
-            padding: 20,
             flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
           }}>
           {this.renderContent()}
         </View>
@@ -115,7 +158,11 @@ const mapStateToProps = (state: StoreState) => {
     classHasErrored: state.classHasErrored,
     classIsLoading: state.classIsLoading,
     classes: state.classes,
+    token: state.token,
+    msgs: state.msgs,
+    msgErrored: state.msgErrored,
+    msgLoading: state.msgLoading,
   };
 };
 
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps, {fetchMsgs})(Home);

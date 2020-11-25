@@ -8,6 +8,7 @@ const mediaUrl = `${root}/media`;
 const studentUrl = `${root}/student`;
 const quizUrl = `${root}/quiz`;
 const resultUrl = `${root}/result`;
+const msgUrl = `${root}/msg`;
 
 export {
   root,
@@ -20,4 +21,5 @@ export {
   studentUrl,
   quizUrl,
   resultUrl,
+  msgUrl,
 };

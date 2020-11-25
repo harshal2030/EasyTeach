@@ -110,6 +110,7 @@ const fetchClasses = (token: string) => {
       dispatch(classesLoading(false));
       dispatch(classesFetchedSuccess(classes.data));
     } catch (e) {
+      dispatch(classesLoading(false));
       dispatch(classesHasErrored(true));
     }
   };
