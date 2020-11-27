@@ -60,7 +60,7 @@ class Test extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
+    if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
       this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
     }
   }

@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {Avatar} from 'react-native-elements';
 import {commonGrey, greyWithAlpha} from '../../styles/colors';
+import {getDateAndMonth} from '../../utils/functions';
 
 interface Props {
   message: string;
@@ -19,7 +20,9 @@ const MsgCard = (props: Props) => {
 
         <View style={styles.nameTextContainer}>
           <Text style={styles.name}>{props.name}</Text>
-          <Text style={{color: commonGrey}}>20-11-2018</Text>
+          <Text style={{color: commonGrey}}>
+            {getDateAndMonth(props.createdAt)}
+          </Text>
         </View>
       </View>
 

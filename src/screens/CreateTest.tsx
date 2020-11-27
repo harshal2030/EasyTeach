@@ -126,6 +126,7 @@ class CreateTest extends React.Component<Props, State> {
     }
   };
 
+  // TODO: Improve code quality for validation
   updateQuiz = () => {
     const {
       questions,

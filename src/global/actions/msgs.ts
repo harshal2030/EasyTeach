@@ -13,7 +13,7 @@ enum ActionTypes {
 
 interface Msg {
   id: string;
-  createdAt: Date;
+  createdAt: string;
   user: {
     name: string;
     username: string;
@@ -38,6 +38,11 @@ interface msgFetchedAction {
   payload: Msg[];
 }
 
+interface addMsgAction {
+  type: ActionTypes.addMsgs;
+  payload: Msg;
+}
+
 const msgHasErrored = (errored: boolean): msgErroredAction => {
   return {
     type: ActionTypes.msgsErrored,
@@ -56,6 +61,13 @@ const msgFetched = (msgs: Msg[]): msgFetchedAction => {
   return {
     type: ActionTypes.msgsFetched,
     payload: msgs,
+  };
+};
+
+const addMsg = (msg: Msg): addMsgAction => {
+  return {
+    type: ActionTypes.addMsgs,
+    payload: msg,
   };
 };
 
@@ -83,6 +95,8 @@ export {
   msgErroredAction,
   msgLoadingAction,
   msgFetchedAction,
+  addMsgAction,
   Msg,
   fetchMsgs,
+  addMsg,
 };

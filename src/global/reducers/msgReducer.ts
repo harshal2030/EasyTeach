@@ -3,6 +3,7 @@ import {
   msgErroredAction,
   msgLoadingAction,
   msgFetchedAction,
+  addMsgAction,
   Msg,
 } from '../actions/msgs';
 
@@ -24,10 +25,12 @@ const msgLoading = (state: boolean = true, action: msgLoadingAction) => {
   }
 };
 
-const msgs = (state: Msg[] = [], action: msgFetchedAction) => {
+const msgs = (state: Msg[] = [], action: msgFetchedAction | addMsgAction) => {
   switch (action.type) {
     case ActionTypes.msgsFetched:
       return action.payload;
+    case ActionTypes.addMsgs:
+      return [action.payload, ...state];
     default:
       return state;
   }

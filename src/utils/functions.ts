@@ -11,4 +11,26 @@ const formatDate = (date: Date) => {
   return `${dateNum}-${month}-${y} ${hr}:${min}:00`;
 };
 
-export {formatDate};
+const monthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sept',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const getDateAndMonth = (date: Date) => {
+  const dateNum = date.getDate();
+  const month = monthNames[date.getMonth()];
+
+  return `${month} ${dateNum}`;
+};
+
+export {formatDate, getDateAndMonth};
