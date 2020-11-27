@@ -1,6 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import {View, StyleSheet, Alert, FlatList} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Alert,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import {Avatar, Header, ListItem, Text} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -17,6 +23,7 @@ import {
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
 import {mediaUrl, studentUrl} from '../utils/urls';
+import {commonBlue, flatRed} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
@@ -45,6 +52,8 @@ interface peopleProp {
 
 const People = (props: Props) => {
   const [people, setPeople] = React.useState<peopleProp[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
+
   React.useEffect(() => {
     if (props.currentClass) {
       axios
@@ -52,9 +61,21 @@ const People = (props: Props) => {
           headers: {
             Authorization: `Bearer ${props.token!}`,
           },
+          timeout: 20000,
         })
-        .then((res) => setPeople(res.data))
-        .catch((e) => console.log(e));
+        .then((res) => {
+          setLoading(false);
+          setPeople(res.data);
+        })
+        .catch(() => {
+          setLoading(false);
+          SnackBar.show({
+            text: 'Unable to show people. Please try again later',
+            backgroundColor: flatRed,
+            duration: SnackBar.LENGTH_SHORT,
+            textColor: '#ffff',
+          });
+        });
     }
   }, [props.currentClass, props.token]);
 
@@ -126,12 +147,19 @@ const People = (props: Props) => {
     );
   };
 
+  const renderListFooter = () => {
+    if (loading) {
+      return <ActivityIndicator size="large" animating color={commonBlue} />;
+    }
+  };
+
   const renderMainContent = () => (
     <View style={{padding: 5}}>
       <FlatList
         data={people}
         renderItem={renderListItem}
         keyExtractor={(_item, i) => i.toString()}
+        ListFooterComponent={renderListFooter()}
         ListHeaderComponent={
           <>
             <Text h4 style={styles.titleStyle}>

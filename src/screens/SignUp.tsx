@@ -9,7 +9,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
-import {removeCurrentClass} from '../global/actions/classes';
 import {registerProfile} from '../global/actions/profile';
 import {usernamePattern} from '../utils/regexPatterns';
 
@@ -28,7 +27,7 @@ type Props = {
   registerToken: typeof registerToken;
   token: string;
   registerProfile: typeof registerProfile;
-  removeCurrentClass: typeof removeCurrentClass;
+  fcm: {os: string; fcmToken: string} | null;
 };
 
 interface State {
@@ -60,10 +59,6 @@ class SignUp extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.props.removeCurrentClass();
-  }
-
   storeToken = async (token: string): Promise<void> => {
     try {
       AsyncStorage.setItem('token', token);
@@ -72,6 +67,7 @@ class SignUp extends React.Component<Props, State> {
 
   onSubmit = (): void => {
     const {name, username, email, password} = this.state;
+    const {fcm} = this.props;
 
     if (name.length <= 0) {
       this.setState({nameErr: 'Please enter your name'});
@@ -125,6 +121,7 @@ class SignUp extends React.Component<Props, State> {
               email,
               password,
             },
+            device: fcm,
           },
           {
             timeout: 20000,
@@ -216,14 +213,16 @@ class SignUp extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: StoreState): {token: string} => {
+const mapStateToProps = (
+  state: StoreState,
+): {token: string; fcm: {os: string; fcmToken: string} | null} => {
   return {
     token: state.token!,
+    fcm: state.fcm,
   };
 };
 
 export default connect(mapStateToProps, {
   registerToken,
   registerProfile,
-  removeCurrentClass,
 })(SignUp);

@@ -78,7 +78,7 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const logOut = async () => {
     try {
-      const res = await axios.post(
+      await axios.post(
         logOutUrl,
         {},
         {
@@ -87,12 +87,10 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      console.log(res.data, res.status);
       await AsyncStorage.removeItem('token');
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
-      console.log(e);
       Alert.alert('Error', 'Unable to logout please try again later');
     }
   };

@@ -1,15 +1,14 @@
 import React from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios';
 import {View, ScrollView, Alert} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Input, Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
-import axios from 'axios';
 
 import {TextLink} from '../components/common';
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
-import {removeCurrentClass} from '../global/actions/classes';
 import {registerProfile} from '../global/actions/profile';
 
 import {commonBlue} from '../styles/colors';
@@ -24,7 +23,10 @@ type Props = {
   token: string | null;
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
-  removeCurrentClass: typeof removeCurrentClass;
+  device: {
+    os: string;
+    fcmToken: string;
+  } | null;
 };
 
 type State = {
@@ -44,10 +46,6 @@ class Login extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.props.removeCurrentClass();
-  }
-
   storeToken = async (token: string): Promise<void> => {
     try {
       AsyncStorage.setItem('token', token);
@@ -56,6 +54,7 @@ class Login extends React.Component<Props, State> {
 
   onSubmit = (): void => {
     const {username, password} = this.state;
+    const {device} = this.props;
 
     if (password.length < 6) {
       return Alert.alert('Invalid credentials');
@@ -73,6 +72,7 @@ class Login extends React.Component<Props, State> {
               username,
               password,
             },
+            device,
           },
           {
             timeout: 20000,
@@ -136,14 +136,22 @@ class Login extends React.Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: StoreState): {token: string | null} => {
+const mapStateToProps = (
+  state: StoreState,
+): {
+  token: string | null;
+  device: {
+    os: string;
+    fcmToken: string;
+  } | null;
+} => {
   return {
     token: state.token,
+    device: state.fcm,
   };
 };
 
 export default connect(mapStateToProps, {
   registerToken,
   registerProfile,
-  removeCurrentClass,
 })(Login);

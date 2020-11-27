@@ -126,6 +126,7 @@ class CreateTest extends React.Component<Props, State> {
     }
   };
 
+  // TODO: Improve code quality for validation
   updateQuiz = () => {
     const {
       questions,
@@ -314,8 +315,7 @@ class CreateTest extends React.Component<Props, State> {
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         })
-        .catch((e) => {
-          console.log(e);
+        .catch(() => {
           this.setState({APILoading: false});
           SnackBar.show({
             text: 'Unable to delete Test. Please try again later.',
