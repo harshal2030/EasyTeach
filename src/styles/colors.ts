@@ -3,6 +3,7 @@ const commonGrey = '#6c7a89';
 const commonBackground = '#edf0f2';
 const statusbarColor = '#19b5fe';
 const flatRed = '#d91e18';
+const eucalyptusGreen = '#26a65b';
 
 const greyWithAlpha = (alpha: number): string => {
   if (alpha > 1 || alpha < 0) {
@@ -18,5 +19,6 @@ export {
   commonBackground,
   statusbarColor,
   flatRed,
+  eucalyptusGreen,
   greyWithAlpha,
 };

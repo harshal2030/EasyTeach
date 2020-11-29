@@ -20,7 +20,12 @@ import {
   DrawerParamList,
   BottomTabHomeParamList,
 } from '../navigators/types';
-import {commonBlue, flatRed} from '../styles/colors';
+import {
+  commonBackground,
+  commonBlue,
+  commonGrey,
+  flatRed,
+} from '../styles/colors';
 import {mediaUrl, msgUrl} from '../utils/urls';
 import Snackbar from 'react-native-snackbar';
 
@@ -217,7 +222,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.isOwner && (
+          {this.isOwner ? (
             <Input
               placeholder="Type here..."
               value={this.state.message}
@@ -230,6 +235,16 @@ class Home extends React.Component<Props, State> {
                 onPress: this.postMessage,
               }}
             />
+          ) : (
+            <View
+              style={{
+                backgroundColor: commonBackground,
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: 10,
+              }}>
+              <Text style={{color: commonGrey}}>Read Only</Text>
+            </View>
           )}
         </View>
       </View>

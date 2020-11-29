@@ -23,7 +23,7 @@ PushNotification.configure({
   onNotification: (notification) => {
     const {currentClass} = store.getState();
 
-    if (currentClass) {
+    if (currentClass && !notification.userInteraction) {
       if (currentClass.id === notification.data.classId) {
         const {
           username,

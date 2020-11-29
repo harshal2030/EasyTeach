@@ -6,6 +6,7 @@ type RootStackParamList = {
   JoinClass: undefined;
   Quiz: {
     quizId: string;
+    title: string;
   };
   CreateTest: {
     file?: {

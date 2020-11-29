@@ -106,7 +106,7 @@ class Quiz extends React.Component<Props, State> {
     });
 
     axios
-      .post(
+      .post<{releaseScore: boolean}>(
         `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
         {response: marked},
         {
@@ -115,8 +115,28 @@ class Quiz extends React.Component<Props, State> {
           },
         },
       )
-      .then((res) => console.log(res.data))
-      .catch((e) => console.log(e));
+      .then((res) => {
+        if (res.data.releaseScore) {
+          return this.props.navigation.navigate('ShowScore', {
+            quizId: route.params.quizId,
+            title: route.params.title,
+            questions: this.state.questions.length,
+          });
+        }
+
+        Alert.alert('Success', 'Your response has been recorded', [
+          {
+            text: 'Ok',
+            onPress: () => this.props.navigation.goBack(),
+          },
+        ]);
+      })
+      .catch(() => {
+        Alert.alert(
+          'Oops!',
+          "We're unable to record your response, please try again later",
+        );
+      });
   };
 
   renderContent = () => {

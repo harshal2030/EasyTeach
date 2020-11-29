@@ -1,6 +1,11 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import PhotoView from 'react-native-photo-view-ex';
+import LightBox from 'react-native-lightbox-v2';
+import {View, StyleSheet, Linking, Image} from 'react-native';
 import {Header, Button, Text} from 'react-native-elements';
+
+import {eucalyptusGreen} from '../../styles/colors';
+import {mediaUrl} from '../../utils/urls';
 
 interface Props {
   onBackPress: () => any;
@@ -8,7 +13,19 @@ interface Props {
 }
 
 const ImportExcel = (props: Props) => {
-  const {container, content, secondaryText, imageStyle} = styles;
+  const {container, content, secondaryText, imageStyle, expandText} = styles;
+
+  const ZoomImage = () => {
+    return (
+      <PhotoView
+        source={require('../../images/sheet.png')}
+        resizeMode="contain"
+        style={{height: '100%', width: '100%'}}
+        maximumZoomScale={4}
+      />
+    );
+  };
+
   return (
     <View style={container}>
       <Header
@@ -29,7 +46,14 @@ const ImportExcel = (props: Props) => {
           You need to import excel file in given format
         </Text>
 
-        <View style={imageStyle} />
+        <LightBox renderContent={ZoomImage}>
+          <Image
+            source={require('../../images/sheet.png')}
+            style={imageStyle}
+            resizeMode="stretch"
+          />
+          <Text style={expandText}>*click to expand</Text>
+        </LightBox>
 
         <Button
           title="Import Sheet"
@@ -40,6 +64,19 @@ const ImportExcel = (props: Props) => {
           }}
           containerStyle={{marginTop: 20}}
           onPress={props.onImportPress}
+        />
+
+        <Button
+          title="Download Sample"
+          containerStyle={{marginTop: 10}}
+          buttonStyle={{backgroundColor: eucalyptusGreen}}
+          icon={{
+            name: 'file-download',
+            type: 'font-awesome-5',
+            color: '#fff',
+            size: 24,
+          }}
+          onPress={() => Linking.openURL(`${mediaUrl}/sample`)}
         />
       </View>
     </View>
@@ -58,10 +95,12 @@ const styles = StyleSheet.create({
     color: 'grey',
   },
   imageStyle: {
-    height: 300,
+    height: 140,
     width: '100%',
-    backgroundColor: 'red',
     marginTop: 10,
+  },
+  expandText: {
+    fontSize: 12,
   },
 });
 

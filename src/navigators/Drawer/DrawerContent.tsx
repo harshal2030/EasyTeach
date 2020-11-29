@@ -7,12 +7,11 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  Image,
   Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import {Button, Avatar} from 'react-native-elements';
+import {Button, Avatar, Image} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
@@ -100,11 +99,13 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         onPress={() => {
           props.registerCurrentClass(item);
+          props.navigation.closeDrawer();
         }}>
         <Image
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
           }}
+          PlaceholderContent={<View style={{backgroundColor: commonGrey}} />}
           style={avatarImageStyle}
         />
         <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
@@ -261,7 +262,6 @@ const styles = StyleSheet.create({
   avatarImageStyle: {
     height: 60,
     width: 60,
-    backgroundColor: commonGrey,
     marginTop: 10,
   },
   leftContainer: {
