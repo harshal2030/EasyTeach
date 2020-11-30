@@ -146,6 +146,7 @@ class CommonTest extends React.Component<Props, State> {
           isVisible={this.state.modalVisible}
           animationIn="slideInLeft"
           animationOut="slideOutLeft"
+          hideModalContentWhileAnimating
           onBackButtonPress={() => this.setState({modalVisible: false})}
           // eslint-disable-next-line react-native/no-inline-styles
           style={{margin: 0}}>

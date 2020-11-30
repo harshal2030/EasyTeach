@@ -118,6 +118,10 @@ const App = (props: Props): JSX.Element => {
             name="Quiz"
             component={require('./screens/Quiz').default}
           />
+          <Stack.Screen
+            name="EditProfile"
+            component={require('./screens/EditProfile').default}
+          />
           {isOwner && (
             <Stack.Screen
               name="CreateTest"

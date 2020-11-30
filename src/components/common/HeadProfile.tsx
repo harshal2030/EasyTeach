@@ -1,7 +1,6 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Avatar, Text} from 'react-native-elements';
-import Entypo from 'react-native-vector-icons/Entypo';
 import {commonBackground, commonGrey} from '../../styles/colors';
 
 type Props = {
@@ -27,12 +26,6 @@ const HeadCom = (props: Props) => {
       {props.rightComponent}
     </View>
   );
-};
-
-HeadCom.defaultProps = {
-  rightComponent: (
-    <Entypo name="chevron-thin-right" size={24} color={commonGrey} />
-  ),
 };
 
 const styles = StyleSheet.create({

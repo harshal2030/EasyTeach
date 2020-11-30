@@ -19,6 +19,7 @@ import {
   Class,
   updateClasses,
   registerCurrentClass,
+  removeClass,
 } from '../global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
@@ -35,6 +36,7 @@ interface Props {
   token: string | null;
   updateClasses: typeof updateClasses;
   registerCurrentClass: typeof registerCurrentClass;
+  removeClass: typeof removeClass;
 }
 
 interface State {
@@ -271,6 +273,8 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {updateClasses, registerCurrentClass})(
-  ManageClass,
-);
+export default connect(mapStateToProps, {
+  updateClasses,
+  registerCurrentClass,
+  removeClass,
+})(ManageClass);

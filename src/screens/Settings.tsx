@@ -7,6 +7,7 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {HeadCom} from '../components/common';
 
@@ -20,7 +21,7 @@ import {
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {mediaUrl, studentUrl} from '../utils/urls';
 import {ContainerStyles} from '../styles/styles';
-import {flatRed, commonBlue} from '../styles/colors';
+import {flatRed, commonBlue, commonGrey} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Settings'>,
@@ -176,7 +177,18 @@ class Settings extends React.PureComponent<Props> {
           avatar={`${mediaUrl}/avatar/${profile.avatar}`}
           name={profile.name}
           username={profile.username}
-          rightComponent={null}
+          rightComponent={
+            <MaterialCommunityIcons
+              name="account-edit-outline"
+              size={28}
+              color={commonGrey}
+              onPress={() =>
+                this.props.navigation.navigate('EditProfile', {
+                  username: profile.username,
+                })
+              }
+            />
+          }
         />
 
         {this.renderContent()}
