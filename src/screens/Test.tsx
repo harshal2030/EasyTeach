@@ -106,7 +106,7 @@ class Test extends React.Component<Props, State> {
           data={quizzes}
           headerText="Live"
           renderItem={this.renderItem}
-          currentClassOwner={currentClass!.owner.name}
+          currentClassOwner={currentClass!.owner.username}
           user={profile.username}
         />
 

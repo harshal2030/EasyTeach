@@ -1,15 +1,25 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Header} from 'react-native-elements';
+import axios from 'axios';
+import {View, Platform} from 'react-native';
+import {Header, Input} from 'react-native-elements';
+import {ImageOrVideo} from 'react-native-image-crop-picker';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
+import SnackBar from 'react-native-snackbar';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {CommonSetting} from '../components/main';
+import {PhotoPicker} from '../components/common';
 
 import {StoreState} from '../global';
+import {registerToken} from '../global/actions/token';
+import {registerProfile} from '../global/actions/profile';
+
 import {RootStackParamList} from '../navigators/types';
-import {mediaUrl} from '../utils/urls';
+import {mediaUrl, root} from '../utils/urls';
+import {flatRed} from '../styles/colors';
 
 type NavigationProps = StackNavigationProp<RootStackParamList, 'EditProfile'>;
 
@@ -21,10 +31,108 @@ interface Props {
     username: string;
     avatar: string;
   };
+  token: string | null;
+  registerToken: typeof registerToken;
+  registerProfile: typeof registerProfile;
 }
 
-class EditProfile extends React.Component<Props> {
+interface State {
+  name: string;
+  username: string;
+  avatar: {
+    uri: string;
+    type: string;
+  };
+}
+
+class EditProfile extends React.Component<Props, State> {
+  sheet: RBSheet | null = null;
+
+  constructor(props: Props) {
+    super(props);
+
+    const {name, username, avatar} = this.props.profile;
+
+    this.state = {
+      name,
+      username,
+      avatar: {
+        uri: `${mediaUrl}/avatar/${avatar}`,
+        type: '',
+      },
+    };
+  }
+
+  storeNewToken = async (token: string) => {
+    try {
+      await AsyncStorage.setItem('token', token);
+    } catch (e) {
+      // move on
+    }
+  };
+
+  onImage = (image: ImageOrVideo) => {
+    this.sheet!.close();
+    this.setState({
+      avatar: {
+        uri: image.path,
+        type: image.mime,
+      },
+    });
+  };
+
+  onImageError = () => {
+    this.sheet!.close();
+    SnackBar.show({
+      text: 'Unable to pick image.',
+      duration: SnackBar.LENGTH_SHORT,
+    });
+  };
+
+  updateProfile = () => {
+    const {name, username, avatar} = this.state;
+    const form = new FormData();
+    form.append('info', JSON.stringify({name, username}));
+
+    if (avatar.uri !== `${mediaUrl}/avatar/${this.props.profile.avatar}`) {
+      form.append('avatar', {
+        // @ts-ignore
+        name: 'photo.jpeg',
+        type: avatar.type,
+        uri:
+          Platform.OS === 'android'
+            ? avatar.uri
+            : avatar.uri.replace('file://', ''),
+      });
+    }
+
+    axios
+      .put<{
+        token: string;
+        user: {avatar: string; name: string; username: string};
+      }>(`${root}/users`, form, {
+        headers: {
+          Authorization: `Bearer ${this.props.token}`,
+        },
+      })
+      .then((res) => {
+        this.storeNewToken(res.data.token);
+        this.props.registerToken(res.data.token);
+        this.props.registerProfile(res.data.user);
+        this.props.navigation.goBack();
+      })
+      .catch(() => {
+        SnackBar.show({
+          text: 'Unable to update profile. please try again later',
+          backgroundColor: flatRed,
+          textColor: '#fff',
+        });
+      });
+  };
+
   render() {
+    const {avatar, name, username} = this.state;
+
     return (
       <View>
         <Header
@@ -42,11 +150,29 @@ class EditProfile extends React.Component<Props> {
 
         <CommonSetting
           imageSource={{
-            uri: `${mediaUrl}/avatar/${this.props.profile.avatar}`,
+            uri: avatar.uri,
           }}
-          onButtonPress={() => console.log('hello')}
-          onImagePress={() => console.log('hello')}
-          buttonProps={{title: 'Update'}}
+          onButtonPress={this.updateProfile}
+          onImagePress={() => this.sheet!.open()}
+          buttonProps={{title: 'Update'}}>
+          <Input
+            label="Name"
+            value={name}
+            onChangeText={(text) => this.setState({name: text})}
+          />
+          <Input
+            label="Username"
+            value={username}
+            onChangeText={(text) => this.setState({username: text})}
+          />
+        </CommonSetting>
+
+        <PhotoPicker
+          sheetRef={(ref) => (this.sheet = ref)}
+          onCameraImage={this.onImage}
+          onPickerImage={this.onImage}
+          onCameraError={this.onImageError}
+          onPickerError={this.onImageError}
         />
       </View>
     );
@@ -56,7 +182,10 @@ class EditProfile extends React.Component<Props> {
 const mapStateToProps = (state: StoreState) => {
   return {
     profile: state.profile,
+    token: state.token,
   };
 };
 
-export default connect(mapStateToProps)(EditProfile);
+export default connect(mapStateToProps, {registerProfile, registerToken})(
+  EditProfile,
+);

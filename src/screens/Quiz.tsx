@@ -19,7 +19,7 @@ import {Class} from '../global/actions/classes';
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
 import {quizUrl} from '../utils/urls';
-import {commonBlue} from '../styles/colors';
+import {commonBlue, commonGrey, greyWithAlpha} from '../styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList>;
@@ -33,6 +33,7 @@ type Questions = {
   options: string[];
   queId: string;
   selected: number | null;
+  score: number;
 };
 
 interface State {
@@ -117,7 +118,7 @@ class Quiz extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.data.releaseScore) {
-          return this.props.navigation.navigate('ShowScore', {
+          return this.props.navigation.replace('ShowScore', {
             quizId: route.params.quizId,
             title: route.params.title,
             questions: this.state.questions.length,
@@ -141,12 +142,7 @@ class Quiz extends React.Component<Props, State> {
 
   renderContent = () => {
     const {loading, errored, questions, currentIndex} = this.state;
-    const {
-      buttonContainer,
-      buttonContainerStyle,
-      textStyle,
-      buttonStyle,
-    } = styles;
+    const {buttonContainerStyle, textStyle, buttonStyle} = styles;
 
     if (errored) {
       return (
@@ -165,46 +161,37 @@ class Quiz extends React.Component<Props, State> {
     }
 
     return (
-      <>
-        <View style={buttonContainer}>
-          <Button
-            title="Previous"
-            disabled={currentIndex === 0}
-            onPress={() => this.setState({currentIndex: currentIndex - 1})}
-          />
-          <Button title="Submit" onPress={this.postResponse} />
-          <Button
-            title="Next"
-            disabled={currentIndex === questions.length - 1}
-            onPress={() => this.setState({currentIndex: currentIndex + 1})}
-          />
-        </View>
+      <ScrollView style={[ContainerStyles.padder, {width: '100%'}]}>
+        <Text style={{color: commonGrey}}>
+          Question {currentIndex + 1} of {questions.length},{' '}
+          {questions[currentIndex].score} marks
+        </Text>
 
-        <ScrollView style={[ContainerStyles.padder, {width: '100%'}]}>
-          <Text style={{fontSize: 18, fontWeight: '500'}}>
-            {questions[currentIndex].question}
-          </Text>
-          <ButtonGroup
-            buttons={questions[currentIndex].options}
-            onPress={this.updateSelected}
-            buttonContainerStyle={buttonContainerStyle}
-            buttonStyle={buttonStyle}
-            textStyle={textStyle}
-            containerStyle={{marginBottom: 100}}
-            vertical
-            selectedIndex={this.state.questions[currentIndex].selected}
-          />
-        </ScrollView>
-      </>
+        <Text style={{fontSize: 18, fontWeight: '500'}}>
+          {questions[currentIndex].question}
+        </Text>
+        <ButtonGroup
+          buttons={questions[currentIndex].options}
+          onPress={this.updateSelected}
+          buttonContainerStyle={buttonContainerStyle}
+          buttonStyle={buttonStyle}
+          textStyle={textStyle}
+          containerStyle={{marginBottom: 100}}
+          vertical
+          selectedIndex={this.state.questions[currentIndex].selected}
+        />
+      </ScrollView>
     );
   };
 
   render() {
+    const {questions, currentIndex} = this.state;
+
     return (
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: 'Quiz',
+            text: this.props.route.params.title,
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -218,6 +205,25 @@ class Quiz extends React.Component<Props, State> {
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           {this.renderContent()}
         </View>
+
+        <Text style={{marginLeft: 10}}>
+          You have answered{' '}
+          {questions.filter((que) => que.selected !== undefined).length} of{' '}
+          {questions.length}
+        </Text>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Previous"
+            disabled={currentIndex === 0}
+            onPress={() => this.setState({currentIndex: currentIndex - 1})}
+          />
+          <Button title="Submit" onPress={this.postResponse} />
+          <Button
+            title="Next"
+            disabled={currentIndex === questions.length - 1}
+            onPress={() => this.setState({currentIndex: currentIndex + 1})}
+          />
+        </View>
       </View>
     );
   }
@@ -229,6 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     padding: 20,
+    backgroundColor: greyWithAlpha(0.2),
   },
   buttonContainerStyle: {
     flex: 1,

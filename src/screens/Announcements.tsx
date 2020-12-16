@@ -137,7 +137,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.classIsLoading || props.msgLoading) {
+    if (props.classIsLoading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator color={commonBlue} animating size="large" />
@@ -147,8 +147,8 @@ class Home extends React.Component<Props, State> {
 
     if (props.classes.length === 0) {
       return (
-        <>
-          <Text>
+        <View style={ContainerStyles.centerElements}>
+          <Text style={ContainerStyles.padder}>
             Looks like it's your first time. Begin with Joining or Creating a
             class
           </Text>
@@ -156,7 +156,7 @@ class Home extends React.Component<Props, State> {
             title="Create or Join class"
             onPress={() => props.navigation.navigate('JoinClass')}
           />
-        </>
+        </View>
       );
     }
 
@@ -167,6 +167,14 @@ class Home extends React.Component<Props, State> {
             We're having trouble in fetching Announcements for you. Please try
             again later
           </Text>
+        </View>
+      );
+    }
+
+    if (props.msgLoading) {
+      return (
+        <View style={ContainerStyles.centerElements}>
+          <ActivityIndicator color={commonBlue} animating size="large" />
         </View>
       );
     }

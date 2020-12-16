@@ -168,6 +168,7 @@ const People = (props: Props) => {
             <ListItem bottomDivider topDivider>
               <Avatar
                 size="medium"
+                rounded
                 source={{
                   uri: `${mediaUrl}/avatar/${props.currentClass!.owner.avatar}`,
                 }}

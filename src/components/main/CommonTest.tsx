@@ -142,6 +142,7 @@ class CommonTest extends React.Component<Props, State> {
             onPress={() => this.setState({modalVisible: true})}
           />
         )}
+
         <Modal
           isVisible={this.state.modalVisible}
           animationIn="slideInLeft"
@@ -165,8 +166,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 60,
     width: 60,
-    bottom: 10,
-    right: 10,
+    bottom: 30,
+    right: 20,
     padding: 10,
     backgroundColor: '#ffff',
     borderWidth: 1,
