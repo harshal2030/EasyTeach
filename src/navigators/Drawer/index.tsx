@@ -52,6 +52,12 @@ const DrawerNavigator = (props: Props): JSX.Element => {
           component={require('../../screens/ManageClass').default}
         />
       )}
+      {props.currentClass && (
+        <Drawer.Screen
+          name="Resource"
+          component={require('../../screens/Resource').default}
+        />
+      )}
       <Drawer.Screen
         name="Settings"
         component={require('../../screens/Settings').default}

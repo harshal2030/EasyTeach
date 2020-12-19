@@ -1,4 +1,4 @@
-const root = 'http://192.168.43.26:3000';
+const root = 'http://192.168.43.25:3000';
 const signUpUrl = `${root}/users/create`;
 const loginUrl = `${root}/users/login`;
 const logOutUrl = `${root}/users/logout`;

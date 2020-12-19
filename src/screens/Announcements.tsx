@@ -30,7 +30,7 @@ import {mediaUrl, msgUrl} from '../utils/urls';
 import Snackbar from 'react-native-snackbar';
 
 type NavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
+  BottomTabNavigationProp<BottomTabHomeParamList, 'Announcements'>,
   CompositeNavigationProp<
     DrawerNavigationProp<DrawerParamList>,
     StackNavigationProp<RootStackParamList>
