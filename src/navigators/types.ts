@@ -42,6 +42,7 @@ type DrawerParamList = {
   Test: undefined;
   Manage: undefined;
   Settings: undefined;
+  Resource: undefined;
 };
 
 export {

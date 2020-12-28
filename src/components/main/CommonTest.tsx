@@ -92,7 +92,7 @@ class CommonTest extends React.Component<Props, State> {
   ImportSheet = async () => {
     try {
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
+        type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
       });
 
       this.setState({modalVisible: false});

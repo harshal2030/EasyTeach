@@ -17,6 +17,7 @@ import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../../global';
 import {removeToken} from '../../global/actions/token';
@@ -228,6 +229,13 @@ const DrawerContent = (props: Props): JSX.Element => {
                   onPress={() => props.navigation.navigate('Test')}>
                   <Octicons name="checklist" color="#34495e" size={25} />
                   <Text style={optionText}> Tests</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => props.navigation.navigate('Resource')}>
+                  <MaterialIcons name="view-module" color="#34495e" size={23} />
+                  <Text style={optionText}> Resources</Text>
                 </TouchableOpacity>
               </>
             )}

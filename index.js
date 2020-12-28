@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import 'react-native-gesture-handler';
-import {AppRegistry} from 'react-native';
+import {AppRegistry, StatusBar} from 'react-native';
 import App from './src/App';
 import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
@@ -58,6 +58,7 @@ enableScreens(true);
 const Wrapper = () => {
   return (
     <Provider store={store}>
+      <StatusBar translucent backgroundColor="#1e8bc3" />
       <NavigationContainer>
         <App />
       </NavigationContainer>
