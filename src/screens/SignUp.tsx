@@ -125,6 +125,10 @@ class SignUp extends React.Component<Props, State> {
           },
           {
             timeout: 20000,
+            auth: {
+              username: 'accountCreator',
+              password: 'AJHK TREE VS *(%(@221133',
+            },
           },
         )
         .then((res) => {
@@ -135,6 +139,7 @@ class SignUp extends React.Component<Props, State> {
           }
         })
         .catch((e) => {
+          console.log(e);
           this.setState({loading: false});
           if (e.response) {
             if (e.response.status === 400) {

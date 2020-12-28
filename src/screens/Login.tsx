@@ -76,6 +76,10 @@ class Login extends React.Component<Props, State> {
           },
           {
             timeout: 20000,
+            auth: {
+              username: 'accountCreator',
+              password: 'AJHK TREE VS *(%(@221133',
+            },
           },
         )
         .then((res) => {
