@@ -23,7 +23,7 @@ import {PhotoPicker} from '../components/common';
 import {CommonSetting} from '../components/main';
 import {classUrl} from '../utils/urls';
 
-import {Class, addClass} from '../global/actions/classes';
+import {Class, addClass, registerCurrentClass} from '../global/actions/classes';
 import {StoreState} from '../global';
 
 type Props = {
@@ -31,6 +31,7 @@ type Props = {
   token: string;
   classes: Class[];
   addClass: typeof addClass;
+  registerCurrentClass: typeof registerCurrentClass;
 };
 
 type State = {
@@ -82,6 +83,7 @@ class JoinClass extends React.Component<Props, State> {
       )
       .then((res) => {
         this.props.addClass(res.data);
+        this.props.registerCurrentClass(res.data);
         this.props.navigation.navigate('Drawer');
       })
       .catch((e) => {
@@ -132,6 +134,7 @@ class JoinClass extends React.Component<Props, State> {
       })
       .then((res) => {
         this.props.addClass(res.data);
+        this.props.registerCurrentClass(res.data);
         this.props.navigation.navigate('Drawer');
       })
       .catch((e) => {
@@ -294,4 +297,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addClass})(JoinClass);
+export default connect(mapStateToProps, {addClass, registerCurrentClass})(
+  JoinClass,
+);
