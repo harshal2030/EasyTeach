@@ -19,6 +19,7 @@
     "@react-navigation/native": "^5.7.3",
     "@react-navigation/stack": "^5.9.0",
     "axios": "^0.20.0",
+    "js-base64": "^3.6.0",
     "react": "16.13.1",
     "react-native": "0.63.3",
     "react-native-document-picker": "^4.1.0",

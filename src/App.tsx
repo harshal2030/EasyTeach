@@ -1,8 +1,10 @@
 import React from 'react';
+import Axios from 'axios';
 import {ActivityIndicator, View, Alert, BackHandler} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
+import {encode, decode} from 'js-base64';
 
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
@@ -13,9 +15,16 @@ import {checkTokenUrl} from './utils/urls';
 
 import {RootStackParamList} from './navigators/types';
 import {commonBlue} from './styles/colors';
-import Axios from 'axios';
 
 const Stack = createStackNavigator<RootStackParamList>();
+
+if (!global.btoa) {
+  global.btoa = encode;
+}
+
+if (!global.atob) {
+  global.atob = decode;
+}
 
 interface Props {
   token: string | null;
