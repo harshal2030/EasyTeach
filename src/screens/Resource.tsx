@@ -7,14 +7,17 @@ import {
   StyleSheet,
   TouchableHighlight,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
-import {Header, Button} from 'react-native-elements';
+import {Header, Button, Icon} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
 import SnackBar from 'react-native-snackbar';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -57,6 +60,7 @@ interface State {
 class Resource extends React.Component<Props, State> {
   isOwner: boolean =
     this.props.profile.username === this.props.currentClass.owner.username;
+  sheet: RBSheet | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -74,6 +78,8 @@ class Resource extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
+    this.isOwner =
+      this.props.profile.username === this.props.currentClass.owner.username;
     if (prevProps.currentClass.id !== this.props.currentClass.id) {
       this.loadBlocks();
       this.isOwner =
@@ -111,12 +117,13 @@ class Resource extends React.Component<Props, State> {
         },
       )
       .then((res) => {
-        this.setState({dialogVisible: false});
         this.setState({
           blocks: [
             {id: res.data.id, title: res.data.title},
             ...this.state.blocks,
           ],
+          dialogVisible: false,
+          moduleName: '',
         });
       })
       .catch(() => {
@@ -126,6 +133,25 @@ class Resource extends React.Component<Props, State> {
           backgroundColor: flatRed,
         });
       });
+  };
+
+  renderBlock = ({item}: {item: {id: string; title: string}}) => {
+    return (
+      <TouchableHighlight
+        underlayColor={greyWithAlpha(0.4)}
+        onPress={() => console.log(item.id)}>
+        <View style={styles.moduleContainer}>
+          <Text style={{fontWeight: 'bold', fontSize: 16}}>{item.title}</Text>
+          {this.isOwner && (
+            <Icon
+              name="more-horizontal"
+              type="feather"
+              onPress={() => this.sheet!.open()}
+            />
+          )}
+        </View>
+      </TouchableHighlight>
+    );
   };
 
   renderContent = () => {
@@ -159,8 +185,12 @@ class Resource extends React.Component<Props, State> {
       <>
         <Dialog.Container
           visible={this.state.dialogVisible}
-          onBackdropPress={() => this.setState({dialogVisible: false})}
-          onBackButtonPress={() => this.setState({dialogVisible: false})}>
+          onBackdropPress={() =>
+            this.setState({dialogVisible: false, moduleName: ''})
+          }
+          onBackButtonPress={() =>
+            this.setState({dialogVisible: false, moduleName: ''})
+          }>
           <Dialog.Title>Module Name</Dialog.Title>
           <Dialog.Input
             underlineColorAndroid={commonGrey}
@@ -169,7 +199,9 @@ class Resource extends React.Component<Props, State> {
           />
           <Dialog.Button
             label="Cancel"
-            onPress={() => this.setState({dialogVisible: false})}
+            onPress={() =>
+              this.setState({dialogVisible: false, moduleName: ''})
+            }
           />
           <Dialog.Button label="Create" onPress={this.addModule} />
         </Dialog.Container>
@@ -177,29 +209,9 @@ class Resource extends React.Component<Props, State> {
         <FlatList
           data={this.state.blocks}
           keyExtractor={(_item, i) => i.toString()}
-          renderItem={({item}) => (
-            <TouchableHighlight
-              underlayColor={greyWithAlpha(0.4)}
-              onPress={() => console.log(item.id)}>
-              <View style={styles.moduleContainer}>
-                <Text style={{fontWeight: 'bold', fontSize: 16}}>
-                  {item.title}
-                </Text>
-              </View>
-            </TouchableHighlight>
-          )}
+          renderItem={this.renderBlock}
           style={{padding: 5}}
         />
-
-        {this.isOwner && (
-          <View style={{padding: 10}}>
-            <Button
-              title="Add Module"
-              icon={{name: 'plus', type: 'font-awesome', color: '#fff'}}
-              onPress={() => this.setState({dialogVisible: true})}
-            />
-          </View>
-        )}
       </>
     );
   };
@@ -221,6 +233,43 @@ class Resource extends React.Component<Props, State> {
           }}
         />
         {this.renderContent()}
+
+        {this.isOwner && (
+          <View style={{padding: 10}}>
+            <Button
+              title="Add Module"
+              icon={{name: 'plus', type: 'font-awesome', color: '#fff'}}
+              onPress={() => this.setState({dialogVisible: true})}
+            />
+          </View>
+        )}
+
+        <RBSheet
+          height={150}
+          ref={(ref) => (this.sheet = ref)}
+          closeOnPressMask
+          closeOnDragDown
+          customStyles={{
+            container: {
+              borderTopWidth: 1,
+              borderTopLeftRadius: 10,
+              borderTopRightRadius: 10,
+              borderColor: 'transparent',
+            },
+          }}>
+          <View>
+            <TouchableOpacity style={styles.RBOptionContainer}>
+              <MaterialIcons name="edit" color="#000" size={24} />
+              <Text style={styles.RBTextStyle}>Change Name</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.RBOptionContainer}>
+              <MaterialIcons name="delete" color={flatRed} size={24} />
+              <Text style={[styles.RBTextStyle, {color: flatRed}]}>
+                Delete Module
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </RBSheet>
       </View>
     );
   }
@@ -234,6 +283,18 @@ const styles = StyleSheet.create({
     backgroundColor: commonBackground,
     marginVertical: 2,
     borderRadius: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  RBOptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  RBTextStyle: {
+    fontSize: 20,
+    fontWeight: '400',
   },
 });
 
