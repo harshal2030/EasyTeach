@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {
   View,
+  Alert,
   FlatList,
   Text,
   StyleSheet,
@@ -51,10 +52,12 @@ interface Props {
 
 interface State {
   dialogVisible: boolean;
+  editDialogVisible: boolean;
   blocks: {id: string; title: string}[];
   moduleName: string;
   loading: boolean;
   errored: boolean;
+  selectedModule: string | null;
 }
 
 class Resource extends React.Component<Props, State> {
@@ -66,10 +69,12 @@ class Resource extends React.Component<Props, State> {
 
     this.state = {
       dialogVisible: false,
+      editDialogVisible: false,
       blocks: [],
       moduleName: '',
       loading: true,
       errored: false,
+      selectedModule: null,
     };
   }
 
@@ -103,6 +108,69 @@ class Resource extends React.Component<Props, State> {
         this.setState({blocks, loading: false});
       })
       .catch(() => this.setState({loading: false, errored: true}));
+  };
+
+  editModule = () => {
+    const id = this.state.selectedModule;
+    const modules = [...this.state.blocks];
+    const indexToBeChanged = modules.findIndex((val) => val.id === id);
+    modules[indexToBeChanged].title = this.state.moduleName;
+    this.setState({blocks: modules, editDialogVisible: false, moduleName: ''});
+
+    axios
+      .put<{classId: string; id: string; title: string}>(
+        `${moduleUrl}/${this.props.currentClass.id}/${this.state.selectedModule}`,
+        {title: this.state.moduleName},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .catch(() => {
+        SnackBar.show({
+          text: 'Unable to edit module at the moment',
+          backgroundColor: flatRed,
+          duration: SnackBar.LENGTH_SHORT,
+        });
+      });
+  };
+
+  deleteModule = () => {
+    const module = this.state.selectedModule;
+    const perform = () => {
+      axios
+        .delete(`${moduleUrl}/${this.props.currentClass.id}/${module}`, {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        })
+        .then(() => {
+          const blocks = this.state.blocks.filter((val) => val.id !== module);
+          this.setState({blocks});
+        })
+        .catch(() => {
+          SnackBar.show({
+            text: 'Unable to delete module at the moment',
+            duration: SnackBar.LENGTH_SHORT,
+            backgroundColor: flatRed,
+          });
+        });
+    };
+
+    Alert.alert(
+      'Confirm',
+      'All the related files will also be deleted. Are you sure to delete this module?',
+      [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: perform,
+        },
+      ],
+    );
   };
 
   addModule = () => {
@@ -146,7 +214,10 @@ class Resource extends React.Component<Props, State> {
             <Icon
               name="more-horizontal"
               type="feather"
-              onPress={() => this.sheet!.open()}
+              onPress={() => {
+                this.setState({selectedModule: item.id});
+                this.sheet!.open();
+              }}
             />
           )}
         </View>
@@ -183,29 +254,6 @@ class Resource extends React.Component<Props, State> {
 
     return (
       <>
-        <Dialog.Container
-          visible={this.state.dialogVisible}
-          onBackdropPress={() =>
-            this.setState({dialogVisible: false, moduleName: ''})
-          }
-          onBackButtonPress={() =>
-            this.setState({dialogVisible: false, moduleName: ''})
-          }>
-          <Dialog.Title>Module Name</Dialog.Title>
-          <Dialog.Input
-            underlineColorAndroid={commonGrey}
-            value={this.state.moduleName}
-            onChangeText={(text) => this.setState({moduleName: text})}
-          />
-          <Dialog.Button
-            label="Cancel"
-            onPress={() =>
-              this.setState({dialogVisible: false, moduleName: ''})
-            }
-          />
-          <Dialog.Button label="Create" onPress={this.addModule} />
-        </Dialog.Container>
-
         <FlatList
           data={this.state.blocks}
           keyExtractor={(_item, i) => i.toString()}
@@ -232,6 +280,53 @@ class Resource extends React.Component<Props, State> {
             onPress: () => this.props.navigation.openDrawer(),
           }}
         />
+
+        <Dialog.Container
+          visible={this.state.dialogVisible}
+          onBackdropPress={() =>
+            this.setState({dialogVisible: false, moduleName: ''})
+          }
+          onBackButtonPress={() =>
+            this.setState({dialogVisible: false, moduleName: ''})
+          }>
+          <Dialog.Title>Module Name</Dialog.Title>
+          <Dialog.Input
+            underlineColorAndroid={commonGrey}
+            value={this.state.moduleName}
+            onChangeText={(text) => this.setState({moduleName: text})}
+          />
+          <Dialog.Button
+            label="Cancel"
+            onPress={() =>
+              this.setState({dialogVisible: false, moduleName: ''})
+            }
+          />
+          <Dialog.Button label="Create" onPress={this.addModule} />
+        </Dialog.Container>
+
+        <Dialog.Container
+          visible={this.state.editDialogVisible}
+          onBackdropPress={() =>
+            this.setState({editDialogVisible: false, moduleName: ''})
+          }
+          onBackButtonPress={() =>
+            this.setState({editDialogVisible: false, moduleName: ''})
+          }>
+          <Dialog.Title>Module Name</Dialog.Title>
+          <Dialog.Input
+            underlineColorAndroid={commonGrey}
+            value={this.state.moduleName}
+            onChangeText={(text) => this.setState({moduleName: text})}
+          />
+          <Dialog.Button
+            label="Cancel"
+            onPress={() =>
+              this.setState({editDialogVisible: false, moduleName: ''})
+            }
+          />
+          <Dialog.Button label="Edit Name" onPress={this.editModule} />
+        </Dialog.Container>
+
         {this.renderContent()}
 
         {this.isOwner && (
@@ -258,11 +353,21 @@ class Resource extends React.Component<Props, State> {
             },
           }}>
           <View>
-            <TouchableOpacity style={styles.RBOptionContainer}>
+            <TouchableOpacity
+              style={styles.RBOptionContainer}
+              onPress={() => {
+                this.sheet!.close();
+                this.setState({editDialogVisible: true});
+              }}>
               <MaterialIcons name="edit" color="#000" size={24} />
               <Text style={styles.RBTextStyle}>Change Name</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.RBOptionContainer}>
+            <TouchableOpacity
+              style={styles.RBOptionContainer}
+              onPress={() => {
+                this.sheet!.close();
+                this.deleteModule();
+              }}>
               <MaterialIcons name="delete" color={flatRed} size={24} />
               <Text style={[styles.RBTextStyle, {color: flatRed}]}>
                 Delete Module
