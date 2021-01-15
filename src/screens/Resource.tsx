@@ -207,7 +207,9 @@ class Resource extends React.Component<Props, State> {
     return (
       <TouchableHighlight
         underlayColor={greyWithAlpha(0.4)}
-        onPress={() => console.log(item.id)}>
+        onPress={() =>
+          this.props.navigation.navigate('Files', {moduleId: item.id})
+        }>
         <View style={styles.moduleContainer}>
           <Text style={{fontWeight: 'bold', fontSize: 16}}>{item.title}</Text>
           {this.isOwner && (

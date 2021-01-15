@@ -24,6 +24,9 @@ type RootStackParamList = {
   EditProfile: {
     username: string;
   };
+  Files: {
+    moduleId: string;
+  };
 };
 
 type BottomTabHomeParamList = {

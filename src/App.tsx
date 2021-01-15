@@ -143,6 +143,12 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/ShowScore').default}
             />
           )}
+          {props.currentClass && (
+            <Stack.Screen
+              name="Files"
+              component={require('./screens/Files').default}
+            />
+          )}
         </>
       )}
     </Stack.Navigator>
