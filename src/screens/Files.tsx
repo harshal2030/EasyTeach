@@ -1,6 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {Header} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
@@ -74,11 +80,11 @@ class Files extends React.Component<Props, State> {
     let name: string = 'image';
 
     if (item.filename.match(imageExtPattern)) {
-      name = 'image';
+      name = 'image-outline';
     }
 
     if (item.filename.match(videoExtPattern)) {
-      name = 'play-box';
+      name = 'play-box-outline';
     }
 
     if (item.filename.match(pdfExtPattern)) {
@@ -98,10 +104,10 @@ class Files extends React.Component<Props, State> {
     }
 
     return (
-      <View style={styles.fileBlock}>
-        <MaterialCommunityIcons name={name} size={30} color={commonGrey} />
+      <TouchableOpacity style={styles.fileBlock} onPress={() => console.log(item.filename)}>
+        <MaterialCommunityIcons name={name} size={35} color={commonGrey} />
         <Text style={styles.fileBlockText}>{item.title}</Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -128,7 +134,7 @@ class Files extends React.Component<Props, State> {
 
     if (files.length === 0) {
       return (
-        <View>
+        <View style={ContainerStyles.centerElements}>
           <Text>Wow! Such empty</Text>
         </View>
       );
@@ -146,7 +152,7 @@ class Files extends React.Component<Props, State> {
 
   render() {
     return (
-      <View>
+      <View style={{flex: 1}}>
         <Header
           centerComponent={{
             text: 'Files',
