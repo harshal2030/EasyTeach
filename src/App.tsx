@@ -4,6 +4,7 @@ import {ActivityIndicator, View, Alert, BackHandler} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
+import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
 
 import {StoreState} from './global';
@@ -42,6 +43,7 @@ const App = (props: Props): JSX.Element => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
       if (token) {
+        SplashScreen.hide();
         props.registerToken(token);
         Axios.get<{name: string; username: string; avatar: string}>(
           checkTokenUrl,
@@ -60,6 +62,7 @@ const App = (props: Props): JSX.Element => {
           .catch((e) => {
             if (e.response) {
               if (e.response.status === 401) {
+                SplashScreen.hide();
                 return props.removeToken();
               }
             }
@@ -76,6 +79,7 @@ const App = (props: Props): JSX.Element => {
             );
           });
       } else {
+        SplashScreen.hide();
         props.removeToken();
       }
       setLoading(false);
