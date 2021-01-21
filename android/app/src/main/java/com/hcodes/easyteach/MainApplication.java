@@ -1,4 +1,4 @@
-package com.easyteach;
+package com.hcodes.easyteach;
 
 import android.app.Application;
 import android.content.Context;

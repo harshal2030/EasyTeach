@@ -135,7 +135,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.easyteach"
+        applicationId "com.hcodes.easyteach"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true

@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:665109037312:android:9d2ada84b86e3e1f29f3e5",
+        "mobilesdk_app_id": "1:665109037312:android:469b2571f4d361cb29f3e5",
         "android_client_info": {
-          "package_name": "com.easyteach"
+          "package_name": "com.hcodes.easyteach"
         }
       },
       "oauth_client": [
