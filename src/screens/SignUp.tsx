@@ -14,7 +14,6 @@ import {usernamePattern} from '../utils/regexPatterns';
 
 import {TextLink} from '../components/common';
 
-import {commonBlue} from '../styles/colors';
 import {FormStyles} from '../styles/styles';
 
 import {RootStackParamList} from '../navigators/types';
@@ -157,13 +156,12 @@ class SignUp extends React.Component<Props, State> {
   render(): JSX.Element {
     const {loading, nameErr, usernameErr, mailErr, passErr} = this.state;
     return (
-      <View style={FormStyles.containerStyle}>
+      <View style={[FormStyles.containerStyle, {backgroundColor: '#fff'}]}>
         <Header
           centerComponent={{
             text: 'Create Account',
             style: {color: '#fff', fontSize: 23, fontWeight: 'bold'},
           }}
-          containerStyle={{backgroundColor: commonBlue}}
         />
 
         <ScrollView keyboardShouldPersistTaps="handled">

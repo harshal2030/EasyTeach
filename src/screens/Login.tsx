@@ -11,7 +11,6 @@ import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
 import {registerProfile} from '../global/actions/profile';
 
-import {commonBlue} from '../styles/colors';
 import {FormStyles} from '../styles/styles';
 import {RootStackParamList} from '../navigators/types';
 import {loginUrl} from '../utils/urls';
@@ -99,13 +98,12 @@ class Login extends React.Component<Props, State> {
   render(): JSX.Element {
     const {loading} = this.state;
     return (
-      <View style={FormStyles.containerStyle}>
+      <View style={[FormStyles.containerStyle, {backgroundColor: '#ffff'}]}>
         <Header
           centerComponent={{
             text: 'Login',
             style: {color: '#fff', fontSize: 23, fontWeight: 'bold'},
           }}
-          containerStyle={{backgroundColor: commonBlue}}
         />
         <ScrollView keyboardShouldPersistTaps="handled">
           <View style={FormStyles.formContainerStyle}>

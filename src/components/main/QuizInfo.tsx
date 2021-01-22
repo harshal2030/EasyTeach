@@ -41,8 +41,7 @@ class QuizInfo extends React.PureComponent<Props> {
 
           <Text style={{fontSize: 18}}>
             {`Things to note:
-1. Switching between apps or moving app in background will result in new question set.
-2. Screenshots on your phone are disabled while your Test is going on.`}
+Screenshots on your phone are disabled while your Test is going on.`}
           </Text>
 
           <Button
