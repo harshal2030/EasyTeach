@@ -111,12 +111,13 @@ class Login extends React.Component<Props, State> {
               // eslint-disable-next-line react-native/no-inline-styles
               containerStyle={{marginTop: 30}}
               disabled={loading}
-              label="E-mail or Username"
+              autoCapitalize="none"
+              placeholder="E-mail or Username"
               onChangeText={(username) => this.setState({username})}
             />
 
             <Input
-              label="Password"
+              placeholder="Password"
               disabled={loading}
               secureTextEntry
               onChangeText={(password) => this.setState({password})}
