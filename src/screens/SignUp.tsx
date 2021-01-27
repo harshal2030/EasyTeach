@@ -168,13 +168,13 @@ class SignUp extends React.Component<Props, State> {
           <View style={FormStyles.formContainerStyle}>
             <Input
               errorMessage={nameErr}
-              placeholder="Name"
+              label="Name"
               disabled={loading}
               onChangeText={(name) => this.setState({name})}
             />
 
             <Input
-              placeholder="Username"
+              label="Username"
               autoCapitalize="none"
               errorMessage={usernameErr}
               disabled={loading}
@@ -182,7 +182,7 @@ class SignUp extends React.Component<Props, State> {
             />
 
             <Input
-              placeholder="E-mail"
+              label="E-mail"
               autoCapitalize="none"
               errorMessage={mailErr}
               disabled={loading}
@@ -190,7 +190,7 @@ class SignUp extends React.Component<Props, State> {
             />
 
             <Input
-              placeholder="Password"
+              label="Password"
               errorMessage={passErr}
               secureTextEntry
               disabled={loading}

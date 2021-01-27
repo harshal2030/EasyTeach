@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import * as ScreenCapture from 'expo-screen-capture';
 import {
   View,
   Text,
@@ -44,6 +45,7 @@ interface State {
 }
 
 class Quiz extends React.Component<Props, State> {
+  private _unSub: (() => void) | undefined;
   constructor(props: Props) {
     super(props);
 
@@ -56,7 +58,16 @@ class Quiz extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    ScreenCapture.preventScreenCaptureAsync('quiz');
     this.fetchQues();
+
+    this._unSub = this.props.navigation.addListener('blur', () => {
+      ScreenCapture.allowScreenCaptureAsync('quiz');
+    });
+  }
+
+  componentWillUnmount() {
+    this._unSub!();
   }
 
   fetchQues = () => {

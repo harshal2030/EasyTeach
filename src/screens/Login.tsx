@@ -112,12 +112,12 @@ class Login extends React.Component<Props, State> {
               containerStyle={{marginTop: 30}}
               disabled={loading}
               autoCapitalize="none"
-              placeholder="E-mail or Username"
+              label="E-mail or Username"
               onChangeText={(username) => this.setState({username})}
             />
 
             <Input
-              placeholder="Password"
+              label="Password"
               disabled={loading}
               secureTextEntry
               onChangeText={(password) => this.setState({password})}
