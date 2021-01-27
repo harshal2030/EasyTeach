@@ -167,28 +167,30 @@ class SignUp extends React.Component<Props, State> {
         <ScrollView keyboardShouldPersistTaps="handled">
           <View style={FormStyles.formContainerStyle}>
             <Input
-              label="Name"
               errorMessage={nameErr}
+              placeholder="Name"
               disabled={loading}
               onChangeText={(name) => this.setState({name})}
             />
 
             <Input
-              label="Username"
+              placeholder="Username"
+              autoCapitalize="none"
               errorMessage={usernameErr}
               disabled={loading}
               onChangeText={(username) => this.setState({username})}
             />
 
             <Input
-              label="E-mail"
+              placeholder="E-mail"
+              autoCapitalize="none"
               errorMessage={mailErr}
               disabled={loading}
               onChangeText={(email) => this.setState({email})}
             />
 
             <Input
-              label="Password"
+              placeholder="Password"
               errorMessage={passErr}
               secureTextEntry
               disabled={loading}
