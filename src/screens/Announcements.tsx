@@ -7,6 +7,8 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
+import Snackbar from 'react-native-snackbar';
+import Megaphone from '../images/Megaphone.svg';
 
 import {MsgCard} from '../components/common';
 
@@ -27,7 +29,6 @@ import {
   flatRed,
 } from '../styles/colors';
 import {mediaUrl, msgUrl} from '../utils/urls';
-import Snackbar from 'react-native-snackbar';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
@@ -182,7 +183,7 @@ class Home extends React.Component<Props, State> {
     if (props.msgs.length === 0) {
       return (
         <View style={ContainerStyles.centerElements}>
-          <Text>No Announcements yet.</Text>
+          <Megaphone height={250} width={250} />
         </View>
       );
     }

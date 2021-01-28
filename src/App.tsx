@@ -109,12 +109,8 @@ const App = (props: Props): JSX.Element => {
       {props.token === null ? (
         <>
           <Stack.Screen
-            name="SignUp"
-            component={require('./screens/SignUp').default}
-          />
-          <Stack.Screen
-            name="Login"
-            component={require('./screens/Login').default}
+            name="Auth"
+            component={require('./screens/AuthScreen').default}
           />
         </>
       ) : (

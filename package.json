@@ -38,6 +38,7 @@
     "react-native-simple-radio-button": "^2.7.4",
     "react-native-snackbar": "^2.2.3",
     "react-native-splash-screen": "^3.2.0",
+    "react-native-svg": "^12.1.0",
     "react-native-unimodules": "^0.12.0",
     "react-native-vector-icons": "^7.1.0",
     "react-redux": "^7.2.1",
@@ -59,6 +60,7 @@
     "eslint": "^7.9.0",
     "jest": "^26.4.2",
     "metro-react-native-babel-preset": "^0.63.0",
+    "react-native-svg-transformer": "^0.14.3",
     "react-native-typescript-transformer": "^1.2.13",
     "react-test-renderer": "16.13.1",
     "typescript": "^4.0.2"

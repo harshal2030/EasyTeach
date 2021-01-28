@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 type RootStackParamList = {
-  Login: undefined;
-  SignUp: undefined;
+  Auth: undefined;
   Drawer: undefined;
   JoinClass: undefined;
   Quiz: {
