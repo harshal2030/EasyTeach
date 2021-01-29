@@ -1,11 +1,5 @@
 import React, {Component} from 'react';
-import {
-  KeyboardAvoidingView,
-  LayoutAnimation,
-  Platform,
-  StyleSheet,
-  UIManager,
-} from 'react-native';
+import {LayoutAnimation, Platform, StyleSheet, UIManager} from 'react-native';
 import {Image, View} from 'react-native-animatable';
 
 import metrics from '../../config/metrics';
@@ -121,10 +115,7 @@ export default class AuthScreen extends Component<Props, State> {
             onSignInPress={() => this._setVisibleForm('LOGIN')}
           />
         )}
-        <KeyboardAvoidingView
-          keyboardVerticalOffset={-100}
-          behavior={'padding'}
-          style={[formStyle, styles.bottom]}>
+        <View style={[formStyle, styles.bottom]}>
           {visibleForm === 'SIGNUP' && (
             <SignupForm
               ref={(ref) => (this.formRef = ref)}
@@ -141,7 +132,7 @@ export default class AuthScreen extends Component<Props, State> {
               isLoading={isLoading}
             />
           )}
-        </KeyboardAvoidingView>
+        </View>
       </View>
     );
   }
@@ -154,7 +145,7 @@ const styles = StyleSheet.create({
     width: metrics.DEVICE_WIDTH,
     height: metrics.DEVICE_HEIGHT,
     paddingTop: 24,
-    backgroundColor: 'white',
+    backgroundColor: '#ffff',
   },
   logoImg: {
     flex: 1,

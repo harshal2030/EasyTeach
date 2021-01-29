@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
 import {Text, View} from 'react-native-animatable';
 
 import CustomButton from '../../components/common/CustomButton';
@@ -54,7 +54,7 @@ export default class SignupForm extends Component<Props, State> {
     const {isLoading, onLoginLinkPress, onSignupPress} = this.props;
 
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.form} ref={(ref) => (this.formRef = ref)}>
           <CustomTextInput
             ref={(ref) => (this.mobileInputRef = ref)}
@@ -126,7 +126,7 @@ export default class SignupForm extends Component<Props, State> {
             {'Already have an account?'}
           </Text>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
   footer: {
     height: 100,
     justifyContent: 'center',
+    marginBottom: 20,
   },
   createAccountButton: {
     backgroundColor: 'white',

@@ -1,6 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import {View, Text, ActivityIndicator, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -183,10 +189,15 @@ class Home extends React.Component<Props, State> {
 
     if (props.msgs.length === 0) {
       return (
-        <View style={ContainerStyles.centerElements}>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
           <Megaphone height={200} width={200} />
           <MegaText height={50} width={200} />
-        </View>
+        </ScrollView>
       );
     }
 
