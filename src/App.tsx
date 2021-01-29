@@ -42,6 +42,7 @@ const App = (props: Props): JSX.Element => {
   React.useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
+      setLoading(false);
       if (token) {
         SplashScreen.hide();
         props.registerToken(token);
@@ -82,7 +83,6 @@ const App = (props: Props): JSX.Element => {
         SplashScreen.hide();
         props.removeToken();
       }
-      setLoading(false);
     };
 
     checkToken();

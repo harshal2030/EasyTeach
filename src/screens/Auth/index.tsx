@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
   },
   logoImg: {
     flex: 1,
+    minHeight: 90,
     height: undefined,
     width: IMAGE_WIDTH,
     alignSelf: 'center',
