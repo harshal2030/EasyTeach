@@ -1,6 +1,12 @@
 import React from 'react';
 import Axios from 'axios';
-import {ActivityIndicator, View, Alert, BackHandler} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  Alert,
+  BackHandler,
+  Linking,
+} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -36,6 +42,15 @@ interface Props {
   registerProfile: typeof registerProfile;
 }
 
+interface userChecker {
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
+}
+
 const App = (props: Props): JSX.Element => {
   const [loading, setLoading] = React.useState(true);
 
@@ -46,19 +61,44 @@ const App = (props: Props): JSX.Element => {
       if (token) {
         SplashScreen.hide();
         props.registerToken(token);
-        Axios.get<{name: string; username: string; avatar: string}>(
-          checkTokenUrl,
-          {
-            timeout: 20000,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        Axios.get<userChecker>(checkTokenUrl, {
+          timeout: 20000,
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        )
+        })
           .then((res) => {
-            if (res.status === 200) {
-              props.registerProfile(res.data);
+            if (res.data.message === 'UPDATE_REQUIRED') {
+              Alert.alert(
+                'Update Required',
+                "It won't take your much of time. Please update the app before use.",
+                [
+                  {
+                    text: 'Ok',
+                    onPress: () => {
+                      BackHandler.exitApp();
+                      Linking.openURL(
+                        'https://play.google.com/store/apps/details?id=com.hcodes.easyteach',
+                      );
+                    },
+                  },
+                ],
+              );
             }
+
+            if (res.data.message === 'SERVER_MAINTENANCE') {
+              Alert.alert(
+                'Server Maintenance',
+                'Please try some time, servers are under maintenance.',
+                [
+                  {
+                    text: 'Ok',
+                    onPress: () => BackHandler.exitApp(),
+                  },
+                ],
+              );
+            }
+            props.registerProfile(res.data.user);
           })
           .catch((e) => {
             if (e.response) {

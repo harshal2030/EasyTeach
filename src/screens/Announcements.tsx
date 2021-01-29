@@ -66,25 +66,31 @@ interface Props {
 
 interface State {
   message: string;
+  isOwner: boolean;
 }
 
 class Home extends React.Component<Props, State> {
-  isOwner: boolean = false;
   constructor(props: Props) {
     super(props);
 
     this.state = {
       message: '',
+      isOwner: false,
     };
   }
 
   componentDidMount() {
     if (this.props.currentClass) {
-      this.props.fetchMsgs(this.props.token!, this.props.currentClass.id);
-      this.isOwner =
-        this.props.currentClass.owner.username === this.props.profile.username;
+      this.updateComponent();
     }
   }
+
+  updateComponent = () => {
+    const isOwner =
+      this.props.currentClass!.owner.username === this.props.profile.username;
+    this.setState({isOwner});
+    this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+  };
 
   componentDidUpdate(prevProps: Props) {
     const {currentClass} = this.props;
@@ -96,9 +102,7 @@ class Home extends React.Component<Props, State> {
     const currentClassId = currentClass ? currentClass.id : null;
     if (currentClass) {
       if (currentClassId !== prevClassId) {
-        this.props.fetchMsgs(this.props.token!, currentClassId!);
-        this.isOwner =
-          currentClass.owner.username === this.props.profile.username;
+        this.updateComponent();
       }
     }
   }
@@ -244,7 +248,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.isOwner ? (
+          {this.state.isOwner ? (
             <Input
               placeholder="Type here..."
               value={this.state.message}
