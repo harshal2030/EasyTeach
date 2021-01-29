@@ -9,6 +9,7 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Snackbar from 'react-native-snackbar';
 import Megaphone from '../images/Megaphone.svg';
+import MegaText from '../images/announcement.svg';
 
 import {MsgCard} from '../components/common';
 
@@ -183,7 +184,8 @@ class Home extends React.Component<Props, State> {
     if (props.msgs.length === 0) {
       return (
         <View style={ContainerStyles.centerElements}>
-          <Megaphone height={250} width={250} />
+          <Megaphone height={200} width={200} />
+          <MegaText height={50} width={200} />
         </View>
       );
     }

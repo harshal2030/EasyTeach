@@ -158,12 +158,12 @@ const styles = StyleSheet.create({
   },
   logoImg: {
     flex: 1,
-    minHeight: 90,
+    minHeight: 50,
     height: undefined,
     width: IMAGE_WIDTH,
     alignSelf: 'center',
     resizeMode: 'contain',
-    marginVertical: 30,
+    marginVertical: 20,
   },
   bottom: {
     backgroundColor: '#1976D2',

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, ScrollView} from 'react-native';
 import {Text, View} from 'react-native-animatable';
 
 import CustomButton from '../../components/common/CustomButton';
@@ -44,7 +44,7 @@ export default class LoginForm extends Component<Props, State> {
     const {email, password} = this.state;
     const {isLoading, onSignupLinkPress, onLoginPress} = this.props;
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View
           style={styles.form}
           ref={(ref) => {
@@ -100,7 +100,7 @@ export default class LoginForm extends Component<Props, State> {
             {'Not registered yet?'}
           </Text>
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }
