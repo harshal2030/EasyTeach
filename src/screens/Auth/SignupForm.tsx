@@ -54,7 +54,7 @@ export default class SignupForm extends Component<Props, State> {
     const {isLoading, onLoginLinkPress, onSignupPress} = this.props;
 
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.form} ref={(ref) => (this.formRef = ref)}>
           <CustomTextInput
             ref={(ref) => (this.mobileInputRef = ref)}
@@ -62,6 +62,7 @@ export default class SignupForm extends Component<Props, State> {
             editable={!isLoading}
             returnKeyType={'next'}
             blurOnSubmit={false}
+            underlineColorAndroid="transparent"
             withRef={true}
             onSubmitEditing={() => this.usernameRef.focus()}
             onChangeText={(value) => this.setState({name: value})}
@@ -73,6 +74,7 @@ export default class SignupForm extends Component<Props, State> {
             editable={!isLoading}
             returnKeyType={'next'}
             blurOnSubmit={false}
+            underlineColorAndroid="transparent"
             withRef={true}
             onSubmitEditing={() => this.emailInputRef.focus()}
             onChangeText={(value) => this.setState({username: value})}
@@ -84,6 +86,7 @@ export default class SignupForm extends Component<Props, State> {
             keyboardType={'email-address'}
             editable={!isLoading}
             returnKeyType={'next'}
+            underlineColorAndroid="transparent"
             blurOnSubmit={false}
             withRef={true}
             onSubmitEditing={() => this.passwordInputRef.focus()}
@@ -96,6 +99,7 @@ export default class SignupForm extends Component<Props, State> {
             editable={!isLoading}
             returnKeyType={'done'}
             secureTextEntry={true}
+            underlineColorAndroid="transparent"
             withRef={true}
             onChangeText={(value) => this.setState({password: value})}
             isEnabled={!isLoading}

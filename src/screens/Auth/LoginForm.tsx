@@ -44,7 +44,7 @@ export default class LoginForm extends Component<Props, State> {
     const {email, password} = this.state;
     const {isLoading, onSignupLinkPress, onLoginPress} = this.props;
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <View
           style={styles.form}
           ref={(ref) => {
@@ -57,6 +57,7 @@ export default class LoginForm extends Component<Props, State> {
             keyboardType={'email-address'}
             editable={!isLoading}
             returnKeyType={'next'}
+            underlineColorAndroid="transparent"
             blurOnSubmit={false}
             withRef={true}
             onSubmitEditing={() => this.passwordInputRef.focus()}
@@ -69,6 +70,7 @@ export default class LoginForm extends Component<Props, State> {
             placeholder={'Password'}
             editable={!isLoading}
             returnKeyType={'done'}
+            underlineColorAndroid="transparent"
             secureTextEntry={true}
             withRef={true}
             onChangeText={(value) => this.setState({password: value})}

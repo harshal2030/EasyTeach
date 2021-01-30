@@ -36,7 +36,7 @@ export default class AuthTextInput extends Component<Props, State> {
             autoCorrect={false}
             style={[styles.textInput, {color}]}
             maxLength={32}
-            underlineColorAndroid={'transparent'}
+            underlineColorAndroid="none"
             placeholderTextColor={'rgba(255,255,255,0.4)'}
             selectionColor={'white'}
             onFocus={() => this.setState({isFocused: true})}
