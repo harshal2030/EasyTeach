@@ -1,4 +1,5 @@
 import React from 'react';
+import {View, Text} from 'react-native';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Modal from 'react-native-modal';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -18,6 +19,7 @@ import {
   DrawerParamList,
   BottomTabTestParamList,
 } from '../navigators/types';
+import {commonBackground} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
@@ -109,6 +111,19 @@ class Test extends React.Component<Props, State> {
           currentClassOwner={currentClass!.owner.username}
           user={profile.username}
         />
+        {currentClass!.owner.username === profile.username && (
+          <View
+            style={{
+              padding: 3,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: commonBackground,
+            }}>
+            <Text style={{fontSize: 16, fontWeight: '800'}}>
+              Scheduled tests are also shown here for owners
+            </Text>
+          </View>
+        )}
 
         <Modal
           isVisible={this.state.modalVisible}
