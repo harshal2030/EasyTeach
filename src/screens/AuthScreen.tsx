@@ -104,7 +104,7 @@ class AuthScreen extends React.Component<Props, State> {
     if (!usernamePattern.test(username)) {
       return Alert.alert(
         '',
-        'Invalid username pattern. Only underscores, periods are allowed',
+        'Invalid username pattern. Only underscores, periods, alphabet, numbers are allowed',
       );
     }
 

@@ -168,6 +168,12 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/ShowScore').default}
             />
           )}
+          {props.currentClass && (
+            <Stack.Screen
+              name="EditQuestions"
+              component={require('./screens/EditQuestions').default}
+            />
+          )}
         </>
       )}
     </Stack.Navigator>

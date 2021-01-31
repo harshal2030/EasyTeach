@@ -191,7 +191,9 @@ const DrawerContent = (props: Props): JSX.Element => {
                 : 'none',
             }}
             style={mainImage}>
-            <Text style={classText}>
+            <Text
+              style={classText}
+              onPress={() => props.navigation.navigate('EditQuestions')}>
               {currentClass ? currentClass.name : 'Current Class appears here'}
             </Text>
           </ImageBackground>

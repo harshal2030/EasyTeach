@@ -23,6 +23,7 @@ type RootStackParamList = {
   EditProfile: {
     username: string;
   };
+  EditQuestions: undefined;
 };
 
 type BottomTabHomeParamList = {
