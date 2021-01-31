@@ -54,6 +54,7 @@ class ShowScore extends React.Component<Props, State> {
         incorrect: 0,
         correct: 0,
         userScored: 0,
+        notAnswered: 0,
       },
       loading: true,
       errored: false,
@@ -117,6 +118,9 @@ class ShowScore extends React.Component<Props, State> {
           <Text style={styles.textStyle}>Your Score: {result.userScored}</Text>
           <Text style={styles.textStyle}>Correct: {result.correct}</Text>
           <Text style={styles.textStyle}>Incorrect: {result.incorrect}</Text>
+          <Text style={styles.textStyle}>
+            Not Answered: {result.notAnswered}
+          </Text>
         </View>
 
         {this.isOwner && (

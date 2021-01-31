@@ -34,6 +34,7 @@ interface Result {
   totalQues: number;
   totalScore: number;
   userScored: number;
+  notAnswered: number;
 }
 
 interface quizErroredAction {
