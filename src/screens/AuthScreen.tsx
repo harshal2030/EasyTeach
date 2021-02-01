@@ -4,6 +4,7 @@ import {Alert} from 'react-native';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
+import Config from 'react-native-config';
 
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
@@ -68,7 +69,7 @@ class AuthScreen extends React.Component<Props, State> {
             timeout: 20000,
             auth: {
               username: 'accountCreator',
-              password: 'AJHK TREE VS *(%(@221133',
+              password: Config.accPass,
             },
           },
         )
@@ -104,7 +105,7 @@ class AuthScreen extends React.Component<Props, State> {
     if (!usernamePattern.test(username)) {
       return Alert.alert(
         '',
-        'Invalid username pattern. Only underscores, periods, alphabet, numbers are allowed',
+        'Invalid username pattern. Only underscores, periods, alphabets, numbers are allowed',
       );
     }
 
@@ -140,7 +141,7 @@ class AuthScreen extends React.Component<Props, State> {
           timeout: 20000,
           auth: {
             username: 'accountCreator',
-            password: 'AJHK TREE VS *(%(@221133',
+            password: Config.accPass,
           },
         },
       )

@@ -1,11 +1,13 @@
 import React from 'react';
 import Axios from 'axios';
+import Config from 'react-native-config';
 import {Alert, BackHandler, Linking} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
+import VersionCheck from 'react-native-version-check';
 
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
@@ -61,24 +63,6 @@ const App = (props: Props): JSX.Element => {
         },
       })
         .then((res) => {
-          if (res.data.message === 'UPDATE_REQUIRED') {
-            Alert.alert(
-              'Update Required',
-              "It won't take your much of time. Please update the app before use.",
-              [
-                {
-                  text: 'Ok',
-                  onPress: () => {
-                    BackHandler.exitApp();
-                    Linking.openURL(
-                      'https://play.google.com/store/apps/details?id=com.hcodes.easyteach',
-                    );
-                  },
-                },
-              ],
-            );
-          }
-
           if (res.data.message === 'SERVER_MAINTENANCE') {
             Alert.alert(
               'Server Maintenance',
@@ -118,7 +102,30 @@ const App = (props: Props): JSX.Element => {
     }
   };
 
+  const checkVersion = async () => {
+    const updateNeeded = await VersionCheck.needUpdate();
+
+    if (updateNeeded) {
+      Alert.alert(
+        'Update Required',
+        "It won't take your much of time. Please update the app before use.",
+        [
+          {
+            text: 'Ok',
+            onPress: () => {
+              BackHandler.exitApp();
+              Linking.openURL(updateNeeded.storeUrl);
+            },
+          },
+        ],
+      );
+    }
+  };
+
   React.useEffect(() => {
+    if (Config.env === 'production') {
+      checkVersion();
+    }
     checkToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
