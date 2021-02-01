@@ -139,8 +139,9 @@ class CreateTest extends React.Component<Props, State> {
     } = this.state;
     const {currentClass, route} = this.props;
 
-    const start = timeRange[0].getTime(),
-      stop = timeRange[1].getTime();
+    const start = timeRange[0].getTime();
+    const stop = timeRange[1].getTime();
+    const now = new Date().getTime();
 
     const ques = parseInt(questions, 10);
 
@@ -159,7 +160,7 @@ class CreateTest extends React.Component<Props, State> {
       });
     }
 
-    if (start > stop) {
+    if (start > stop || stop < now) {
       return SnackBar.show({
         text: 'Invalid time range.',
         duration: SnackBar.LENGTH_SHORT,
