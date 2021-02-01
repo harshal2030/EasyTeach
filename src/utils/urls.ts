@@ -1,3 +1,4 @@
+
 import Config from 'react-native-config';
 
 let root: string;
@@ -7,7 +8,6 @@ if (Config.env === 'production') {
 } else {
   root = 'http://192.168.43.21:3000';
 }
-
 const signUpUrl = `${root}/users/create`;
 const loginUrl = `${root}/users/login`;
 const logOutUrl = `${root}/users/logout`;
