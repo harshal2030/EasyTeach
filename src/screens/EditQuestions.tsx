@@ -4,6 +4,7 @@ import {View, Platform} from 'react-native';
 import {Button, Header} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
 import {ImageOrVideo} from 'react-native-image-crop-picker';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import SnackBar from 'react-native-snackbar';
@@ -17,6 +18,7 @@ import {questionUrl} from '../utils/urls';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList, 'EditQuestions'>;
+  route: RouteProp<RootStackParamList, 'EditQuestions'>;
   currentClass: Class;
   token: string;
 }
@@ -38,6 +40,20 @@ class EditQuestion extends React.Component<Props, State> {
         type: '',
       },
     };
+  }
+
+  componentDidMount() {
+    const url = `${questionUrl}/${this.props.currentClass.id}/${this.props.route.params.quizId}`;
+    axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${this.props.token}`,
+        },
+      })
+      .then((res) => console.log(res.data))
+      .catch((e) => {
+        console.log(e);
+      });
   }
 
   sheet: RBSheet | null = null;
