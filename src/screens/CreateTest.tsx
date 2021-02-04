@@ -515,19 +515,6 @@ class CreateTest extends React.Component<Props, State> {
 
             {this.props.route.params.quizId && (
               <Button
-                title="Edit Questions"
-                containerStyle={styles.buttonStyle}
-                onPress={() =>
-                  this.props.navigation.navigate('EditQuestions', {
-                    quizId: this.props.route.params.quizId!,
-                  })
-                }
-                loading={APILoading}
-              />
-            )}
-
-            {this.props.route.params.quizId && (
-              <Button
                 title="Delete"
                 containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
                 buttonStyle={{backgroundColor: flatRed}}
