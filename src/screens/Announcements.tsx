@@ -81,6 +81,9 @@ class Home extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.currentClass) {
+      if (this.props.profile.username !== 'loading...') {
+        this.updateOwner();
+      }
       this.updateComponent();
     }
   }
@@ -90,6 +93,12 @@ class Home extends React.Component<Props, State> {
       this.props.currentClass!.owner.username === this.props.profile.username;
     this.setState({isOwner});
     this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+  };
+
+  updateOwner = () => {
+    const isOwner =
+      this.props.currentClass!.owner.username === this.props.profile.username;
+    this.setState({isOwner});
   };
 
   componentDidUpdate(prevProps: Props) {
