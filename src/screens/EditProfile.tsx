@@ -16,6 +16,7 @@ import {PhotoPicker} from '../components/common';
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
 import {registerProfile} from '../global/actions/profile';
+import {updateClassOwner} from '../global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {mediaUrl, root} from '../utils/urls';
@@ -34,6 +35,7 @@ interface Props {
   token: string | null;
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
+  updateClassOwner: typeof updateClassOwner;
 }
 
 interface State {
@@ -116,6 +118,7 @@ class EditProfile extends React.Component<Props, State> {
         },
       })
       .then((res) => {
+        this.props.updateClassOwner(res.data.user, this.props.profile.username);
         this.storeNewToken(res.data.token);
         this.props.registerToken(res.data.token);
         this.props.registerProfile(res.data.user);
@@ -186,6 +189,8 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {registerProfile, registerToken})(
-  EditProfile,
-);
+export default connect(mapStateToProps, {
+  registerProfile,
+  registerToken,
+  updateClassOwner,
+})(EditProfile);

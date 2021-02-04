@@ -76,9 +76,12 @@ interface removeClassAction {
 interface updateClassOwnerAction {
   type: ActionTypes.updateClassOwner;
   payload: {
-    name: string;
-    username: string;
-    avatar: string;
+    newUser: {
+      name: string;
+      username: string;
+      avatar: string;
+    };
+    oldUsername: string;
   };
 }
 
@@ -163,16 +166,14 @@ const removeClass = (classToRemoveId: string): removeClassAction => {
 };
 
 const updateClassOwner = (
-  name: string,
-  username: string,
-  avatar: string,
+  newUser: {name: string; username: string; avatar: string},
+  oldUsername: string,
 ): updateClassOwnerAction => {
   return {
     type: ActionTypes.updateClassOwner,
     payload: {
-      name,
-      username,
-      avatar,
+      newUser,
+      oldUsername,
     },
   };
 };
