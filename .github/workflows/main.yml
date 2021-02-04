@@ -1,4 +1,4 @@
-name: Build Android:
+name: Build Android
   push:
     branches:
       - masterjobs:
@@ -8,4 +8,4 @@ name: Build Android:
       - uses: actions/checkout@v2
       - name: Install npm dependencies
         run: |
-          npm install
+          yarn
