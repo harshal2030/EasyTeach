@@ -57,6 +57,15 @@ const classes = (state: Class[] = [], action: ClassesAction) => {
       return temp;
     case ActionTypes.removeClass:
       return state.filter((cls) => cls.id !== action.payload);
+    case ActionTypes.updateClassOwner:
+      const tempClass = [...state];
+      tempClass.forEach((cls) => {
+        if (cls.owner.username === action.payload.oldUsername) {
+          cls.owner = action.payload.newUser;
+        }
+      });
+
+      return tempClass;
     default:
       return state;
   }
