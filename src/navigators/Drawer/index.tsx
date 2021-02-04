@@ -17,17 +17,12 @@ type Props = {
     username: string;
     avatar: string;
   };
+  isOwner: boolean;
 };
 
 const DrawerNavigator = (props: Props): JSX.Element => {
   const width = useWindowDimensions().width;
   const isLargeScreen = width >= 768;
-
-  let isOwner = false;
-
-  if (props.currentClass) {
-    isOwner = props.profile.username === props.currentClass.owner.username;
-  }
   return (
     <Drawer.Navigator
       hideStatusBar={true}
@@ -46,7 +41,7 @@ const DrawerNavigator = (props: Props): JSX.Element => {
           component={require('../bottom-tabs/TestTabs').default}
         />
       )}
-      {isOwner && (
+      {props.isOwner && (
         <Drawer.Screen
           name="Manage"
           component={require('../../screens/ManageClass').default}
@@ -61,9 +56,14 @@ const DrawerNavigator = (props: Props): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     currentClass: state.currentClass,
     profile: state.profile,
+    isOwner,
   };
 };
 

@@ -34,6 +34,7 @@ interface Props {
     username: string;
     avatar: string;
   };
+  isOwner: boolean;
 }
 
 interface State {
@@ -43,7 +44,6 @@ interface State {
 }
 
 class ShowScore extends React.Component<Props, State> {
-  isOwner: boolean = false;
   constructor(props: Props) {
     super(props);
 
@@ -59,9 +59,6 @@ class ShowScore extends React.Component<Props, State> {
       loading: true,
       errored: false,
     };
-
-    this.isOwner =
-      props.currentClass?.owner.username === props.profile.username;
   }
 
   componentDidMount() {
@@ -123,7 +120,7 @@ class ShowScore extends React.Component<Props, State> {
           </Text>
         </View>
 
-        {this.isOwner && (
+        {this.props.isOwner && (
           <Button
             title="Download class result sheet"
             onPress={() =>
@@ -169,10 +166,15 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     currentClass: state.currentClass,
     profile: state.profile,
+    isOwner,
   };
 };
 

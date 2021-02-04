@@ -62,11 +62,11 @@ interface Props {
   msgs: Msg[];
   msgErrored: boolean;
   msgLoading: boolean;
+  isOwner: boolean;
 }
 
 interface State {
   message: string;
-  isOwner: boolean;
 }
 
 class Home extends React.Component<Props, State> {
@@ -75,31 +75,14 @@ class Home extends React.Component<Props, State> {
 
     this.state = {
       message: '',
-      isOwner: false,
     };
   }
 
   componentDidMount() {
     if (this.props.currentClass) {
-      if (this.props.profile.username !== 'loading...') {
-        this.updateOwner();
-      }
-      this.updateComponent();
+      this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
     }
   }
-
-  updateComponent = () => {
-    const isOwner =
-      this.props.currentClass!.owner.username === this.props.profile.username;
-    this.setState({isOwner});
-    this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
-  };
-
-  updateOwner = () => {
-    const isOwner =
-      this.props.currentClass!.owner.username === this.props.profile.username;
-    this.setState({isOwner});
-  };
 
   componentDidUpdate(prevProps: Props) {
     const {currentClass} = this.props;
@@ -111,7 +94,7 @@ class Home extends React.Component<Props, State> {
     const currentClassId = currentClass ? currentClass.id : null;
     if (currentClass) {
       if (currentClassId !== prevClassId) {
-        this.updateComponent();
+        this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
       }
     }
   }
@@ -257,7 +240,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.state.isOwner ? (
+          {this.props.isOwner ? (
             <Input
               placeholder="Type here..."
               value={this.state.message}
@@ -288,6 +271,10 @@ class Home extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     profile: state.profile,
     currentClass: state.currentClass,
@@ -298,6 +285,7 @@ const mapStateToProps = (state: StoreState) => {
     msgs: state.msgs,
     msgErrored: state.msgErrored,
     msgLoading: state.msgLoading,
+    isOwner,
   };
 };
 

@@ -57,6 +57,7 @@ type Props = DrawerContentComponentProps & {
     avatar: string;
   };
   removeCurrentClass: typeof removeCurrentClass;
+  isOwner: boolean;
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -66,14 +67,10 @@ const DrawerContent = (props: Props): JSX.Element => {
   }, []);
 
   const {currentClass} = props;
-  let isOwner = false;
-  let FontAwesome = null;
-  if (currentClass) {
-    isOwner = props.profile.username === currentClass.owner.username;
-    FontAwesome = isOwner
-      ? require('react-native-vector-icons/FontAwesome').default
-      : null;
-  }
+
+  const FontAwesome = props.isOwner
+    ? require('react-native-vector-icons/FontAwesome').default
+    : null;
 
   const logOut = async () => {
     try {
@@ -234,7 +231,7 @@ const DrawerContent = (props: Props): JSX.Element => {
               </>
             )}
 
-            {isOwner && (
+            {props.isOwner && (
               <TouchableOpacity
                 style={optionContainer}
                 onPress={() => props.navigation.navigate('Manage')}>
@@ -316,6 +313,10 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     classes: state.classes,
@@ -323,6 +324,7 @@ const mapStateToProps = (state: StoreState) => {
     classErrored: state.classHasErrored,
     currentClass: state.currentClass,
     profile: state.profile,
+    isOwner,
   };
 };
 
