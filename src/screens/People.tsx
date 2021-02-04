@@ -42,6 +42,7 @@ interface Props {
   navigation: NavigationProp;
   currentClass: Class | null;
   token: string | null;
+  isOwner: boolean;
 }
 
 interface peopleProp {
@@ -78,11 +79,6 @@ const People = (props: Props) => {
         });
     }
   }, [props.currentClass, props.token]);
-
-  let isOwner = false;
-  if (props.currentClass) {
-    isOwner = props.profile.username === props.currentClass.owner.username;
-  }
 
   const removeStudent = (name: string, username: string) => {
     const removeReq = () => {
@@ -135,7 +131,7 @@ const People = (props: Props) => {
           <ListItem.Title>{item.name}</ListItem.Title>
           <ListItem.Subtitle>{'@' + item.username}</ListItem.Subtitle>
         </ListItem.Content>
-        {isOwner && (
+        {props.isOwner && (
           <ListItem.Chevron
             name="cross"
             type="entypo"
@@ -226,10 +222,15 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     currentClass: state.currentClass,
     profile: state.profile,
+    isOwner,
   };
 };
 

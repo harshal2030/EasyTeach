@@ -9,6 +9,7 @@ import {
   removeCurrentClassAction,
   updatedClassAction,
   removeClassAction,
+  updateClassOwnerAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -36,6 +37,7 @@ type ClassesAction =
   | classFetchedAction
   | addedClassAction
   | updatedClassAction
+  | updateClassOwnerAction
   | removeClassAction;
 
 const classes = (state: Class[] = [], action: ClassesAction) => {

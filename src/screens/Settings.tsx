@@ -40,6 +40,7 @@ type Props = {
   classIsLoading: boolean;
   classHasErrored: boolean;
   currentClass: Class | null;
+  isOwner: boolean;
   removeClass: typeof removeClass;
   registerCurrentClass: typeof registerCurrentClass;
 };
@@ -85,7 +86,6 @@ class Settings extends React.PureComponent<Props> {
   };
 
   renderItem = ({item}: {item: Class}) => {
-    const isOwner = item.owner.username === this.props.profile.username;
     return (
       <ListItem bottomDivider>
         <Avatar
@@ -101,18 +101,18 @@ class Settings extends React.PureComponent<Props> {
         </ListItem.Content>
 
         <Button
-          title={isOwner ? 'Manage' : 'Unenroll'}
+          title={this.props.isOwner ? 'Manage' : 'Unenroll'}
           type="outline"
           onPress={() => {
-            if (isOwner) {
+            if (this.props.isOwner) {
               this.props.navigation.navigate('Manage');
               this.props.registerCurrentClass(item);
             } else {
               this.confirmUnenroll(item.id, item.name);
             }
           }}
-          buttonStyle={{borderColor: isOwner ? commonBlue : flatRed}}
-          titleStyle={{color: isOwner ? commonBlue : flatRed}}
+          buttonStyle={{borderColor: this.props.isOwner ? commonBlue : flatRed}}
+          titleStyle={{color: this.props.isOwner ? commonBlue : flatRed}}
         />
       </ListItem>
     );
@@ -198,6 +198,10 @@ class Settings extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     profile: state.profile,
@@ -205,6 +209,7 @@ const mapStateToProps = (state: StoreState) => {
     classIsLoading: state.classIsLoading,
     classHasErrored: state.classHasErrored,
     currentClass: state.currentClass,
+    isOwner,
   };
 };
 

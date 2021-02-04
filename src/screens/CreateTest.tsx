@@ -505,7 +505,7 @@ class CreateTest extends React.Component<Props, State> {
             desc="Randomize order of options specified in question sheet"
           />
 
-          <View style={{flexDirection: 'row'}}>
+          <View>
             <Button
               title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
               containerStyle={styles.buttonStyle}
@@ -516,7 +516,7 @@ class CreateTest extends React.Component<Props, State> {
             {this.props.route.params.quizId && (
               <Button
                 title="Delete"
-                containerStyle={styles.buttonStyle}
+                containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
                 buttonStyle={{backgroundColor: flatRed}}
                 onPress={this.deleteQuiz}
                 loading={APILoading}
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   buttonStyle: {
-    marginVertical: 30,
+    marginVertical: 5,
     flex: 1,
     marginHorizontal: 10,
   },

@@ -33,6 +33,7 @@ interface Props {
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   registerProfile: typeof registerProfile;
+  isOwner: boolean;
 }
 
 interface userChecker {
@@ -105,12 +106,6 @@ const App = (props: Props): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  let isOwner = false;
-
-  if (props.currentClass) {
-    isOwner = props.profile.username === props.currentClass.owner.username;
-  }
-
   return (
     <Stack.Navigator headerMode="none">
       {props.token === null ? (
@@ -138,7 +133,7 @@ const App = (props: Props): JSX.Element => {
             name="EditProfile"
             component={require('./screens/EditProfile').default}
           />
-          {isOwner && (
+          {props.isOwner && (
             <Stack.Screen
               name="CreateTest"
               component={require('./screens/CreateTest').default}
@@ -157,10 +152,15 @@ const App = (props: Props): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     profile: state.profile,
     currentClass: state.currentClass,
+    isOwner,
   };
 };
 
