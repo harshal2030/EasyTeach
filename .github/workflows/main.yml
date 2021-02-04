@@ -1,10 +1,18 @@
-name: Build Android
+name: build
 on:
   push:
     branches:
       - master
 jobs:
   install-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install npm dependencies
+        run: |
+          npm install
+  build-android:
+    needs: install-and-test
     runs-on: ubuntu-latest
     steps: 
       - uses: actions/checkout@v2
@@ -13,9 +21,9 @@ jobs:
           npm install
       - name: Build Android Release
         run: |
-          cd android && .gradlew bundleRelease -MYAPP_UPLOAD_STORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}' -MYAPP_UPLOAD_KEY_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}'
+          cd android && ./gradlew assembleRelease
       - name: Upload Artifact
         uses: actions/upload-artifact@v1
         with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/
