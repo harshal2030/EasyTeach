@@ -139,6 +139,12 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/CreateTest').default}
             />
           )}
+          {props.isOwner && (
+            <Stack.Screen
+              name="EditQuestion"
+              component={require('./screens/EditQuestion').default}
+            />
+          )}
           {props.currentClass && (
             <Stack.Screen
               name="ShowScore"
