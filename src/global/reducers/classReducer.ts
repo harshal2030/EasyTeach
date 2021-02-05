@@ -9,6 +9,7 @@ import {
   removeCurrentClassAction,
   updatedClassAction,
   removeClassAction,
+  updateClassOwnerAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -36,6 +37,7 @@ type ClassesAction =
   | classFetchedAction
   | addedClassAction
   | updatedClassAction
+  | updateClassOwnerAction
   | removeClassAction;
 
 const classes = (state: Class[] = [], action: ClassesAction) => {
@@ -55,6 +57,15 @@ const classes = (state: Class[] = [], action: ClassesAction) => {
       return temp;
     case ActionTypes.removeClass:
       return state.filter((cls) => cls.id !== action.payload);
+    case ActionTypes.updateClassOwner:
+      const tempClass = [...state];
+      tempClass.forEach((cls) => {
+        if (cls.owner.username === action.payload.oldUsername) {
+          cls.owner = action.payload.newUser;
+        }
+      });
+
+      return tempClass;
     default:
       return state;
   }

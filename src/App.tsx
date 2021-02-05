@@ -1,13 +1,11 @@
 import React from 'react';
 import Axios from 'axios';
-import Config from 'react-native-config';
-import {Alert, BackHandler, Linking} from 'react-native';
+import {Alert, BackHandler} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
-import VersionCheck from 'react-native-version-check';
 
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
@@ -35,6 +33,7 @@ interface Props {
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   registerProfile: typeof registerProfile;
+  isOwner: boolean;
 }
 
 interface userChecker {
@@ -102,39 +101,10 @@ const App = (props: Props): JSX.Element => {
     }
   };
 
-  const checkVersion = async () => {
-    const updateNeeded = await VersionCheck.needUpdate();
-
-    if (updateNeeded) {
-      Alert.alert(
-        'Update Required',
-        "It won't take your much of time. Please update the app before use.",
-        [
-          {
-            text: 'Ok',
-            onPress: () => {
-              BackHandler.exitApp();
-              Linking.openURL(updateNeeded.storeUrl);
-            },
-          },
-        ],
-      );
-    }
-  };
-
   React.useEffect(() => {
-    if (Config.env === 'production') {
-      checkVersion();
-    }
     checkToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  let isOwner = false;
-
-  if (props.currentClass) {
-    isOwner = props.profile.username === props.currentClass.owner.username;
-  }
 
   return (
     <Stack.Navigator headerMode="none">
@@ -163,7 +133,7 @@ const App = (props: Props): JSX.Element => {
             name="EditProfile"
             component={require('./screens/EditProfile').default}
           />
-          {isOwner && (
+          {props.isOwner && (
             <Stack.Screen
               name="CreateTest"
               component={require('./screens/CreateTest').default}
@@ -175,12 +145,6 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/ShowScore').default}
             />
           )}
-          {props.currentClass && (
-            <Stack.Screen
-              name="EditQuestions"
-              component={require('./screens/EditQuestions').default}
-            />
-          )}
         </>
       )}
     </Stack.Navigator>
@@ -188,10 +152,15 @@ const App = (props: Props): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner: boolean = false;
+  if (state.currentClass) {
+    isOwner = state.currentClass.owner.username === state.profile.username;
+  }
   return {
     token: state.token,
     profile: state.profile,
     currentClass: state.currentClass,
+    isOwner,
   };
 };
 
