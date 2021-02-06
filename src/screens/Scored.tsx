@@ -37,6 +37,7 @@ interface Props {
     avatar: string;
   };
   navigation: NavigationProp;
+  isOwner: boolean;
 }
 
 interface State {
@@ -108,7 +109,7 @@ class Scored extends React.Component<Props, State> {
   };
 
   render() {
-    const {navigation, currentClass, profile} = this.props;
+    const {navigation} = this.props;
     const {loading, errored, data} = this.state;
     return (
       <CommonTest
@@ -117,8 +118,7 @@ class Scored extends React.Component<Props, State> {
         dataErrored={errored}
         data={data}
         headerText="Scored"
-        currentClassOwner={currentClass!.owner.name}
-        user={profile.username}
+        isOwner={this.props.isOwner}
         renderItem={this.renderItem}
       />
     );
@@ -130,6 +130,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     profile: state.profile,
     currentClass: state.currentClass,
+    isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
 

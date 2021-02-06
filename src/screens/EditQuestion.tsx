@@ -1,10 +1,11 @@
 import React from 'react';
 import axios from 'axios';
-import {View, Text, ActivityIndicator} from 'react-native';
-import {Header} from 'react-native-elements';
+import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {Header, ButtonGroup} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
+import ViewPager from '@react-native-community/viewpager';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -12,7 +13,7 @@ import {Class} from '../global/actions/classes';
 import {RootStackParamList} from '../navigators/types';
 import {questionUrl} from '../utils/urls';
 import {ContainerStyles} from '../styles/styles';
-import {commonBlue} from '../styles/colors';
+import {commonBackground, commonBlue, greyWithAlpha} from '../styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList, 'EditQuestion'>;
@@ -67,7 +68,8 @@ class EditQuestion extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {errored, loading} = this.state;
+    const {errored, loading, questions} = this.state;
+    const {buttonContainerStyle, buttonStyle, textStyle} = styles;
 
     if (errored) {
       return (
@@ -89,14 +91,31 @@ class EditQuestion extends React.Component<Props, State> {
     }
 
     return (
-      <View style={{flex: 1}}>
-        <View key="1" style={{backgroundColor: 'red'}}>
-          <Text>1</Text>
-        </View>
-        <View key="2">
-          <Text>2</Text>
-        </View>
-      </View>
+      <ViewPager initialPage={0} style={{flex: 1}}>
+        {questions.map((que, i) => {
+          return (
+            <View
+              collapsable={false}
+              key={i}
+              style={{flex: 1, padding: 20, backgroundColor: commonBackground}}>
+              <Text style={{fontSize: 20, fontWeight: '500'}}>
+                {que.question}
+              </Text>
+              <ButtonGroup
+                buttons={que.options}
+                disabled={true}
+                buttonContainerStyle={buttonContainerStyle}
+                buttonStyle={buttonStyle}
+                textStyle={textStyle}
+                containerStyle={{height: 200}}
+                onPress={() => console.log('hello')}
+                vertical
+                selectedIndex={null}
+              />
+            </View>
+          );
+        })}
+      </ViewPager>
     );
   };
 
@@ -121,6 +140,27 @@ class EditQuestion extends React.Component<Props, State> {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    width: '100%',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    padding: 20,
+    backgroundColor: greyWithAlpha(0.2),
+  },
+  buttonContainerStyle: {
+    flex: 1,
+    height: '100%',
+  },
+  buttonStyle: {
+    padding: 10,
+  },
+  textStyle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+});
 
 const mapStateToProps = (state: StoreState) => {
   return {

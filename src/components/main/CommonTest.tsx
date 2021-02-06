@@ -31,8 +31,7 @@ type NavigationProp = CompositeNavigationProp<
 
 interface Props {
   navigation: NavigationProp;
-  user: string;
-  currentClassOwner: string;
+  isOwner: boolean;
   dataErrored: boolean;
   dataLoading: boolean;
   data: QuizRes[];
@@ -45,17 +44,12 @@ interface State {
 }
 
 class CommonTest extends React.Component<Props, State> {
-  isOwner: boolean = false;
   constructor(props: Props) {
     super(props);
 
     this.state = {
       modalVisible: false,
     };
-  }
-
-  componentDidUpdate() {
-    this.isOwner = this.props.currentClassOwner === this.props.user;
   }
 
   renderContent = () => {
@@ -133,7 +127,7 @@ class CommonTest extends React.Component<Props, State> {
           {this.renderContent()}
         </View>
 
-        {this.isOwner && (
+        {this.props.isOwner && (
           <Button
             icon={<Octicons name="plus" size={26} color={commonBlue} />}
             containerStyle={styles.FABContainer}

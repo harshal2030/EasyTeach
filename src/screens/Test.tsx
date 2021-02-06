@@ -37,6 +37,7 @@ interface Props {
   quizLoading: boolean;
   quizzes: QuizRes[];
   fetchQuiz(token: string, classId: string, quizType?: string): void;
+  isOwner: boolean;
 }
 
 interface State {
@@ -74,26 +75,28 @@ class Test extends React.Component<Props, State> {
         onPress={() => this.setState({modalVisible: true, quiz: item})}
         expiresOn={new Date(item.timePeriod[1].value)}
         collapseComponent={
-          <View style={styles.collapseContainer}>
-            <Pressable
-              style={styles.collapseButton}
-              onPress={() =>
-                this.props.navigation.navigate('CreateTest', {
-                  quizId: item.quizId,
-                })
-              }>
-              <Text style={styles.collapseText}>Edit</Text>
-            </Pressable>
-            <Pressable
-              style={styles.collapseButton}
-              onPress={() =>
-                this.props.navigation.navigate('EditQuestion', {
-                  quizId: item.quizId,
-                })
-              }>
-              <Text style={styles.collapseText}>Edit Questions</Text>
-            </Pressable>
-          </View>
+          this.props.isOwner ? (
+            <View style={styles.collapseContainer}>
+              <Pressable
+                style={styles.collapseButton}
+                onPress={() =>
+                  this.props.navigation.navigate('CreateTest', {
+                    quizId: item.quizId,
+                  })
+                }>
+                <Text style={styles.collapseText}>Edit</Text>
+              </Pressable>
+              <Pressable
+                style={styles.collapseButton}
+                onPress={() =>
+                  this.props.navigation.navigate('EditQuestion', {
+                    quizId: item.quizId,
+                  })
+                }>
+                <Text style={styles.collapseText}>Edit Questions</Text>
+              </Pressable>
+            </View>
+          ) : null
         }
       />
     );
@@ -118,8 +121,7 @@ class Test extends React.Component<Props, State> {
           data={quizzes}
           headerText="Live"
           renderItem={this.renderItem}
-          currentClassOwner={currentClass!.owner.username}
-          user={profile.username}
+          isOwner={this.props.isOwner}
         />
         {currentClass!.owner.username === profile.username && (
           <View
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: greyWithAlpha(0.8),
     backgroundColor: greyWithAlpha(0.2),
+    borderRadius: 2,
   },
   collapseText: {
     fontSize: 17,
@@ -185,6 +188,7 @@ const mapStateToProps = (state: StoreState) => {
     quizLoading: state.quizLoading,
     quizErrored: state.quizErrored,
     quizzes: state.quizzes,
+    isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
 

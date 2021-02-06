@@ -42,7 +42,7 @@ const Card = (props: Props) => {
           {props.collapseComponent && (
             <Octicons
               name="gear"
-              size={25}
+              size={23}
               onPress={() => updateCollapse(!collapsed)}
             />
           )}

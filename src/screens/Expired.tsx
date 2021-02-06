@@ -39,6 +39,7 @@ interface Props {
     avatar: string;
   };
   navigation: NavigationProp;
+  isOwner: boolean;
 }
 
 interface State {
@@ -110,7 +111,7 @@ class Expired extends React.Component<Props, State> {
   };
 
   render() {
-    const {navigation, currentClass, profile} = this.props;
+    const {navigation} = this.props;
     const {loading, errored, data} = this.state;
     return (
       <CommonTest
@@ -120,8 +121,7 @@ class Expired extends React.Component<Props, State> {
         renderItem={this.renderItem}
         data={data}
         headerText="Expired"
-        currentClassOwner={currentClass!.owner.name}
-        user={profile.username}
+        isOwner={this.props.isOwner}
       />
     );
   }
@@ -132,6 +132,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     profile: state.profile,
     currentClass: state.currentClass,
+    isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
 
