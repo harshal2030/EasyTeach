@@ -15,6 +15,8 @@ import PushNotification from 'react-native-push-notification';
 import {registerFCM} from './src/global/actions/token';
 import {addMsg} from './src/global/actions/msgs';
 
+enableScreens(true);
+
 PushNotification.configure({
   onRegister: (token) => {
     store.dispatch(registerFCM({os: token.os, fcmToken: token.token}));
@@ -52,8 +54,6 @@ PushNotification.configure({
 
   requestPermissions: true,
 });
-
-enableScreens(true);
 
 const Wrapper = () => {
   return (

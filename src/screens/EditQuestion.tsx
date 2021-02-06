@@ -1,11 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
-import {Header, ButtonGroup} from 'react-native-elements';
+import {Header} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import ViewPager from '@react-native-community/viewpager';
+
+import {QuestionCard} from '../components/main';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
@@ -13,7 +15,7 @@ import {Class} from '../global/actions/classes';
 import {RootStackParamList} from '../navigators/types';
 import {questionUrl} from '../utils/urls';
 import {ContainerStyles} from '../styles/styles';
-import {commonBackground, commonBlue, greyWithAlpha} from '../styles/colors';
+import {commonBackground, commonBlue} from '../styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList, 'EditQuestion'>;
@@ -27,6 +29,7 @@ type Questions = {
   options: string[];
   queId: string;
   score: number;
+  attachments: string;
 };
 
 interface State {
@@ -34,6 +37,10 @@ interface State {
   errored: boolean;
   questions: Questions[];
   page: number;
+  photo: {
+    uri: string;
+    type: string;
+  };
 }
 
 class EditQuestion extends React.Component<Props, State> {
@@ -45,6 +52,10 @@ class EditQuestion extends React.Component<Props, State> {
       loading: true,
       errored: false,
       page: 0,
+      photo: {
+        uri: 'none',
+        type: 'image/png',
+      },
     };
   }
 
@@ -68,8 +79,7 @@ class EditQuestion extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {errored, loading, questions} = this.state;
-    const {buttonContainerStyle, buttonStyle, textStyle} = styles;
+    const {errored, loading, questions, page} = this.state;
 
     if (errored) {
       return (
@@ -90,27 +100,18 @@ class EditQuestion extends React.Component<Props, State> {
       );
     }
 
+    const queNo = questions.length * page + questions.length;
+
     return (
+      // eslint-disable-next-line react-native/no-inline-styles
       <ViewPager initialPage={0} style={{flex: 1}}>
         {questions.map((que, i) => {
           return (
-            <View
-              collapsable={false}
-              key={i}
-              style={{flex: 1, padding: 20, backgroundColor: commonBackground}}>
-              <Text style={{fontSize: 20, fontWeight: '500'}}>
-                {que.question}
-              </Text>
-              <ButtonGroup
-                buttons={que.options}
-                disabled={true}
-                buttonContainerStyle={buttonContainerStyle}
-                buttonStyle={buttonStyle}
-                textStyle={textStyle}
-                containerStyle={{height: 200}}
-                onPress={() => console.log('hello')}
-                vertical
-                selectedIndex={null}
+            <View collapsable={false} key={i} style={styles.queContainer}>
+              <QuestionCard
+                question={que}
+                totalQues={queNo}
+                queNo={page * 10 + i + 1}
               />
             </View>
           );
@@ -142,23 +143,10 @@ class EditQuestion extends React.Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    width: '100%',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    padding: 20,
-    backgroundColor: greyWithAlpha(0.2),
-  },
-  buttonContainerStyle: {
+  queContainer: {
     flex: 1,
-    height: '100%',
-  },
-  buttonStyle: {
-    padding: 10,
-  },
-  textStyle: {
-    fontSize: 18,
-    fontWeight: '600',
+    padding: 20,
+    backgroundColor: commonBackground,
   },
 });
 
