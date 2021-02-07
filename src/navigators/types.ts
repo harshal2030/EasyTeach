@@ -3,6 +3,7 @@ type RootStackParamList = {
   Auth: undefined;
   Drawer: undefined;
   JoinClass: undefined;
+  Forgot: undefined;
   Quiz: {
     quizId: string;
     title: string;

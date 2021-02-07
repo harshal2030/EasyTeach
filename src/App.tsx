@@ -114,6 +114,10 @@ const App = (props: Props): JSX.Element => {
             name="Auth"
             component={require('./screens/AuthScreen').default}
           />
+          <Stack.Screen
+            name="Forgot"
+            component={require('./screens/Forgot').default}
+          />
         </>
       ) : (
         <>
