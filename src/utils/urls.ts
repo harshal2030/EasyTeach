@@ -18,6 +18,7 @@ const quizUrl = `${root}/quiz`;
 const resultUrl = `${root}/result`;
 const msgUrl = `${root}/msg`;
 const questionUrl = `${root}/que`;
+const recoveryUrl = `${root}/users/recover`;
 
 export {
   root,
@@ -32,4 +33,5 @@ export {
   resultUrl,
   msgUrl,
   questionUrl,
+  recoveryUrl,
 };

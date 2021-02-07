@@ -10,6 +10,7 @@ interface Props {
   isLoading: boolean;
   onLoginPress: (email: string, password: string) => void;
   onSignupLinkPress: () => void;
+  onForgotClick: () => void;
 }
 
 interface State {
@@ -26,23 +27,30 @@ export default class LoginForm extends Component<Props, State> {
   };
 
   hideForm = async () => {
-    if (this.buttonRef && this.formRef && this.linkRef) {
+    if (this.buttonRef && this.formRef && this.linkRef && this.forgotRef) {
       await Promise.all([
         this.buttonRef.zoomOut(200),
         this.formRef.fadeOut(300),
         this.linkRef.fadeOut(300),
+        this.forgotRef.fadeOut(300),
       ]);
     }
   };
   buttonRef: any;
   formRef: any;
+  forgotRef: any;
   linkRef: any;
   emailInputRef: CustomTextInput | null = null;
   passwordInputRef: any;
 
   render() {
     const {email, password} = this.state;
-    const {isLoading, onSignupLinkPress, onLoginPress} = this.props;
+    const {
+      isLoading,
+      onSignupLinkPress,
+      onLoginPress,
+      onForgotClick,
+    } = this.props;
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <View
@@ -92,15 +100,27 @@ export default class LoginForm extends Component<Props, State> {
               text={'Log In'}
             />
           </View>
-          <Text
-            ref={(ref) => (this.linkRef = ref)}
-            style={styles.signupLink}
-            onPress={onSignupLinkPress}
-            animation={'fadeIn'}
-            duration={600}
-            delay={400}>
-            {'Not registered yet?'}
-          </Text>
+          <View style={styles.textButtonContainer}>
+            <Text
+              ref={(ref) => (this.forgotRef = ref)}
+              style={styles.signupLink}
+              onPress={onForgotClick}
+              animation={'fadeIn'}
+              duration={600}
+              delay={400}>
+              {'Forgot Password?'}
+            </Text>
+
+            <Text
+              ref={(ref) => (this.linkRef = ref)}
+              style={styles.signupLink}
+              onPress={onSignupLinkPress}
+              animation={'fadeIn'}
+              duration={600}
+              delay={400}>
+              {'Not registered yet?'}
+            </Text>
+          </View>
         </View>
       </ScrollView>
     );
@@ -115,7 +135,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   footer: {
-    height: 100,
+    height: 110,
     justifyContent: 'center',
   },
   loginButton: {
@@ -128,6 +148,12 @@ const styles = StyleSheet.create({
   signupLink: {
     color: 'rgba(255,255,255,0.6)',
     alignSelf: 'center',
-    padding: 20,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  textButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
