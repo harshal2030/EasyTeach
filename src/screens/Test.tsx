@@ -77,7 +77,7 @@ class Test extends React.Component<Props, State> {
         rightComponent={
           <Octicons
             name="gear"
-            size={16}
+            size={22}
             onPress={() =>
               this.props.navigation.navigate('CreateTest', {
                 quizId: item.quizId,
