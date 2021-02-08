@@ -1,12 +1,15 @@
 import React from 'react';
+import axios from 'axios';
 import {
   ScrollView,
+  Platform,
+  View,
   Text,
   ImageBackground,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {ButtonGroup} from 'react-native-elements';
+import {ButtonGroup, Button} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import SnackBar from 'react-native-snackbar';
@@ -14,7 +17,8 @@ import {ImageOrVideo} from 'react-native-image-crop-picker';
 
 import {PhotoPicker} from '../common';
 
-import {commonGrey, greyWithAlpha} from '../../styles/colors';
+import {commonGrey, flatRed, greyWithAlpha} from '../../styles/colors';
+import {mediaUrl, questionUrl} from '../../utils/urls';
 
 interface Props {
   queNo: number;
@@ -23,7 +27,11 @@ interface Props {
     question: string;
     options: string[];
     attachments: string;
+    queId: string;
   };
+  token: string;
+  quizId: string;
+  classId: string;
 }
 
 interface State {
@@ -31,6 +39,7 @@ interface State {
     uri: string;
     type: string;
   };
+  loading: boolean;
 }
 
 class QuestionCard extends React.Component<Props, State> {
@@ -40,11 +49,67 @@ class QuestionCard extends React.Component<Props, State> {
 
     this.state = {
       photo: {
-        uri: 'none',
+        uri: props.question.attachments
+          ? `${mediaUrl}/que/${props.question.attachments}`
+          : 'none',
         type: 'image/png',
       },
+      loading: false,
     };
   }
+
+  onUpdatePress = () => {
+    const {photo} = this.state;
+    const {question, options, attachments, queId} = this.props.question;
+    const {classId, quizId, token} = this.props;
+    const data = new FormData();
+
+    data.append(
+      'info',
+      JSON.stringify({
+        question,
+        options,
+      }),
+    );
+
+    if (
+      photo.uri !== 'none' &&
+      photo.uri !== `${mediaUrl}/que/${attachments}`
+    ) {
+      data.append('media', {
+        // @ts-ignore
+        name: 'photo.jpeg',
+        type: photo.type,
+        uri:
+          Platform.OS === 'android'
+            ? photo.uri
+            : photo.uri.replace('file://', ''),
+      });
+    }
+
+    this.setState({loading: true});
+    axios
+      .put(`${questionUrl}/${classId}/${quizId}/${queId}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        this.setState({loading: false});
+        SnackBar.show({
+          text: 'Question updated successfully.',
+          duration: SnackBar.LENGTH_LONG,
+        });
+      })
+      .catch(() => {
+        this.setState({loading: false});
+        SnackBar.show({
+          text: 'Unable to update question at the moment.',
+          duration: SnackBar.LENGTH_LONG,
+          backgroundColor: flatRed,
+        });
+      });
+  };
 
   onImage = (image: ImageOrVideo) => {
     this.sheet!.close();
@@ -67,43 +132,55 @@ class QuestionCard extends React.Component<Props, State> {
   render() {
     const {queNo, totalQues, question} = this.props;
     return (
-      <ScrollView>
-        <Text style={{color: commonGrey}}>
-          Question {queNo} of {totalQues}
-        </Text>
-        <Text style={styles.queText}>{question.question}</Text>
+      <>
+        <ScrollView>
+          <Text style={{color: commonGrey}}>
+            Question {queNo} of {totalQues}
+          </Text>
+          <Text style={styles.queText}>{question.question}</Text>
 
-        <ImageBackground
-          source={{uri: this.state.photo.uri}}
-          style={styles.imageStyle}>
-          <TouchableOpacity
-            style={styles.imageOverlay}
-            onPress={() => this.sheet!.open()}>
-            <MaterialIcons name="camera-alt" color="#000" size={28} />
-          </TouchableOpacity>
-        </ImageBackground>
+          <ImageBackground
+            source={{uri: this.state.photo.uri}}
+            style={styles.imageStyle}>
+            <TouchableOpacity
+              style={styles.imageOverlay}
+              onPress={() => this.sheet!.open()}>
+              <MaterialIcons name="camera-alt" color="#000" size={28} />
+            </TouchableOpacity>
+          </ImageBackground>
 
-        <ButtonGroup
-          buttons={question.options}
-          disabled={true}
-          buttonContainerStyle={styles.buttonContainerStyle}
-          buttonStyle={styles.buttonStyle}
-          textStyle={styles.textStyle}
-          onPress={() => null}
-          vertical
-          selectedIndex={null}
-        />
+          <ButtonGroup
+            buttons={question.options}
+            disabled={true}
+            buttonContainerStyle={styles.buttonContainerStyle}
+            buttonStyle={styles.buttonStyle}
+            textStyle={styles.textStyle}
+            onPress={() => null}
+            vertical
+            selectedIndex={null}
+          />
 
-        <PhotoPicker
-          sheetRef={(ref) => (this.sheet = ref)}
-          onCameraImage={this.onImage}
-          onPickerImage={this.onImage}
-          onCameraError={this.onImageError}
-          onPickerError={this.onImageError}
-          pickerProps={{cropping: true}}
-          cameraProps={{cropping: true}}
-        />
-      </ScrollView>
+          <Button
+            title="Update"
+            containerStyle={styles.updateButton}
+            onPress={this.onUpdatePress}
+          />
+
+          <PhotoPicker
+            sheetRef={(ref) => (this.sheet = ref)}
+            onCameraImage={this.onImage}
+            onPickerImage={this.onImage}
+            onCameraError={this.onImageError}
+            onPickerError={this.onImageError}
+            pickerProps={{cropping: true}}
+            cameraProps={{cropping: true}}
+          />
+        </ScrollView>
+
+        <View>
+          <Text>Swipe left/right to change question</Text>
+        </View>
+      </>
     );
   }
 }
@@ -144,6 +221,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 2,
     borderColor: '#000',
+  },
+  updateButton: {
+    width: '95%',
+    alignSelf: 'center',
+    marginTop: 20,
   },
 });
 

@@ -112,6 +112,9 @@ class EditQuestion extends React.Component<Props, State> {
                 question={que}
                 totalQues={queNo}
                 queNo={page * 10 + i + 1}
+                classId={this.props.currentClass.id}
+                quizId={this.props.route.params.quizId}
+                token={this.props.token}
               />
             </View>
           );
