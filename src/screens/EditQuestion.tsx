@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {View, Text, ActivityIndicator, StyleSheet, Alert} from 'react-native';
 import {Header} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -44,6 +44,7 @@ interface State {
 }
 
 class EditQuestion extends React.Component<Props, State> {
+  pager: ViewPager | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -72,10 +73,25 @@ class EditQuestion extends React.Component<Props, State> {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: {
+            page: this.state.page,
+          },
         },
       )
-      .then((res) => this.setState({questions: res.data, loading: false}))
+      .then((res) => {
+        if (res.data.length === 0) {
+          this.setState({loading: false, page: this.state.page - 1});
+          return Alert.alert('', 'No more question remaining.');
+        }
+        this.setState({questions: res.data, loading: false}, () =>
+          this.pager!.setPage(0),
+        );
+      })
       .catch(() => this.setState({loading: false, errored: true}));
+  };
+
+  onLoadNextPress = () => {
+    this.setState({page: this.state.page + 1}, this.fetchQues);
   };
 
   renderContent = () => {
@@ -104,7 +120,10 @@ class EditQuestion extends React.Component<Props, State> {
 
     return (
       // eslint-disable-next-line react-native/no-inline-styles
-      <ViewPager initialPage={0} style={{flex: 1}}>
+      <ViewPager
+        initialPage={0}
+        style={{flex: 1}}
+        ref={(ref) => (this.pager = ref)}>
         {questions.map((que, i) => {
           return (
             <View collapsable={false} key={i} style={styles.queContainer}>
@@ -115,6 +134,9 @@ class EditQuestion extends React.Component<Props, State> {
                 classId={this.props.currentClass.id}
                 quizId={this.props.route.params.quizId}
                 token={this.props.token}
+                onLoadNextPress={() =>
+                  this.setState({page: this.state.page + 1}, this.fetchQues)
+                }
               />
             </View>
           );

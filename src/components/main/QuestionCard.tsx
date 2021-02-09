@@ -32,6 +32,7 @@ interface Props {
   token: string;
   quizId: string;
   classId: string;
+  onLoadNextPress: () => void;
 }
 
 interface State {
@@ -175,6 +176,14 @@ class QuestionCard extends React.Component<Props, State> {
             pickerProps={{cropping: true}}
             cameraProps={{cropping: true}}
           />
+
+          {queNo === 10 && (
+            <Button
+              containerStyle={styles.updateButton}
+              title="Load next 10 question"
+              onPress={this.props.onLoadNextPress}
+            />
+          )}
         </ScrollView>
 
         <View>
