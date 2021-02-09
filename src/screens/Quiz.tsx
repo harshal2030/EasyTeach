@@ -8,18 +8,21 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Image,
 } from 'react-native';
 import {Header, Button, ButtonGroup} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
+import LightBox from 'react-native-lightbox-v2';
+import PhotoView from 'react-native-photo-view-ex';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
-import {quizUrl} from '../utils/urls';
+import {mediaUrl, quizUrl} from '../utils/urls';
 import {commonBlue, commonGrey, greyWithAlpha} from '../styles/colors';
 
 interface Props {
@@ -35,6 +38,7 @@ type Questions = {
   queId: string;
   selected: number | null;
   score: number;
+  attachments: string | undefined;
 };
 
 interface State {
@@ -151,6 +155,18 @@ class Quiz extends React.Component<Props, State> {
       });
   };
 
+  ZoomImage = () => {
+    const {currentIndex, questions} = this.state;
+    return (
+      <PhotoView
+        source={{uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`}}
+        style={{width: '100%', height: '100%'}}
+        resizeMode="contain"
+        maximumZoomScale={5}
+      />
+    );
+  };
+
   renderContent = () => {
     const {loading, errored, questions, currentIndex} = this.state;
     const {buttonContainerStyle, textStyle, buttonStyle} = styles;
@@ -178,9 +194,23 @@ class Quiz extends React.Component<Props, State> {
           {questions[currentIndex].score} marks
         </Text>
 
-        <Text style={{fontSize: 18, fontWeight: '500'}}>
+        <Text style={{fontSize: 18, fontWeight: '600'}}>
           {questions[currentIndex].question}
         </Text>
+
+        {questions[currentIndex].attachments && (
+          <>
+            <Text style={{fontSize: 12}}>*click to enlarge</Text>
+            <LightBox renderContent={this.ZoomImage}>
+              <Image
+                source={{
+                  uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`,
+                }}
+                style={styles.imageStyle}
+              />
+            </LightBox>
+          </>
+        )}
         <ButtonGroup
           buttons={questions[currentIndex].options}
           onPress={this.updateSelected}
@@ -258,6 +288,13 @@ const styles = StyleSheet.create({
   textStyle: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  imageStyle: {
+    height: 100,
+    width: undefined,
+    flex: 1,
+    margin: 5,
+    marginTop: 0,
   },
 });
 

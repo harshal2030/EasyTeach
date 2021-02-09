@@ -45,6 +45,7 @@ interface State {
     uri: string;
     type: string;
   };
+  loading: boolean;
 }
 
 class EditProfile extends React.Component<Props, State> {
@@ -62,6 +63,7 @@ class EditProfile extends React.Component<Props, State> {
         uri: `${mediaUrl}/avatar/${avatar}`,
         type: '',
       },
+      loading: false,
     };
   }
 
@@ -92,6 +94,7 @@ class EditProfile extends React.Component<Props, State> {
   };
 
   updateProfile = () => {
+    this.setState({loading: true});
     const {name, username, avatar} = this.state;
     const form = new FormData();
     form.append('info', JSON.stringify({name, username}));
@@ -122,9 +125,11 @@ class EditProfile extends React.Component<Props, State> {
         this.storeNewToken(res.data.token);
         this.props.registerToken(res.data.token);
         this.props.registerProfile(res.data.user);
+        this.setState({loading: false});
         this.props.navigation.goBack();
       })
       .catch(() => {
+        this.setState({loading: false});
         SnackBar.show({
           text: 'Unable to update profile. please try again later',
           backgroundColor: flatRed,
@@ -155,6 +160,7 @@ class EditProfile extends React.Component<Props, State> {
           imageSource={{
             uri: avatar.uri,
           }}
+          buttonLoading={this.state.loading}
           onButtonPress={this.updateProfile}
           onImagePress={() => this.sheet!.open()}
           buttonProps={{title: 'Update'}}>

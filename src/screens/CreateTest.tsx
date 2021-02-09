@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
   buttonStyle: {
     marginVertical: 10,
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: 5,
   },
 });
 

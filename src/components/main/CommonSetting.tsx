@@ -46,7 +46,7 @@ const CommonSetting = (props: Props) => {
 };
 
 CommonSetting.defaultProps = {
-  loading: false,
+  buttonLoading: false,
 };
 
 const styles = StyleSheet.create({

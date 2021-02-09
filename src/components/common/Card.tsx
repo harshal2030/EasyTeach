@@ -1,7 +1,13 @@
 import React from 'react';
-import {View, StyleSheet, TouchableHighlight, ViewStyle} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  ViewStyle,
+} from 'react-native';
 import {Text} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Octicons from 'react-native-vector-icons/Octicons';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {formatDate} from '../../utils/functions';
 
@@ -10,32 +16,40 @@ type Props = {
   onPress?(): any;
   containerStyle?: ViewStyle;
   expiresOn: Date;
-  rightComponent?: JSX.Element | null;
+  collapseComponent?: JSX.Element | null;
 };
 
 const Card = (props: Props) => {
+  const [collapsed, updateCollapse] = React.useState(false);
+
   return (
-    <TouchableHighlight
-      style={[styles.main, props.containerStyle]}
-      onPress={props.onPress}
-      underlayColor={greyWithAlpha(0.4)}>
-      <View style={styles.contentContainer}>
-        <View>
-          <View style={styles.iconTextContainer}>
-            <MaterialIcons name="assignment" size={26} />
-            <Text style={styles.titleStyle} numberOfLines={1}>
-              {props.title}
+    <View style={[styles.main, props.containerStyle]}>
+      <TouchableWithoutFeedback onPress={props.onPress}>
+        <View style={styles.contentContainer}>
+          <View>
+            <View style={styles.iconTextContainer}>
+              <MaterialIcons name="assignment" size={26} />
+              <Text style={styles.titleStyle} numberOfLines={1}>
+                {props.title}
+              </Text>
+            </View>
+
+            <Text style={styles.timeText} numberOfLines={1}>
+              Expires On: {formatDate(props.expiresOn)}
             </Text>
           </View>
 
-          <Text style={styles.timeText} numberOfLines={1}>
-            Expires On: {formatDate(props.expiresOn)}
-          </Text>
+          {props.collapseComponent && (
+            <Octicons
+              name="gear"
+              size={23}
+              onPress={() => updateCollapse(!collapsed)}
+            />
+          )}
         </View>
-
-        {props.rightComponent}
-      </View>
-    </TouchableHighlight>
+      </TouchableWithoutFeedback>
+      {collapsed && props.collapseComponent}
+    </View>
   );
 };
 

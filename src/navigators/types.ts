@@ -24,6 +24,9 @@ type RootStackParamList = {
   EditProfile: {
     username: string;
   };
+  EditQuestion: {
+    quizId: string;
+  };
 };
 
 type BottomTabHomeParamList = {
