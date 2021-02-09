@@ -505,24 +505,25 @@ class CreateTest extends React.Component<Props, State> {
             desc="Randomize order of options specified in question sheet"
           />
 
-          <View>
+          <Button
+            title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
+            containerStyle={[
+              styles.buttonStyle,
+              {marginBottom: this.props.route.params.quizId ? 0 : 30},
+            ]}
+            onPress={this.quizRequest}
+            loading={APILoading}
+          />
+
+          {this.props.route.params.quizId && (
             <Button
-              title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
-              containerStyle={styles.buttonStyle}
-              onPress={this.quizRequest}
+              title="Delete"
+              containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
+              buttonStyle={{backgroundColor: flatRed}}
+              onPress={this.deleteQuiz}
               loading={APILoading}
             />
-
-            {this.props.route.params.quizId && (
-              <Button
-                title="Delete"
-                containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
-                buttonStyle={{backgroundColor: flatRed}}
-                onPress={this.deleteQuiz}
-                loading={APILoading}
-              />
-            )}
-          </View>
+          )}
         </ScrollView>
       </View>
     );
@@ -545,7 +546,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   buttonStyle: {
-    marginVertical: 5,
+    marginVertical: 10,
     flex: 1,
     marginHorizontal: 5,
   },

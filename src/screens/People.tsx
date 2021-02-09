@@ -78,7 +78,8 @@ const People = (props: Props) => {
           });
         });
     }
-  }, [props.currentClass, props.token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.currentClass]);
 
   const removeStudent = (name: string, username: string) => {
     const removeReq = () => {
@@ -149,50 +150,8 @@ const People = (props: Props) => {
     }
   };
 
-  const renderMainContent = () => (
-    <View style={{padding: 5}}>
-      <FlatList
-        data={people}
-        renderItem={renderListItem}
-        keyExtractor={(_item, i) => i.toString()}
-        ListFooterComponent={renderListFooter()}
-        ListHeaderComponent={
-          <>
-            <Text h4 style={styles.titleStyle}>
-              Owner
-            </Text>
-            <ListItem bottomDivider topDivider>
-              <Avatar
-                size="medium"
-                rounded
-                source={{
-                  uri: `${mediaUrl}/avatar/${props.currentClass!.owner.avatar}`,
-                }}
-              />
-
-              <ListItem.Content>
-                <ListItem.Title>
-                  {props.currentClass!.owner.name}
-                </ListItem.Title>
-                <ListItem.Subtitle>
-                  {'@' + props.currentClass!.owner.username}
-                </ListItem.Subtitle>
-              </ListItem.Content>
-            </ListItem>
-
-            {people.length !== 0 && (
-              <Text h4 style={styles.titleStyle}>
-                Students
-              </Text>
-            )}
-          </>
-        }
-      />
-    </View>
-  );
-
   return (
-    <View>
+    <View style={{flex: 1}}>
       <Header
         centerComponent={{
           text: 'People',
@@ -206,7 +165,46 @@ const People = (props: Props) => {
         }}
       />
       {props.currentClass ? (
-        renderMainContent()
+        <FlatList
+          data={people}
+          renderItem={renderListItem}
+          style={{padding: 5}}
+          keyExtractor={(_item, i) => i.toString()}
+          ListFooterComponent={renderListFooter()}
+          ListHeaderComponent={
+            <>
+              <Text h4 style={styles.titleStyle}>
+                Owner
+              </Text>
+              <ListItem bottomDivider topDivider>
+                <Avatar
+                  size="medium"
+                  rounded
+                  source={{
+                    uri: `${mediaUrl}/avatar/${
+                      props.currentClass!.owner.avatar
+                    }`,
+                  }}
+                />
+
+                <ListItem.Content>
+                  <ListItem.Title>
+                    {props.currentClass!.owner.name}
+                  </ListItem.Title>
+                  <ListItem.Subtitle>
+                    {'@' + props.currentClass!.owner.username}
+                  </ListItem.Subtitle>
+                </ListItem.Content>
+              </ListItem>
+
+              {people.length !== 0 && (
+                <Text h4 style={styles.titleStyle}>
+                  Students
+                </Text>
+              )}
+            </>
+          }
+        />
       ) : (
         <Text>Enroll in a class to see people</Text>
       )}

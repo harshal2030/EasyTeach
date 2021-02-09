@@ -54,6 +54,7 @@ interface Props {
   ) => void;
   login: (email: string, password: string) => void;
   onLoginAnimationCompleted: () => void;
+  onForgotClick: () => void;
 }
 
 interface State {
@@ -95,7 +96,7 @@ export default class AuthScreen extends Component<Props, State> {
   };
 
   render() {
-    const {isLoggedIn, isLoading, signup, login} = this.props;
+    const {isLoggedIn, isLoading, signup, login, onForgotClick} = this.props;
     const {visibleForm} = this.state;
     // The following style is responsible of the "bounce-up from bottom" animation of the form
     const formStyle = !visibleForm ? {height: 0} : {marginTop: 40};
@@ -130,6 +131,7 @@ export default class AuthScreen extends Component<Props, State> {
               onSignupLinkPress={() => this._setVisibleForm('SIGNUP')}
               onLoginPress={login}
               isLoading={isLoading}
+              onForgotClick={onForgotClick}
             />
           )}
         </View>

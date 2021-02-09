@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 import {StoreState} from '../global';
 import {registerToken} from '../global/actions/token';
@@ -14,6 +15,7 @@ import Auth from './Auth';
 
 import {signUpUrl, loginUrl} from '../utils/urls';
 import {usernamePattern} from '../utils/regexPatterns';
+import {RootStackParamList} from '../navigators/types';
 
 interface Props {
   token: string;
@@ -23,6 +25,7 @@ interface Props {
   };
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
+  navigation: StackNavigationProp<RootStackParamList, 'Auth'>;
 }
 
 interface State {
@@ -174,6 +177,7 @@ class AuthScreen extends React.Component<Props, State> {
         login={this.onLogin}
         signup={this.onSignUp}
         onLoginAnimationCompleted={() => null}
+        onForgotClick={() => this.props.navigation.navigate('Forgot')}
       />
     );
   }
