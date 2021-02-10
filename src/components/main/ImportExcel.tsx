@@ -1,8 +1,8 @@
 import React from 'react';
 import PhotoView from 'react-native-photo-view-ex';
 import LightBox from 'react-native-lightbox-v2';
-import {View, StyleSheet, Linking, Image} from 'react-native';
-import {Header, Button, Text} from 'react-native-elements';
+import {View, StyleSheet, Linking} from 'react-native';
+import {Header, Button, Text, Image} from 'react-native-elements';
 
 import {eucalyptusGreen} from '../../styles/colors';
 import {mediaUrl} from '../../utils/urls';

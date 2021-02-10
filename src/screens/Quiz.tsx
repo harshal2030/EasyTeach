@@ -8,9 +8,10 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  Image,
+  AppState,
+  AppStateStatus,
 } from 'react-native';
-import {Header, Button, ButtonGroup} from 'react-native-elements';
+import {Header, Button, ButtonGroup, Image} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
@@ -62,13 +63,21 @@ class Quiz extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    AppState.addEventListener('change', this.appStateHandler);
     ScreenCapture.preventScreenCaptureAsync('quiz');
     this.fetchQues();
 
     this._unSub = this.props.navigation.addListener('blur', () => {
       ScreenCapture.allowScreenCaptureAsync('quiz');
+      AppState.removeEventListener('change', this.appStateHandler);
     });
   }
+
+  appStateHandler = (state: AppStateStatus) => {
+    if (state === 'background' || state === 'inactive') {
+      this.fetchQues();
+    }
+  };
 
   componentWillUnmount() {
     this._unSub!();

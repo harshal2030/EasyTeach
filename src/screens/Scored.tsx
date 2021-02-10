@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {View, Text, Pressable, StyleSheet} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -19,6 +20,7 @@ import {
   DrawerParamList,
   BottomTabTestParamList,
 } from '../navigators/types';
+import {greyWithAlpha} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
@@ -104,6 +106,30 @@ class Scored extends React.Component<Props, State> {
             questions: item.questions,
           })
         }
+        collapseComponent={
+          this.props.isOwner ? (
+            <View style={styles.collapseContainer}>
+              <Pressable
+                style={styles.collapseButton}
+                onPress={() =>
+                  this.props.navigation.navigate('CreateTest', {
+                    quizId: item.quizId,
+                  })
+                }>
+                <Text style={styles.collapseText}>Edit</Text>
+              </Pressable>
+              <Pressable
+                style={styles.collapseButton}
+                onPress={() =>
+                  this.props.navigation.navigate('EditQuestion', {
+                    quizId: item.quizId,
+                  })
+                }>
+                <Text style={styles.collapseText}>Edit Questions</Text>
+              </Pressable>
+            </View>
+          ) : null
+        }
       />
     );
   };
@@ -124,6 +150,27 @@ class Scored extends React.Component<Props, State> {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  collapseContainer: {
+    marginLeft: 30,
+    flexDirection: 'row',
+  },
+  collapseButton: {
+    marginHorizontal: 5,
+    padding: 3,
+    marginTop: 5,
+    borderWidth: 1,
+    borderColor: greyWithAlpha(0.8),
+    backgroundColor: greyWithAlpha(0.2),
+    borderRadius: 2,
+  },
+  collapseText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#003',
+  },
+});
 
 const mapStateToProps = (state: StoreState) => {
   return {
