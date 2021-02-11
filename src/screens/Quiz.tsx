@@ -82,6 +82,8 @@ class Quiz extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this._unSub!();
+    ScreenCapture.allowScreenCaptureAsync('quiz');
+    AppState.removeEventListener('change', this.appStateHandler);
   }
 
   fetchQues = () => {
@@ -125,9 +127,16 @@ class Quiz extends React.Component<Props, State> {
   postResponse = () => {
     const {currentClass, route, token} = this.props;
     const marked = this.state.questions.map((val) => {
+      let response: string | null;
+      if (val.selected === null || val.selected === undefined) {
+        response = null;
+      } else {
+        response = val.options[val.selected];
+      }
+
       return {
         queId: val.queId,
-        response: val.selected ? val.options[val.selected] : null,
+        response,
       };
     });
 
