@@ -8,7 +8,6 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
-  Image,
   AppState,
   AppStateStatus,
 } from 'react-native';
