@@ -386,7 +386,7 @@ class CreateTest extends React.Component<Props, State> {
 
     if (errored) {
       return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={ContainerStyles.centerElements}>
           <Text>
             We're having trouble in fetching content for you. Please try again
             later.
@@ -397,7 +397,7 @@ class CreateTest extends React.Component<Props, State> {
 
     if (loading) {
       return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={ContainerStyles.centerElements}>
           <ActivityIndicator size="large" animating color={commonBlue} />
         </View>
       );

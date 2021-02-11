@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  Image,
   AppState,
   AppStateStatus,
 } from 'react-native';
@@ -81,6 +82,8 @@ class Quiz extends React.Component<Props, State> {
 
   componentWillUnmount() {
     this._unSub!();
+    ScreenCapture.allowScreenCaptureAsync('quiz');
+    AppState.removeEventListener('change', this.appStateHandler);
   }
 
   fetchQues = () => {
@@ -124,9 +127,16 @@ class Quiz extends React.Component<Props, State> {
   postResponse = () => {
     const {currentClass, route, token} = this.props;
     const marked = this.state.questions.map((val) => {
+      let response: string | null;
+      if (val.selected === null || val.selected === undefined) {
+        response = null;
+      } else {
+        response = val.options[val.selected];
+      }
+
       return {
         queId: val.queId,
-        response: val.selected ? val.options[val.selected] : val.selected,
+        response,
       };
     });
 
@@ -203,13 +213,13 @@ class Quiz extends React.Component<Props, State> {
           {questions[currentIndex].score} marks
         </Text>
 
-        <Text style={{fontSize: 18, fontWeight: '600'}}>
+        <Text style={styles.questionText}>
           {questions[currentIndex].question}
         </Text>
 
         {questions[currentIndex].attachments && (
           <>
-            <Text style={{fontSize: 12}}>*click to enlarge</Text>
+            <Text style={styles.imageText}>*click to enlarge</Text>
             <LightBox renderContent={this.ZoomImage}>
               <Image
                 source={{
@@ -252,7 +262,7 @@ class Quiz extends React.Component<Props, State> {
           }}
         />
 
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={ContainerStyles.centerElements}>
           {this.renderContent()}
         </View>
 
@@ -304,6 +314,13 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 5,
     marginTop: 0,
+  },
+  imageText: {
+    fontSize: 12,
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
 
