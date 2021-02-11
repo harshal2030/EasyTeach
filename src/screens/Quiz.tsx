@@ -127,7 +127,7 @@ class Quiz extends React.Component<Props, State> {
     const marked = this.state.questions.map((val) => {
       return {
         queId: val.queId,
-        response: val.selected ? val.options[val.selected] : val.selected,
+        response: val.selected ? val.options[val.selected] : null,
       };
     });
 
