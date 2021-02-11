@@ -141,7 +141,6 @@ class CreateTest extends React.Component<Props, State> {
 
     const start = timeRange[0].getTime();
     const stop = timeRange[1].getTime();
-    const now = new Date().getTime();
 
     const ques = parseInt(questions, 10);
 
@@ -160,7 +159,7 @@ class CreateTest extends React.Component<Props, State> {
       });
     }
 
-    if (start > stop || stop < now) {
+    if (start > stop) {
       return SnackBar.show({
         text: 'Invalid time range.',
         duration: SnackBar.LENGTH_SHORT,
@@ -190,7 +189,13 @@ class CreateTest extends React.Component<Props, State> {
         if (res.status === 200) {
           this.props.updateQuiz(res.data);
           this.setState({APILoading: false});
-          this.props.navigation.goBack();
+          // @ts-ignore
+          this.props.navigation.navigate('Drawer', {
+            screen: 'Test',
+            params: {
+              screen: 'TestHome',
+            },
+          });
         }
       })
       .catch(() => {

@@ -12,7 +12,7 @@ import {
   AppState,
   AppStateStatus,
 } from 'react-native';
-import {Header, Button, ButtonGroup} from 'react-native-elements';
+import {Header, Button, ButtonGroup, Image} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
