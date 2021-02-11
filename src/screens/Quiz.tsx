@@ -213,13 +213,13 @@ class Quiz extends React.Component<Props, State> {
           {questions[currentIndex].score} marks
         </Text>
 
-        <Text style={{fontSize: 18, fontWeight: '600'}}>
+        <Text style={styles.questionText}>
           {questions[currentIndex].question}
         </Text>
 
         {questions[currentIndex].attachments && (
           <>
-            <Text style={{fontSize: 12}}>*click to enlarge</Text>
+            <Text style={styles.imageText}>*click to enlarge</Text>
             <LightBox renderContent={this.ZoomImage}>
               <Image
                 source={{
@@ -262,7 +262,7 @@ class Quiz extends React.Component<Props, State> {
           }}
         />
 
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={ContainerStyles.centerElements}>
           {this.renderContent()}
         </View>
 
@@ -314,6 +314,13 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 5,
     marginTop: 0,
+  },
+  imageText: {
+    fontSize: 12,
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
 
