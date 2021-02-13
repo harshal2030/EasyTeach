@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {connect} from 'react-redux';
@@ -12,9 +11,8 @@ import {Card} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes} from '../global/actions/quiz';
+import {QuizRes, fetchQuiz} from '../global/actions/quiz';
 
-import {quizUrl} from '../utils/urls';
 import {
   RootStackParamList,
   DrawerParamList,
@@ -33,65 +31,34 @@ type NavigationProp = CompositeNavigationProp<
 interface Props {
   token: string | null;
   currentClass: Class | null;
-  profile: {
-    name: string;
-    username: string;
-    avatar: string;
-  };
   navigation: NavigationProp;
   isOwner: boolean;
-}
-
-interface State {
-  loading: boolean;
+  fetchQuiz(token: string, classId: string, quizType?: string): void;
+  quizzes: QuizRes[];
   errored: boolean;
-  data: QuizRes[];
+  loading: boolean;
 }
 
-class Scored extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      loading: true,
-      errored: false,
-      data: [],
-    };
-  }
-
+class Scored extends React.Component<Props> {
   componentDidMount() {
-    this.fetchData();
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchData();
+    if (this.props.currentClass) {
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass.id,
+        'scored',
+      );
     }
   }
 
-  fetchData = () => {
-    axios
-      .get<{scored: QuizRes[]}>(`${quizUrl}/${this.props.currentClass!.id}`, {
-        headers: {
-          Authorization: `Bearer ${this.props.token}`,
-        },
-        params: {
-          return: 'scored',
-        },
-      })
-      .then((res) => {
-        this.setState({
-          data: res.data.scored,
-          loading: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          errored: true,
-        });
-      });
-  };
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass!.id,
+        'scored',
+      );
+    }
+  }
 
   renderItem = ({item}: {item: QuizRes}) => {
     return (
@@ -135,14 +102,13 @@ class Scored extends React.Component<Props, State> {
   };
 
   render() {
-    const {navigation} = this.props;
-    const {loading, errored, data} = this.state;
+    const {navigation, quizzes, loading, errored} = this.props;
     return (
       <CommonTest
         navigation={navigation}
         dataLoading={loading}
         dataErrored={errored}
-        data={data}
+        data={quizzes}
         headerText="Scored"
         isOwner={this.props.isOwner}
         renderItem={this.renderItem}
@@ -175,10 +141,12 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    profile: state.profile,
     currentClass: state.currentClass,
     isOwner: state.currentClass!.owner.username === state.profile.username,
+    quizzes: state.quizzes.scored,
+    errored: state.quizErrored.scored,
+    loading: state.quizLoading.scored,
   };
 };
 
-export default connect(mapStateToProps)(Scored);
+export default connect(mapStateToProps, {fetchQuiz})(Scored);

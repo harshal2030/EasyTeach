@@ -23,9 +23,21 @@ export interface StoreState {
   classes: Class[];
   classIsLoading: boolean;
   classHasErrored: boolean;
-  quizErrored: boolean;
-  quizLoading: boolean;
-  quizzes: QuizRes[];
+  quizErrored: {
+    live: boolean;
+    expired: boolean;
+    scored: boolean;
+  };
+  quizLoading: {
+    live: boolean;
+    expired: boolean;
+    scored: boolean;
+  };
+  quizzes: {
+    live: QuizRes[];
+    expired: QuizRes[];
+    scored: QuizRes[];
+  };
   fcm: {
     os: string;
     fcmToken: string;

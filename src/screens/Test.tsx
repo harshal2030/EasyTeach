@@ -31,7 +31,6 @@ type NavigationProp = CompositeNavigationProp<
 interface Props {
   token: string | null;
   navigation: NavigationProp;
-  profile: {name: string; username: string; avatar: string};
   currentClass: Class | null;
   quizErrored: boolean;
   quizLoading: boolean;
@@ -103,14 +102,7 @@ class Test extends React.Component<Props, State> {
   };
 
   render() {
-    const {
-      navigation,
-      profile,
-      currentClass,
-      quizLoading,
-      quizErrored,
-      quizzes,
-    } = this.props;
+    const {navigation, isOwner, quizLoading, quizErrored, quizzes} = this.props;
 
     return (
       <>
@@ -123,15 +115,9 @@ class Test extends React.Component<Props, State> {
           renderItem={this.renderItem}
           isOwner={this.props.isOwner}
         />
-        {currentClass!.owner.username === profile.username && (
-          <View
-            style={{
-              padding: 3,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: commonBackground,
-            }}>
-            <Text style={{fontSize: 16, fontWeight: '800'}}>
+        {isOwner && (
+          <View style={styles.footerTextContainer}>
+            <Text style={styles.footerText}>
               Scheduled tests are also shown here for owners
             </Text>
           </View>
@@ -178,16 +164,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#003',
   },
+  footerTextContainer: {
+    padding: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: commonBackground,
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
 });
 
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    profile: state.profile,
     currentClass: state.currentClass,
-    quizLoading: state.quizLoading,
-    quizErrored: state.quizErrored,
-    quizzes: state.quizzes,
+    quizLoading: state.quizLoading.live,
+    quizErrored: state.quizErrored.live,
+    quizzes: state.quizzes.live,
     isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };

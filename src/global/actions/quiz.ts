@@ -4,9 +4,15 @@ import axios from 'axios';
 import {quizUrl} from '../../utils/urls';
 
 enum ActionTypes {
-  quizFetchErrored = 'quiz_fetch_errored',
-  quizFetchLoading = 'quiz_fetch_loading',
-  quizFetched = 'quiz_fetched',
+  quizLiveErrored = 'quiz_live_errored',
+  quizLiveLoading = 'quiz_live_loading',
+  quizExpiredErrored = 'quiz_expired_errored',
+  quizExpiredLoading = 'quiz_expired_loading',
+  quizScoredErrored = 'quiz_scored_errored',
+  quizScoredLoading = 'quiz_scored_loading',
+  quizFetchedLive = 'live',
+  quizFetchedExpired = 'expired',
+  quizFetchedScored = 'scored',
   alterQuiz = 'alter_quiz',
   removeQuiz = 'remove_quiz',
   addQuiz = 'add_quiz',
@@ -38,17 +44,26 @@ interface Result {
 }
 
 interface quizErroredAction {
-  type: ActionTypes.quizFetchErrored;
+  type:
+    | ActionTypes.quizLiveErrored
+    | ActionTypes.quizExpiredErrored
+    | ActionTypes.quizScoredErrored;
   payload: boolean;
 }
 
 interface quizLoadingAction {
-  type: ActionTypes.quizFetchLoading;
+  type:
+    | ActionTypes.quizLiveLoading
+    | ActionTypes.quizExpiredLoading
+    | ActionTypes.quizScoredLoading;
   payload: boolean;
 }
 
 interface quizFetchedAction {
-  type: ActionTypes.quizFetched;
+  type:
+    | ActionTypes.quizFetchedLive
+    | ActionTypes.quizFetchedExpired
+    | ActionTypes.quizFetchedScored;
   payload: QuizRes[];
 }
 
@@ -67,23 +82,41 @@ interface quizRemoveAction {
   payload: string;
 }
 
-const quizHasErrored = (errored: boolean): quizErroredAction => {
+const quizHasErrored = (
+  errored: boolean,
+  type:
+    | ActionTypes.quizLiveErrored
+    | ActionTypes.quizExpiredErrored
+    | ActionTypes.quizScoredErrored,
+): quizErroredAction => {
   return {
-    type: ActionTypes.quizFetchErrored,
+    type,
     payload: errored,
   };
 };
 
-const quizIsLoading = (loading: boolean): quizLoadingAction => {
+const quizIsLoading = (
+  loading: boolean,
+  type:
+    | ActionTypes.quizLiveLoading
+    | ActionTypes.quizExpiredLoading
+    | ActionTypes.quizScoredLoading,
+): quizLoadingAction => {
   return {
-    type: ActionTypes.quizFetchLoading,
+    type,
     payload: loading,
   };
 };
 
-const quizFetched = (quiz: QuizRes[]): quizFetchedAction => {
+const quizFetched = (
+  quiz: QuizRes[],
+  type:
+    | ActionTypes.quizFetchedLive
+    | ActionTypes.quizFetchedExpired
+    | ActionTypes.quizFetchedScored,
+): quizFetchedAction => {
   return {
-    type: ActionTypes.quizFetched,
+    type,
     payload: quiz,
   };
 };
@@ -91,11 +124,15 @@ const quizFetched = (quiz: QuizRes[]): quizFetchedAction => {
 const fetchQuiz = (
   token: string,
   classId: string,
-  quizType: string = 'live',
+  quizType:
+    | ActionTypes.quizFetchedLive
+    | ActionTypes.quizFetchedExpired
+    | ActionTypes.quizFetchedScored = ActionTypes.quizFetchedLive,
 ) => {
   return async (dispatch: Dispatch) => {
     try {
-      dispatch(quizIsLoading(true));
+      // @ts-ignore
+      dispatch(quizIsLoading(true, `quiz_${quizType}_loading`));
       const res = await axios.get<{[fieldName: string]: QuizRes[]}>(
         `${quizUrl}/${classId}`,
         {
@@ -108,10 +145,12 @@ const fetchQuiz = (
         },
       );
 
-      dispatch(quizIsLoading(false));
-      dispatch(quizFetched(res.data.live));
+      // @ts-ignore
+      dispatch(quizIsLoading(false, `quiz_${quizType}_loading`));
+      dispatch(quizFetched(res.data[quizType], quizType));
     } catch (e) {
-      dispatch(quizHasErrored(true));
+      // @ts-ignore
+      dispatch(quizHasErrored(true, `quiz_${quizType}_errored`));
     }
   };
 };

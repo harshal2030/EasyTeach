@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import {View, Pressable, Text, StyleSheet} from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {connect} from 'react-redux';
@@ -13,9 +12,8 @@ import {Card} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes} from '../global/actions/quiz';
+import {QuizRes, fetchQuiz} from '../global/actions/quiz';
 
-import {quizUrl} from '../utils/urls';
 import {
   RootStackParamList,
   DrawerParamList,
@@ -34,65 +32,34 @@ type NavigationProp = CompositeNavigationProp<
 interface Props {
   token: string | null;
   currentClass: Class | null;
-  profile: {
-    name: string;
-    username: string;
-    avatar: string;
-  };
   navigation: NavigationProp;
   isOwner: boolean;
-}
-
-interface State {
-  loading: boolean;
+  fetchQuiz(token: string, classId: string, quizType?: string): void;
+  quizzes: QuizRes[];
   errored: boolean;
-  data: QuizRes[];
+  loading: boolean;
 }
 
-class Expired extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      loading: true,
-      errored: false,
-      data: [],
-    };
-  }
-
+class Expired extends React.Component<Props> {
   componentDidMount() {
-    this.fetchData();
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchData();
+    if (this.props.currentClass) {
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass.id,
+        'expired',
+      );
     }
   }
 
-  fetchData = () => {
-    axios
-      .get<{expired: QuizRes[]}>(`${quizUrl}/${this.props.currentClass!.id}`, {
-        headers: {
-          Authorization: `Bearer ${this.props.token}`,
-        },
-        params: {
-          return: 'expired',
-        },
-      })
-      .then((res) => {
-        this.setState({
-          data: res.data.expired,
-          loading: false,
-        });
-      })
-      .catch(() => {
-        this.setState({
-          loading: false,
-          errored: true,
-        });
-      });
-  };
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass!.id,
+        'expired',
+      );
+    }
+  }
 
   renderItem = ({item}: {item: QuizRes}) => {
     return (
@@ -136,15 +103,14 @@ class Expired extends React.Component<Props, State> {
   };
 
   render() {
-    const {navigation} = this.props;
-    const {loading, errored, data} = this.state;
+    const {navigation, loading, errored} = this.props;
     return (
       <CommonTest
         navigation={navigation}
         dataLoading={loading}
         dataErrored={errored}
         renderItem={this.renderItem}
-        data={data}
+        data={this.props.quizzes}
         headerText="Expired"
         isOwner={this.props.isOwner}
       />
@@ -176,10 +142,12 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    profile: state.profile,
     currentClass: state.currentClass,
     isOwner: state.currentClass!.owner.username === state.profile.username,
+    quizzes: state.quizzes.expired,
+    errored: state.quizErrored.expired,
+    loading: state.quizLoading.expired,
   };
 };
 
-export default connect(mapStateToProps)(Expired);
+export default connect(mapStateToProps, {fetchQuiz})(Expired);
