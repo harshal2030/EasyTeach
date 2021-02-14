@@ -125,7 +125,7 @@ class Test extends React.Component<Props, State> {
 
         <Modal
           isVisible={this.state.modalVisible}
-          style={{margin: 0}}
+          style={styles.modalStyle}
           hideModalContentWhileAnimating
           onBackButtonPress={() => this.setState({modalVisible: false})}>
           <QuizInfo
@@ -173,6 +173,9 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     fontWeight: '800',
+  },
+  modalStyle: {
+    margin: 0,
   },
 });
 

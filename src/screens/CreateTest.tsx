@@ -189,13 +189,7 @@ class CreateTest extends React.Component<Props, State> {
         if (res.status === 200) {
           this.props.updateQuiz(res.data);
           this.setState({APILoading: false});
-          // @ts-ignore
-          this.props.navigation.navigate('Drawer', {
-            screen: 'Test',
-            params: {
-              screen: 'TestHome',
-            },
-          });
+          this.props.navigation.goBack();
         }
       })
       .catch(() => {
@@ -331,15 +325,19 @@ class CreateTest extends React.Component<Props, State> {
         });
     };
 
-    Alert.alert('Confirm', 'Are you sure to delete this test', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: deleteReq,
-      },
-    ]);
+    Alert.alert(
+      'Confirm',
+      'All related information will get deleted. Are you sure to delete this test?',
+      [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: deleteReq,
+        },
+      ],
+    );
   };
 
   handleDate = (_e: Event, dateTime?: Date) => {

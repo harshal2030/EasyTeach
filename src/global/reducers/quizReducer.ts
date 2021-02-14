@@ -3,6 +3,8 @@ import {
   quizErroredAction,
   quizLoadingAction,
   quizFetchedAction,
+  quizAddedAction,
+  quizAlterAction,
   QuizRes,
 } from '../actions/quiz';
 
@@ -81,7 +83,7 @@ const quizLoading = (
   }
 };
 
-type quizAction = quizFetchedAction;
+type quizAction = quizFetchedAction | quizAddedAction | quizAlterAction;
 
 type quizState = {
   live: QuizRes[];
@@ -93,24 +95,52 @@ const quizzes = (
   state: quizState = {live: [], expired: [], scored: []},
   action: quizAction,
 ): quizState => {
+  const {live, expired, scored} = state;
+
   switch (action.type) {
     case ActionTypes.quizFetchedLive:
       return {
         live: action.payload,
-        expired: state.expired,
-        scored: state.scored,
+        expired,
+        scored,
       };
     case ActionTypes.quizFetchedExpired:
       return {
-        live: state.live,
+        live,
         expired: action.payload,
-        scored: state.scored,
+        scored,
       };
     case ActionTypes.quizFetchedScored:
       return {
-        live: state.live,
-        expired: state.expired,
+        live,
+        expired,
         scored: action.payload,
+      };
+    case ActionTypes.addQuiz:
+      const stop = new Date(action.payload.timePeriod[1].value).getTime();
+      const now = Date.now();
+
+      let liveQuiz = [...state.live];
+      let expiredQuiz = [...state.expired];
+
+      if (now < stop) {
+        liveQuiz = [action.payload, ...liveQuiz];
+      }
+
+      if (now > stop) {
+        expiredQuiz = [action.payload, ...expiredQuiz];
+      }
+
+      return {
+        live: liveQuiz,
+        expired: expiredQuiz,
+        scored,
+      };
+    case ActionTypes.alterQuiz:
+      return {
+        live,
+        expired,
+        scored,
       };
     default:
       return state;
