@@ -87,7 +87,7 @@ class CreateTest extends React.Component<Props, State> {
   }
 
   getQuizDetail = () => {
-    const {quizId} = this.props.route.params;
+    const {quizId} = this.props.route.params.info!;
     if (quizId) {
       this.setState({loading: true});
       axios
@@ -169,7 +169,7 @@ class CreateTest extends React.Component<Props, State> {
     this.setState({APILoading: true});
     axios
       .put<QuizRes>(
-        `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
+        `${quizUrl}/${currentClass!.id}/${route.params.info!.quizId}`,
         {
           questions: ques,
           title,
@@ -187,7 +187,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.updateQuiz(res.data);
+          this.props.updateQuiz(res.data, route.params.info!.screen);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }
@@ -292,7 +292,7 @@ class CreateTest extends React.Component<Props, State> {
   };
 
   quizRequest = () => {
-    if (this.props.route.params.quizId) {
+    if (this.props.route.params.info) {
       this.updateQuiz();
     } else {
       this.postQuiz();
@@ -305,13 +305,13 @@ class CreateTest extends React.Component<Props, State> {
 
       this.setState({APILoading: true});
       axios
-        .delete(`${quizUrl}/${currentClass!.id}/${route.params.quizId}`, {
+        .delete(`${quizUrl}/${currentClass!.id}/${route.params.info!.quizId}`, {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
         })
         .then(() => {
-          this.props.removeQuiz(route.params.quizId!);
+          this.props.removeQuiz(route.params.info!.quizId!);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         })
@@ -405,7 +405,9 @@ class CreateTest extends React.Component<Props, State> {
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: this.props.route.params.quizId ? 'Edit Test' : 'Create Test',
+            text: this.props.route.params.info!.quizId
+              ? 'Edit Test'
+              : 'Create Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -420,7 +422,7 @@ class CreateTest extends React.Component<Props, State> {
         <ScrollView
           style={ContainerStyles.padder}
           keyboardShouldPersistTaps="handled">
-          {!this.props.route.params.quizId && (
+          {!this.props.route.params.info && (
             <>
               <Text h4 h4Style={TextStyles.h4Style}>
                 Question Sheet
@@ -509,16 +511,16 @@ class CreateTest extends React.Component<Props, State> {
           />
 
           <Button
-            title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
+            title={this.props.route.params.info ? 'Save' : 'Create Test'}
             containerStyle={[
               styles.buttonStyle,
-              {marginBottom: this.props.route.params.quizId ? 0 : 30},
+              {marginBottom: this.props.route.params.info ? 0 : 30},
             ]}
             onPress={this.quizRequest}
             loading={APILoading}
           />
 
-          {this.props.route.params.quizId && (
+          {this.props.route.params.info && (
             <Button
               title="Delete"
               containerStyle={[styles.buttonStyle, {marginBottom: 50}]}

@@ -80,7 +80,10 @@ class Test extends React.Component<Props, State> {
                 style={styles.collapseButton}
                 onPress={() =>
                   this.props.navigation.navigate('CreateTest', {
-                    quizId: item.quizId,
+                    info: {
+                      quizId: item.quizId,
+                      screen: 'live',
+                    },
                   })
                 }>
                 <Text style={styles.collapseText}>Edit</Text>

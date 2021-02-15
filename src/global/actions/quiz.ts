@@ -75,6 +75,7 @@ interface quizAddedAction {
 interface quizAlterAction {
   type: ActionTypes.alterQuiz;
   payload: QuizRes;
+  screen: 'live' | 'expired' | 'scored';
 }
 
 interface quizRemoveAction {
@@ -162,10 +163,14 @@ const addQuiz = (quiz: QuizRes): quizAddedAction => {
   };
 };
 
-const updateQuiz = (quiz: QuizRes): quizAlterAction => {
+const updateQuiz = (
+  quiz: QuizRes,
+  screen: 'live' | 'expired' | 'scored',
+): quizAlterAction => {
   return {
     type: ActionTypes.alterQuiz,
     payload: quiz,
+    screen,
   };
 };
 

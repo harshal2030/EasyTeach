@@ -137,10 +137,34 @@ const quizzes = (
         scored,
       };
     case ActionTypes.alterQuiz:
+      const stopTime = new Date(action.payload.timePeriod[1].value).getTime();
+      const nowTime = Date.now();
+
+      let liveUpdate = [...state.live];
+      let expiredUpdate = [...state.expired];
+      let scoredUpdate = [...state.scored];
+
+      if (nowTime < stopTime) {
+        if (action.screen === 'expired') {
+          const index = expiredUpdate.findIndex(
+            (quiz) => quiz.quizId === action.payload.quizId,
+          );
+          expiredUpdate.splice(index, 1);
+          liveUpdate = [action.payload, ...liveUpdate];
+        }
+
+        if (action.screen === 'live') {
+          const index = liveUpdate.findIndex(
+            (quiz) => quiz.quizId === action.payload.quizId,
+          );
+          liveUpdate[index] = action.payload;
+        }
+      }
+
       return {
-        live,
-        expired,
-        scored,
+        live: liveUpdate,
+        expired: expiredUpdate,
+        scored: scoredUpdate,
       };
     default:
       return state;
