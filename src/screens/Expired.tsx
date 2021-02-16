@@ -81,10 +81,7 @@ class Expired extends React.Component<Props> {
                 style={styles.collapseButton}
                 onPress={() =>
                   this.props.navigation.navigate('CreateTest', {
-                    info: {
-                      quizId: item.quizId,
-                      screen: 'expired',
-                    },
+                    quizId: item.quizId,
                   })
                 }>
                 <Text style={styles.collapseText}>Edit</Text>

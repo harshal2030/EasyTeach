@@ -14,10 +14,7 @@ type RootStackParamList = {
       uri: string;
       type: string;
     };
-    info?: {
-      screen: 'live' | 'expired' | 'scored';
-      quizId: string;
-    };
+    quizId: string;
   };
   ShowScore: {
     quizId: string;

@@ -13,7 +13,6 @@ enum ActionTypes {
   quizFetchedLive = 'live',
   quizFetchedExpired = 'expired',
   quizFetchedScored = 'scored',
-  alterQuiz = 'alter_quiz',
   removeQuiz = 'remove_quiz',
   addQuiz = 'add_quiz',
 }
@@ -70,12 +69,6 @@ interface quizFetchedAction {
 interface quizAddedAction {
   type: ActionTypes.addQuiz;
   payload: QuizRes;
-}
-
-interface quizAlterAction {
-  type: ActionTypes.alterQuiz;
-  payload: QuizRes;
-  screen: 'live' | 'expired' | 'scored';
 }
 
 interface quizRemoveAction {
@@ -156,21 +149,10 @@ const fetchQuiz = (
   };
 };
 
-const addQuiz = (quiz: QuizRes): quizAddedAction => {
+const addQuiz = (quiz: QuizRes) => {
   return {
     type: ActionTypes.addQuiz,
     payload: quiz,
-  };
-};
-
-const updateQuiz = (
-  quiz: QuizRes,
-  screen: 'live' | 'expired' | 'scored',
-): quizAlterAction => {
-  return {
-    type: ActionTypes.alterQuiz,
-    payload: quiz,
-    screen,
   };
 };
 
@@ -186,10 +168,8 @@ export {
   ActionTypes,
   fetchQuiz,
   addQuiz,
-  updateQuiz,
   removeQuiz,
   quizRemoveAction,
-  quizAlterAction,
   quizAddedAction,
   quizErroredAction,
   quizFetchedAction,

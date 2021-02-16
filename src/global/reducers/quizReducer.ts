@@ -4,7 +4,7 @@ import {
   quizLoadingAction,
   quizFetchedAction,
   quizAddedAction,
-  quizAlterAction,
+  quizRemoveAction,
   QuizRes,
 } from '../actions/quiz';
 
@@ -83,7 +83,7 @@ const quizLoading = (
   }
 };
 
-type quizAction = quizFetchedAction | quizAddedAction | quizAlterAction;
+type quizAction = quizFetchedAction | quizAddedAction | quizRemoveAction;
 
 type quizState = {
   live: QuizRes[];
@@ -136,35 +136,19 @@ const quizzes = (
         expired: expiredQuiz,
         scored,
       };
-    case ActionTypes.alterQuiz:
-      const stopTime = new Date(action.payload.timePeriod[1].value).getTime();
-      const nowTime = Date.now();
-
-      let liveUpdate = [...state.live];
-      let expiredUpdate = [...state.expired];
-      let scoredUpdate = [...state.scored];
-
-      if (nowTime < stopTime) {
-        if (action.screen === 'expired') {
-          const index = expiredUpdate.findIndex(
-            (quiz) => quiz.quizId === action.payload.quizId,
-          );
-          expiredUpdate.splice(index, 1);
-          liveUpdate = [action.payload, ...liveUpdate];
-        }
-
-        if (action.screen === 'live') {
-          const index = liveUpdate.findIndex(
-            (quiz) => quiz.quizId === action.payload.quizId,
-          );
-          liveUpdate[index] = action.payload;
-        }
-      }
+    case ActionTypes.removeQuiz:
+      const liveQ = state.live.filter((quiz) => quiz.quizId !== action.payload);
+      const expiredQ = state.expired.filter(
+        (quiz) => quiz.quizId !== action.payload,
+      );
+      const scoredQ = state.scored.filter(
+        (quiz) => quiz.quizId !== action.payload,
+      );
 
       return {
-        live: liveUpdate,
-        expired: expiredUpdate,
-        scored: scoredUpdate,
+        live: liveQ,
+        expired: expiredQ,
+        scored: scoredQ,
       };
     default:
       return state;

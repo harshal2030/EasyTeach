@@ -80,10 +80,7 @@ class Scored extends React.Component<Props> {
                 style={styles.collapseButton}
                 onPress={() =>
                   this.props.navigation.navigate('CreateTest', {
-                    info: {
-                      quizId: item.quizId,
-                      screen: 'scored',
-                    },
+                    quizId: item.quizId,
                   })
                 }>
                 <Text style={styles.collapseText}>Edit</Text>

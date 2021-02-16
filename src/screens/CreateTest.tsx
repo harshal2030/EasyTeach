@@ -21,7 +21,13 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes, addQuiz, updateQuiz, removeQuiz} from '../global/actions/quiz';
+import {
+  QuizRes,
+  addQuiz,
+  fetchQuiz,
+  removeQuiz,
+  ActionTypes,
+} from '../global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
@@ -36,7 +42,14 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  updateQuiz: typeof updateQuiz;
+  fetchQuiz(
+    token: string,
+    classId: string,
+    screen:
+      | ActionTypes.quizFetchedLive
+      | ActionTypes.quizFetchedExpired
+      | ActionTypes.quizFetchedScored,
+  ): void;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -87,7 +100,7 @@ class CreateTest extends React.Component<Props, State> {
   }
 
   getQuizDetail = () => {
-    const {quizId} = this.props.route.params.info!;
+    const {quizId} = this.props.route.params;
     if (quizId) {
       this.setState({loading: true});
       axios
@@ -137,7 +150,7 @@ class CreateTest extends React.Component<Props, State> {
       randomQue,
       randomOp,
     } = this.state;
-    const {currentClass, route} = this.props;
+    const {currentClass, route, token} = this.props;
 
     const start = timeRange[0].getTime();
     const stop = timeRange[1].getTime();
@@ -169,7 +182,7 @@ class CreateTest extends React.Component<Props, State> {
     this.setState({APILoading: true});
     axios
       .put<QuizRes>(
-        `${quizUrl}/${currentClass!.id}/${route.params.info!.quizId}`,
+        `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
         {
           questions: ques,
           title,
@@ -181,13 +194,27 @@ class CreateTest extends React.Component<Props, State> {
         },
         {
           headers: {
-            Authorization: `Bearer ${this.props.token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.updateQuiz(res.data, route.params.info!.screen);
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedLive,
+          );
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedExpired,
+          );
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedScored,
+          );
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }
@@ -292,7 +319,7 @@ class CreateTest extends React.Component<Props, State> {
   };
 
   quizRequest = () => {
-    if (this.props.route.params.info) {
+    if (this.props.route.params.quizId) {
       this.updateQuiz();
     } else {
       this.postQuiz();
@@ -305,13 +332,13 @@ class CreateTest extends React.Component<Props, State> {
 
       this.setState({APILoading: true});
       axios
-        .delete(`${quizUrl}/${currentClass!.id}/${route.params.info!.quizId}`, {
+        .delete(`${quizUrl}/${currentClass!.id}/${route.params.quizId}`, {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
         })
         .then(() => {
-          this.props.removeQuiz(route.params.info!.quizId!);
+          this.props.removeQuiz(route.params.quizId!);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         })
@@ -405,9 +432,7 @@ class CreateTest extends React.Component<Props, State> {
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: this.props.route.params.info!.quizId
-              ? 'Edit Test'
-              : 'Create Test',
+            text: this.props.route.params.quizId ? 'Edit Test' : 'Create Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -422,7 +447,7 @@ class CreateTest extends React.Component<Props, State> {
         <ScrollView
           style={ContainerStyles.padder}
           keyboardShouldPersistTaps="handled">
-          {!this.props.route.params.info && (
+          {!this.props.route.params.quizId && (
             <>
               <Text h4 h4Style={TextStyles.h4Style}>
                 Question Sheet
@@ -511,16 +536,16 @@ class CreateTest extends React.Component<Props, State> {
           />
 
           <Button
-            title={this.props.route.params.info ? 'Save' : 'Create Test'}
+            title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
             containerStyle={[
               styles.buttonStyle,
-              {marginBottom: this.props.route.params.info ? 0 : 30},
+              {marginBottom: this.props.route.params.quizId ? 0 : 30},
             ]}
             onPress={this.quizRequest}
             loading={APILoading}
           />
 
-          {this.props.route.params.info && (
+          {this.props.route.params.quizId && (
             <Button
               title="Delete"
               containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
@@ -564,6 +589,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addQuiz, removeQuiz, updateQuiz})(
+export default connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(
   CreateTest,
 );
