@@ -87,7 +87,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -105,7 +105,7 @@ def enableSeparateBuildPerCPUArchitecture = true
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -127,7 +127,7 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  * on project.ext.react, JavaScript will not be compiled to Hermes Bytecode
  * and the benefits of using Hermes will therefore be sharply reduced.
  */
-def enableHermes = project.ext.react.get("enableHermes", false);
+def enableHermes = project.ext.react.get("enableHermes", true);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -147,8 +147,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 19
-        versionName "1.5.1"
+        versionCode 21
+        versionName "1.6.1"
     }
         signingConfigs {
         release {
@@ -185,6 +185,10 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
+            debuggable false
+            shrinkResources true
+            zipAlignEnabled true
+            useProguard enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }

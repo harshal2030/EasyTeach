@@ -21,13 +21,7 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {
-  QuizRes,
-  addQuiz,
-  fetchQuiz,
-  removeQuiz,
-  ActionTypes,
-} from '../global/actions/quiz';
+import {QuizRes, addQuiz, removeQuiz, updateQuiz} from '../global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
@@ -42,14 +36,7 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  fetchQuiz(
-    token: string,
-    classId: string,
-    screen:
-      | ActionTypes.quizFetchedLive
-      | ActionTypes.quizFetchedExpired
-      | ActionTypes.quizFetchedScored,
-  ): void;
+  updateQuiz: typeof updateQuiz;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -200,21 +187,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedLive,
-          );
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedExpired,
-          );
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedScored,
-          );
+          this.props.updateQuiz(res.data);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }
@@ -589,6 +562,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(
+export default connect(mapStateToProps, {addQuiz, removeQuiz, updateQuiz})(
   CreateTest,
 );

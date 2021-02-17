@@ -5,6 +5,7 @@ import {
   quizFetchedAction,
   quizAddedAction,
   quizRemoveAction,
+  quizUpdateAction,
   QuizRes,
 } from '../actions/quiz';
 
@@ -83,7 +84,11 @@ const quizLoading = (
   }
 };
 
-type quizAction = quizFetchedAction | quizAddedAction | quizRemoveAction;
+type quizAction =
+  | quizFetchedAction
+  | quizAddedAction
+  | quizRemoveAction
+  | quizUpdateAction;
 
 type quizState = {
   live: QuizRes[];
@@ -135,6 +140,61 @@ const quizzes = (
         live: liveQuiz,
         expired: expiredQuiz,
         scored,
+      };
+    case ActionTypes.updateQuiz:
+      const liveIndex = state.live.findIndex(
+        (quiz) => quiz.quizId === action.payload.quizId,
+      );
+      const expiredIndex = state.expired.findIndex(
+        (quiz) => quiz.quizId === action.payload.quizId,
+      );
+      const scoredIndex = state.live.findIndex(
+        (quiz) => quiz.quizId === action.payload.quizId,
+      );
+
+      const stopTime = new Date(action.payload.timePeriod[1].value).getTime();
+      const nowTime = Date.now();
+
+      let liveTemp = [...state.live];
+      let expiredTemp = [...state.expired];
+      let scoredTemp = [...state.scored];
+
+      if (nowTime < stopTime) {
+        if (expiredIndex > -1) {
+          expiredTemp.splice(expiredIndex, 1);
+        }
+
+        if (liveIndex > -1) {
+          liveTemp[liveIndex] = action.payload;
+        } else {
+          liveTemp = [action.payload, ...liveTemp];
+        }
+      }
+
+      if (nowTime > stopTime) {
+        if (liveIndex > -1) {
+          liveTemp.splice(liveIndex, 1);
+        }
+
+        if (expiredIndex > -1) {
+          expiredTemp[expiredIndex] = action.payload;
+        } else {
+          expiredTemp = [action.payload, ...expiredTemp];
+        }
+      }
+
+      if (scoredIndex > -1) {
+        scoredTemp[scoredIndex] = action.payload;
+
+        if (!action.payload.releaseScore) {
+          scoredTemp.splice(scoredIndex, 1);
+        }
+      }
+
+      return {
+        live: liveTemp,
+        expired: expiredTemp,
+        scored: scoredTemp,
       };
     case ActionTypes.removeQuiz:
       const liveQ = state.live.filter((quiz) => quiz.quizId !== action.payload);
