@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 60,
     width: 60,
-    bottom: 30,
+    bottom: 20,
     right: 20,
     padding: 10,
     backgroundColor: '#ffff',

@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
-import {Avatar, Text} from 'react-native-elements';
+import {Text} from 'react-native-elements';
 import {commonBackground, commonGrey} from '../../styles/colors';
+import {Avatar} from './Avatar';
 
 type Props = {
   avatar: string;
@@ -16,7 +17,7 @@ const HeadCom = (props: Props) => {
   return (
     <View style={container}>
       <View style={info}>
-        <Avatar source={{uri: props.avatar}} size="large" rounded />
+        <Avatar source={{uri: props.avatar}} style={styles.avatarStyle} />
         <View style={textContainer}>
           <Text style={nameText}>{props.name}</Text>
           <Text style={usernameText}>{'@' + props.username}</Text>
@@ -58,6 +59,11 @@ const styles = StyleSheet.create({
   usernameText: {
     fontSize: 15,
     color: commonGrey,
+  },
+  avatarStyle: {
+    height: 80,
+    width: 80,
+    borderRadius: 40,
   },
 });
 

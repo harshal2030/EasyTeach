@@ -11,7 +11,8 @@ import {
   AppState,
   AppStateStatus,
 } from 'react-native';
-import {Header, Button, ButtonGroup, Image} from 'react-native-elements';
+import FastImage from 'react-native-fast-image';
+import {Header, Button, ButtonGroup} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
@@ -75,6 +76,7 @@ class Quiz extends React.Component<Props, State> {
 
   appStateHandler = (state: AppStateStatus) => {
     if (state === 'background' || state === 'inactive') {
+      this.setState({currentIndex: 0});
       this.fetchQues();
     }
   };
@@ -220,7 +222,7 @@ class Quiz extends React.Component<Props, State> {
           <>
             <Text style={styles.imageText}>*click to enlarge</Text>
             <LightBox renderContent={this.ZoomImage}>
-              <Image
+              <FastImage
                 source={{
                   uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`,
                 }}

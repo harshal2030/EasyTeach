@@ -127,6 +127,18 @@ class Home extends React.Component<Props, State> {
       );
   };
 
+  renderListItem = ({item}: {item: Msg}) => {
+    return (
+      <MsgCard
+        avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
+        name={item.user.name}
+        username={item.user.username}
+        message={item.message}
+        createdAt={new Date(item.createdAt)}
+      />
+    );
+  };
+
   renderContent = () => {
     const {props} = this;
 
@@ -202,17 +214,7 @@ class Home extends React.Component<Props, State> {
         data={this.props.msgs}
         keyExtractor={(_item, i) => i.toString()}
         inverted
-        renderItem={({item}) => {
-          return (
-            <MsgCard
-              avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
-              name={item.user.name}
-              username={item.user.username}
-              message={item.message}
-              createdAt={new Date(item.createdAt)}
-            />
-          );
-        }}
+        renderItem={this.renderListItem}
       />
     );
   };

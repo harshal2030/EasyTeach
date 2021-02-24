@@ -1,8 +1,9 @@
 import React from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import {Avatar} from 'react-native-elements';
 import {commonGrey, greyWithAlpha} from '../../styles/colors';
 import {getDateAndMonth} from '../../utils/functions';
+
+import {Avatar} from './Avatar';
 
 interface Props {
   message: string;
@@ -16,7 +17,7 @@ const MsgCard = (props: Props) => {
   return (
     <View style={styles.parent}>
       <View style={styles.userContainer}>
-        <Avatar rounded size="medium" source={{uri: props.avatarUrl}} />
+        <Avatar source={{uri: props.avatarUrl}} />
 
         <View style={styles.nameTextContainer}>
           <Text style={styles.name}>{props.name}</Text>

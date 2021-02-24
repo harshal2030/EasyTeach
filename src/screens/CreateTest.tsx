@@ -21,7 +21,13 @@ import {Chip, CheckBox} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
-import {QuizRes, addQuiz, updateQuiz, removeQuiz} from '../global/actions/quiz';
+import {
+  QuizRes,
+  addQuiz,
+  fetchQuiz,
+  removeQuiz,
+  ActionTypes,
+} from '../global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
@@ -36,7 +42,14 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  updateQuiz: typeof updateQuiz;
+  fetchQuiz(
+    token: string,
+    classId: string,
+    screen:
+      | ActionTypes.quizFetchedLive
+      | ActionTypes.quizFetchedExpired
+      | ActionTypes.quizFetchedScored,
+  ): void;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -137,7 +150,7 @@ class CreateTest extends React.Component<Props, State> {
       randomQue,
       randomOp,
     } = this.state;
-    const {currentClass, route} = this.props;
+    const {currentClass, route, token} = this.props;
 
     const start = timeRange[0].getTime();
     const stop = timeRange[1].getTime();
@@ -181,21 +194,29 @@ class CreateTest extends React.Component<Props, State> {
         },
         {
           headers: {
-            Authorization: `Bearer ${this.props.token}`,
+            Authorization: `Bearer ${token}`,
           },
         },
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.updateQuiz(res.data);
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedLive,
+          );
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedExpired,
+          );
+          this.props.fetchQuiz(
+            token!,
+            currentClass!.id,
+            ActionTypes.quizFetchedScored,
+          );
           this.setState({APILoading: false});
-          // @ts-ignore
-          this.props.navigation.navigate('Drawer', {
-            screen: 'Test',
-            params: {
-              screen: 'TestHome',
-            },
-          });
+          this.props.navigation.goBack();
         }
       })
       .catch(() => {
@@ -331,15 +352,19 @@ class CreateTest extends React.Component<Props, State> {
         });
     };
 
-    Alert.alert('Confirm', 'Are you sure to delete this test', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: deleteReq,
-      },
-    ]);
+    Alert.alert(
+      'Confirm',
+      'All related information will get deleted. Are you sure to delete this test?',
+      [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: deleteReq,
+        },
+      ],
+    );
   };
 
   handleDate = (_e: Event, dateTime?: Date) => {
@@ -564,6 +589,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addQuiz, removeQuiz, updateQuiz})(
+export default connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(
   CreateTest,
 );
