@@ -1,9 +1,11 @@
 {
   "cSpell.words": [
+    "Subviews",
     "Unenroll",
     "collapsable",
     "datetimepicker",
     "lightbox",
     "padder"
-  ]
+  ],
+  "compile-hero.disable-compile-files-on-did-save-code": true
 }

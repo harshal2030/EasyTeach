@@ -14,7 +14,7 @@ type RootStackParamList = {
       uri: string;
       type: string;
     };
-    quizId: string;
+    quizId?: string;
   };
   ShowScore: {
     quizId: string;

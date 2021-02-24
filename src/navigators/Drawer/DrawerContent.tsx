@@ -2,16 +2,16 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  ImageBackground,
   Text,
   ScrollView,
   TouchableOpacity,
   FlatList,
   Alert,
 } from 'react-native';
+import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import {Button, Avatar, Image} from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
@@ -26,6 +26,8 @@ import {
   registerCurrentClass,
   removeCurrentClass,
 } from '../../global/actions/classes';
+
+import {Avatar} from '../../components/common';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {mediaUrl, logOutUrl} from '../../utils/urls';
@@ -98,16 +100,30 @@ const DrawerContent = (props: Props): JSX.Element => {
           props.registerCurrentClass(item);
           props.navigation.closeDrawer();
         }}>
-        <Image
+        <FastImage
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
           }}
-          PlaceholderContent={<View style={{backgroundColor: commonGrey}} />}
           style={avatarImageStyle}
         />
         <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
           {item.name}
         </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderListFooter = () => {
+    return (
+      <TouchableOpacity
+        style={{alignSelf: 'center'}}
+        onPress={() => {
+          return (
+            props.navigation.closeDrawer(),
+            props.navigation.navigate('JoinClass')
+          );
+        }}>
+        <Feather name="plus" size={36} color={commonGrey} />
       </TouchableOpacity>
     );
   };
@@ -126,18 +142,8 @@ const DrawerContent = (props: Props): JSX.Element => {
         data={props.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
-        ListFooterComponent={
-          <TouchableOpacity
-            style={{alignSelf: 'center'}}
-            onPress={() => {
-              return (
-                props.navigation.closeDrawer(),
-                props.navigation.navigate('JoinClass')
-              );
-            }}>
-            <Feather name="plus" size={36} color={commonGrey} />
-          </TouchableOpacity>
-        }
+        removeClippedSubviews
+        ListFooterComponent={renderListFooter}
       />
     );
   };
@@ -181,11 +187,11 @@ const DrawerContent = (props: Props): JSX.Element => {
       </View>
       <View style={styles.rightContainer}>
         <ScrollView>
-          <ImageBackground
+          <FastImage
             source={{
               uri: currentClass
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
-                : 'none',
+                : 'https://easyteach.harshall.codes/noimage',
             }}
             style={mainImage}>
             <Text
@@ -193,12 +199,11 @@ const DrawerContent = (props: Props): JSX.Element => {
               onPress={() => props.navigation.navigate('EditQuestions')}>
               {currentClass ? currentClass.name : 'Current Class appears here'}
             </Text>
-          </ImageBackground>
+          </FastImage>
 
           <View style={avatarContainer}>
             <Avatar
-              size={40}
-              rounded
+              style={styles.avatar}
               source={{
                 uri: currentClass
                   ? `${mediaUrl}/avatar/${currentClass.owner.avatar}`
@@ -262,6 +267,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     marginTop: 10,
+    backgroundColor: commonGrey,
   },
   leftContainer: {
     width: 90,
@@ -309,6 +315,11 @@ const styles = StyleSheet.create({
   },
   optionListContainer: {
     padding: 20,
+  },
+  avatar: {
+    height: 40,
+    width: 40,
+    borderRadius: 20,
   },
 });
 

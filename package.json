@@ -27,6 +27,7 @@
     "react-native-config": "^1.4.2",
     "react-native-document-picker": "^4.1.0",
     "react-native-elements": "^3.0.0-alpha.1",
+    "react-native-fast-image": "^8.3.4",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-image-crop-picker": "0.33.2",
     "react-native-lightbox-v2": "^0.8.6",

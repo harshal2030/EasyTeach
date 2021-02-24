@@ -7,13 +7,15 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import {Avatar, Header, ListItem, Text} from 'react-native-elements';
+import {Header, ListItem, Text} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
+
+import {Avatar} from '../components/common';
 
 import {
   DrawerParamList,
@@ -121,8 +123,6 @@ const People = (props: Props) => {
     return (
       <ListItem bottomDivider>
         <Avatar
-          size="medium"
-          rounded
           source={{
             uri: `${mediaUrl}/avatar/${item.avatar}`,
           }}
@@ -141,6 +141,36 @@ const People = (props: Props) => {
           />
         )}
       </ListItem>
+    );
+  };
+
+  const renderHeader = () => {
+    return (
+      <>
+        <Text h4 style={styles.titleStyle}>
+          Owner
+        </Text>
+        <ListItem bottomDivider topDivider>
+          <Avatar
+            source={{
+              uri: `${mediaUrl}/avatar/${props.currentClass!.owner.avatar}`,
+            }}
+          />
+
+          <ListItem.Content>
+            <ListItem.Title>{props.currentClass!.owner.name}</ListItem.Title>
+            <ListItem.Subtitle>
+              {'@' + props.currentClass!.owner.username}
+            </ListItem.Subtitle>
+          </ListItem.Content>
+        </ListItem>
+
+        {people.length !== 0 && (
+          <Text h4 style={styles.titleStyle}>
+            Students
+          </Text>
+        )}
+      </>
     );
   };
 
@@ -171,39 +201,8 @@ const People = (props: Props) => {
           style={{padding: 5}}
           keyExtractor={(_item, i) => i.toString()}
           ListFooterComponent={renderListFooter()}
-          ListHeaderComponent={
-            <>
-              <Text h4 style={styles.titleStyle}>
-                Owner
-              </Text>
-              <ListItem bottomDivider topDivider>
-                <Avatar
-                  size="medium"
-                  rounded
-                  source={{
-                    uri: `${mediaUrl}/avatar/${
-                      props.currentClass!.owner.avatar
-                    }`,
-                  }}
-                />
-
-                <ListItem.Content>
-                  <ListItem.Title>
-                    {props.currentClass!.owner.name}
-                  </ListItem.Title>
-                  <ListItem.Subtitle>
-                    {'@' + props.currentClass!.owner.username}
-                  </ListItem.Subtitle>
-                </ListItem.Content>
-              </ListItem>
-
-              {people.length !== 0 && (
-                <Text h4 style={styles.titleStyle}>
-                  Students
-                </Text>
-              )}
-            </>
-          }
+          removeClippedSubviews
+          ListHeaderComponent={renderHeader}
         />
       ) : (
         <Text>Enroll in a class to see people</Text>

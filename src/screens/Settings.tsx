@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import {View, FlatList, ActivityIndicator, Alert} from 'react-native';
-import {Header, ListItem, Avatar, Button, Text} from 'react-native-elements';
+import {Header, ListItem, Button, Text} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
@@ -9,7 +9,7 @@ import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {HeadCom} from '../components/common';
+import {HeadCom, Avatar} from '../components/common';
 
 import {StoreState} from '../global';
 import {
@@ -89,7 +89,6 @@ class Settings extends React.PureComponent<Props> {
     return (
       <ListItem bottomDivider>
         <Avatar
-          size="medium"
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
           }}
@@ -153,6 +152,7 @@ class Settings extends React.PureComponent<Props> {
         data={this.props.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.renderItem}
+        removeClippedSubviews
       />
     );
   };
