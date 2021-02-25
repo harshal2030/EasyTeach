@@ -164,6 +164,7 @@ class QuestionCard extends React.Component<Props, State> {
           <Button
             title="Update"
             containerStyle={styles.updateButton}
+            loading={this.state.loading}
             onPress={this.onUpdatePress}
           />
 

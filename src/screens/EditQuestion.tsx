@@ -65,6 +65,7 @@ class EditQuestion extends React.Component<Props, State> {
   }
 
   fetchQues = () => {
+    this.setState({loading: true});
     const {currentClass, route, token} = this.props;
     axios
       .get<Questions[]>(
@@ -116,7 +117,7 @@ class EditQuestion extends React.Component<Props, State> {
       );
     }
 
-    const queNo = questions.length * page + questions.length;
+    const queNo = 10 * page + questions.length;
 
     return (
       // eslint-disable-next-line react-native/no-inline-styles
