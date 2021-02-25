@@ -33,6 +33,8 @@ interface Props {
   quizId: string;
   classId: string;
   onLoadNextPress: () => void;
+  showPrevButton: boolean;
+  onPrevPress: () => void;
 }
 
 interface State {
@@ -177,6 +179,14 @@ class QuestionCard extends React.Component<Props, State> {
             pickerProps={{cropping: true}}
             cameraProps={{cropping: true}}
           />
+
+          {this.props.showPrevButton && (
+            <Button
+              containerStyle={styles.updateButton}
+              title="Load previous questions"
+              onPress={this.props.onPrevPress}
+            />
+          )}
 
           {queNo === 10 && (
             <Button

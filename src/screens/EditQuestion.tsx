@@ -130,6 +130,10 @@ class EditQuestion extends React.Component<Props, State> {
             <View collapsable={false} key={i} style={styles.queContainer}>
               <QuestionCard
                 question={que}
+                showPrevButton={page !== 0 && i === 0}
+                onPrevPress={() =>
+                  this.setState({page: page - 1}, this.fetchQues)
+                }
                 totalQues={queNo}
                 queNo={page * 10 + i + 1}
                 classId={this.props.currentClass.id}
