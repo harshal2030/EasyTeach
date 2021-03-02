@@ -102,6 +102,13 @@ class Quiz extends React.Component<Props, State> {
       )
       .then((res) => {
         this.setState({loading: false, questions: res.data.questions});
+        const images = res.data.questions
+          .filter((que) => (que.attachments ? true : false))
+          .map((q) => ({
+            uri: `${mediaUrl}/que/${q.attachments}`,
+          }));
+
+        FastImage.preload(images);
       })
       .catch((e) => {
         this.setState({errored: true, loading: false});

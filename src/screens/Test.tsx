@@ -54,15 +54,19 @@ class Test extends React.Component<Props, State> {
     };
   }
 
+  fetchQuiz = () => {
+    this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
+  };
+
   componentDidMount() {
     if (this.props.currentClass) {
-      this.props.fetchQuiz(this.props.token!, this.props.currentClass.id);
+      this.fetchQuiz();
     }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
-      this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
+      this.fetchQuiz();
     }
   }
 
@@ -111,6 +115,7 @@ class Test extends React.Component<Props, State> {
           dataLoading={quizLoading}
           dataErrored={quizErrored}
           data={quizzes}
+          onRefreshPress={this.fetchQuiz}
           headerText="Live"
           renderItem={this.renderItem}
           isOwner={this.props.isOwner}

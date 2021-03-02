@@ -43,23 +43,23 @@ interface Props {
 class Expired extends React.Component<Props> {
   componentDidMount() {
     if (this.props.currentClass) {
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass.id,
-        'expired',
-      );
+      this.fetchQuiz();
     }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass!.id,
-        'expired',
-      );
+      this.fetchQuiz();
     }
   }
+
+  fetchQuiz = () => {
+    this.props.fetchQuiz(
+      this.props.token!,
+      this.props.currentClass!.id,
+      'expired',
+    );
+  };
 
   renderItem = ({item}: {item: QuizRes}) => {
     return (
@@ -108,6 +108,7 @@ class Expired extends React.Component<Props> {
       <CommonTest
         navigation={navigation}
         dataLoading={loading}
+        onRefreshPress={this.fetchQuiz}
         dataErrored={errored}
         renderItem={this.renderItem}
         data={this.props.quizzes}

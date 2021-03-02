@@ -42,23 +42,23 @@ interface Props {
 class Scored extends React.Component<Props> {
   componentDidMount() {
     if (this.props.currentClass) {
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass.id,
-        'scored',
-      );
+      this.fetchQuiz();
     }
   }
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass!.id,
-        'scored',
-      );
+      this.fetchQuiz();
     }
   }
+
+  fetchQuiz = () => {
+    this.props.fetchQuiz(
+      this.props.token!,
+      this.props.currentClass!.id,
+      'scored',
+    );
+  };
 
   renderItem = ({item}: {item: QuizRes}) => {
     return (
@@ -109,6 +109,7 @@ class Scored extends React.Component<Props> {
         dataLoading={loading}
         dataErrored={errored}
         data={quizzes}
+        onRefreshPress={this.fetchQuiz}
         headerText="Scored"
         isOwner={this.props.isOwner}
         renderItem={this.renderItem}

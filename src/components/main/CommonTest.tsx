@@ -36,6 +36,7 @@ interface Props {
   dataLoading: boolean;
   data: QuizRes[];
   headerText: string;
+  onRefreshPress: () => void;
   renderItem({item, index}: {item: QuizRes; index: number}): JSX.Element;
 }
 
@@ -57,10 +58,17 @@ class CommonTest extends React.Component<Props, State> {
 
     if (dataErrored) {
       return (
-        <Text>
-          We're having trouble fetching latest data for you. Please try again
-          later
-        </Text>
+        <>
+          <Text>
+            We're having trouble fetching latest data for you. Please try again
+            later
+          </Text>
+          <Button
+            title="Refresh"
+            onPress={this.props.onRefreshPress}
+            icon={{name: 'refresh', type: 'font-awesome', color: '#fff'}}
+          />
+        </>
       );
     }
 
@@ -69,7 +77,16 @@ class CommonTest extends React.Component<Props, State> {
     }
 
     if (data.length === 0) {
-      return <Text>Nothing to show here right now</Text>;
+      return (
+        <>
+          <Text>Nothing to show here right now</Text>
+          <Button
+            title="Refresh"
+            onPress={this.props.onRefreshPress}
+            icon={{name: 'refresh', type: 'font-awesome', color: '#fff'}}
+          />
+        </>
+      );
     }
 
     return (
@@ -78,7 +95,21 @@ class CommonTest extends React.Component<Props, State> {
         style={{width: '100%'}}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.props.renderItem}
-        ListFooterComponent={<View style={{marginVertical: 15}} />}
+        ListFooterComponent={
+          <View
+            style={{
+              marginVertical: 15,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Button
+              title="Refresh"
+              containerStyle={{width: 120}}
+              onPress={this.props.onRefreshPress}
+              icon={{name: 'refresh', type: 'font-awesome', color: '#fff'}}
+            />
+          </View>
+        }
       />
     );
   };
@@ -86,7 +117,7 @@ class CommonTest extends React.Component<Props, State> {
   ImportSheet = async () => {
     try {
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
+        type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
       });
 
       this.setState({modalVisible: false});
