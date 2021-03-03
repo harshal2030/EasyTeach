@@ -147,10 +147,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 23
-        versionName "1.6.4"
+        versionCode 24
+        versionName "1.6.6"
     }
-        signingConfigs {
+    signingConfigs {
         release {
             if (project.env.get('MYAPP_UPLOAD_STORE_FILE')) {
                 storeFile file(project.env.get('MYAPP_UPLOAD_STORE_FILE'))
