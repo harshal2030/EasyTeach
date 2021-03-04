@@ -182,6 +182,34 @@ class Quiz extends React.Component<Props, State> {
       });
   };
 
+  confirmSubmit = () => {
+    const onProgress = () => {
+      Alert.alert('Confirm', 'Are you sure to submit the test?', [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Ok',
+          onPress: this.postResponse,
+        },
+      ]);
+    };
+
+    Alert.alert(
+      'Warning!',
+      'Once you submit the test, you cannot resubmit it.',
+      [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Ok',
+          onPress: onProgress,
+        },
+      ],
+    );
+  };
+
   ZoomImage = () => {
     const {currentIndex, questions} = this.state;
     return (
@@ -285,7 +313,7 @@ class Quiz extends React.Component<Props, State> {
             disabled={currentIndex === 0}
             onPress={() => this.setState({currentIndex: currentIndex - 1})}
           />
-          <Button title="Submit" onPress={this.postResponse} />
+          <Button title="Submit" onPress={this.confirmSubmit} />
           <Button
             title="Next"
             disabled={currentIndex === questions.length - 1}
