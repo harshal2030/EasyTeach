@@ -45,10 +45,6 @@ interface userChecker {
   message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
 }
 
-interface State {
-  loading: boolean;
-}
-
 const App = (props: Props): JSX.Element => {
   const checkToken = async () => {
     const token = await AsyncStorage.getItem('token');

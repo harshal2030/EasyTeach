@@ -61,3 +61,11 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+# @generated: @expo/electron-adapter@0.0.47
+/.expo/*
+# Expo Web
+/web-build/*
+# electron-webpack
+/dist
+# @end @expo/electron-adapter
