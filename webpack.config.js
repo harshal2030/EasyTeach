@@ -3,6 +3,10 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
+  .ReactWebConfig;
+
+const envFilePath = path.resolve(__dirname, './.env.development');
 const appDirectory = path.resolve(__dirname);
 const {presets} = require(`${appDirectory}/babel.config.js`);
 
@@ -10,6 +14,15 @@ const compileNodeModules = [
   // Add every react-native package that needs compiling
   // 'react-native-gesture-handler',
   'react-native-animatable',
+  'react-native-vector-icons',
+  'react-native-elements',
+  'react-native-ratings',
+  'react-native-raw-bottom-sheet',
+  'react-native-svg',
+  'react-native-svg-transformer',
+  '@react-navigation/drawer',
+  '@react-navigation/bottom-tabs',
+  'react-native-snackbar',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const babelLoaderConfiguration = {
@@ -68,6 +81,7 @@ module.exports = {
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js'],
     alias: {
+      'react-native-config': 'react-web-config',
       'react-native$': 'react-native-web',
     },
   },
@@ -88,5 +102,6 @@ module.exports = {
       // See: https://github.com/necolas/react-native-web/issues/349
       __DEV__: JSON.stringify(true),
     }),
+    ReactWebConfig(envFilePath),
   ],
 };

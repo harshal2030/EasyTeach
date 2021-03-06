@@ -1,3 +1,5 @@
+import {Platform, Alert, AlertButton} from 'react-native';
+
 const formatDate = (date: Date) => {
   const dateNum = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
   const month =
@@ -33,4 +35,31 @@ const getDateAndMonth = (date: Date) => {
   return `${month} ${dateNum}`;
 };
 
-export {formatDate, getDateAndMonth};
+const alertPolyfill = (
+  title: string,
+  description: string,
+  options?: AlertButton[],
+) => {
+  if (options === undefined || options.length === 0) {
+    // eslint-disable-next-line no-alert
+    window.alert([title, description].filter(Boolean).join('\n'));
+    return;
+  }
+
+  // eslint-disable-next-line no-alert
+  const result = window.confirm(
+    [title, description].filter(Boolean).join('\n'),
+  );
+
+  if (result) {
+    const confirmOption = options!.find(({style}) => style !== 'cancel');
+    confirmOption && confirmOption.onPress!();
+  } else {
+    const cancelOption = options!.find(({style}) => style === 'cancel');
+    cancelOption && cancelOption.onPress!();
+  }
+};
+
+const alert = Platform.OS === 'web' ? alertPolyfill : Alert.alert;
+
+export {formatDate, getDateAndMonth, alert};

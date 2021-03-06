@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
+  ImageBackground,
+  Image as FastImage,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
@@ -180,7 +181,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       </View>
       <View style={styles.rightContainer}>
         <ScrollView>
-          <FastImage
+          <ImageBackground
             source={{
               uri: currentClass
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
@@ -192,7 +193,7 @@ const DrawerContent = (props: Props): JSX.Element => {
               onPress={() => props.navigation.navigate('EditQuestions')}>
               {currentClass ? currentClass.name : 'Current Class appears here'}
             </Text>
-          </FastImage>
+          </ImageBackground>
 
           <View style={avatarContainer}>
             <Avatar

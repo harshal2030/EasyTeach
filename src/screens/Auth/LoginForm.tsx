@@ -59,10 +59,9 @@ export default class LoginForm extends Component<Props, State> {
             this.formRef = ref;
           }}>
           <CustomTextInput
-            name={'email'}
             ref={(ref) => (this.emailInputRef = ref)}
             placeholder={'Email or Username'}
-            keyboardType={'email-address'}
+            keyboardType="default"
             editable={!isLoading}
             returnKeyType={'next'}
             underlineColorAndroid="transparent"

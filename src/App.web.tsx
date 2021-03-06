@@ -1,33 +1,32 @@
 import React from 'react';
 import axios from 'axios';
-import {View, ActivityIndicator, StyleSheet, Text} from 'react-native';
+import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 
 import {RootStackParamList} from './navigators/types';
 import {StoreState} from './global';
-import {registerToken} from './global/actions/token';
+import {registerToken, removeToken} from './global/actions/token';
+import {registerProfile} from './global/actions/profile';
+import {fetchClasses} from './global/actions/classes';
+
 import {checkTokenUrl} from './utils/urls';
+import {alert} from './utils/functions';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 interface Props {
   token: string | null;
+  registerProfile: typeof registerProfile;
   registerToken: typeof registerToken;
+  removeToken: typeof removeToken;
+  fetchClasses: Function;
 }
 
 interface State {
   loading: boolean;
 }
-
-const Test = () => {
-  return (
-    <View>
-      <Text>Hello</Text>
-    </View>
-  );
-};
 
 interface userChecker {
   user: {
@@ -54,10 +53,10 @@ class App extends React.Component<Props, State> {
   checkToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-
       this.setState({loading: false});
       if (token !== null) {
         this.props.registerToken(token);
+        this.props.fetchClasses(token);
 
         const res = await axios.get<userChecker>(checkTokenUrl, {
           timeout: 20000,
@@ -65,9 +64,19 @@ class App extends React.Component<Props, State> {
             Authorization: `Bearer ${token}`,
           },
         });
+
+        if (res.data.message === 'SERVER_MAINTENANCE') {
+          alert(
+            'Server Maintenance',
+            'You might be facing trouble in accessing services',
+          );
+          return;
+        }
+
+        this.props.registerProfile(res.data.user);
       }
     } catch (e) {
-      // move on
+      this.props.removeToken();
     }
   };
 
@@ -88,7 +97,10 @@ class App extends React.Component<Props, State> {
             component={require('./screens/AuthScreen').default}
           />
         ) : (
-          <Stack.Screen name="Drawer" component={Test} />
+          <Stack.Screen
+            name="Drawer"
+            component={require('./screens/People').default}
+          />
         )}
       </Stack.Navigator>
     );
@@ -109,4 +121,9 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {registerToken})(App);
+export default connect(mapStateToProps, {
+  registerToken,
+  registerProfile,
+  removeToken,
+  fetchClasses,
+})(App);

@@ -7,6 +7,39 @@ import {name as appName} from './app.json';
 import App from './src/App';
 import {store} from './src/global';
 
+// Generate required css
+import iconFont from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
+import AntDesign from 'react-native-vector-icons/Fonts/AntDesign.ttf';
+import Entypo from 'react-native-vector-icons/Fonts/Entypo.ttf';
+import EvilIcons from 'react-native-vector-icons/Fonts/EvilIcons.ttf';
+
+const iconFontStyles = `@font-face {
+  src: url(${iconFont});
+  font-family: FontAwesome;
+}
+@font-face {
+  src: url(${AntDesign});
+  font-family: AntDesign;
+}
+@font-face {
+  src: url(${EvilIcons});
+  font-family: EvilIcons;
+}
+EvilIcons.ttf
+`;
+
+// Create stylesheet
+const style = document.createElement('style');
+style.type = 'text/css';
+if (style.styleSheet) {
+  style.styleSheet.cssText = iconFontStyles;
+} else {
+  style.appendChild(document.createTextNode(iconFontStyles));
+}
+
+// Inject stylesheet
+document.head.appendChild(style);
+
 const Wrapper = () => {
   return (
     <Provider store={store}>

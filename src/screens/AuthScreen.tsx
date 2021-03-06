@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import {Alert} from 'react-native';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
@@ -14,6 +13,7 @@ import {registerProfile} from '../global/actions/profile';
 import Auth from './Auth';
 
 import {signUpUrl, loginUrl} from '../utils/urls';
+import {alert} from '../utils/functions';
 import {usernamePattern} from '../utils/regexPatterns';
 import {RootStackParamList} from '../navigators/types';
 
@@ -51,7 +51,7 @@ class AuthScreen extends React.Component<Props, State> {
 
   onLogin = (email: string, password: string) => {
     if (password.length < 6 || email === '') {
-      return Alert.alert('Invalid credentials');
+      return alert('Invalid credentials', '');
     }
 
     this.setState({loading: true}, () => {
@@ -85,7 +85,7 @@ class AuthScreen extends React.Component<Props, State> {
         })
         .catch(() => {
           this.setState({loading: false});
-          Alert.alert('Invalid Credentials');
+          alert('Invalid Credentials', '');
         });
     });
   };
@@ -102,25 +102,22 @@ class AuthScreen extends React.Component<Props, State> {
       email.trim().length === 0 ||
       password.trim().length === 0
     ) {
-      return Alert.alert('', 'All fields are required');
+      return alert('', 'All fields are required');
     }
 
     if (!usernamePattern.test(username)) {
-      return Alert.alert(
+      return alert(
         '',
         'Invalid username pattern. Only underscores, periods, alphabets, numbers are allowed',
       );
     }
 
     if (!validator.isEmail(email)) {
-      return Alert.alert('', 'Please enter valid e-mail');
+      return alert('', 'Please enter valid e-mail');
     }
 
     if (password.length < 6) {
-      return Alert.alert(
-        '',
-        'Password too short. Consider at least 6 characters',
-      );
+      return alert('', 'Password too short. Consider at least 6 characters');
     }
 
     const {fcm} = this.props;
@@ -160,13 +157,10 @@ class AuthScreen extends React.Component<Props, State> {
         this.setState({loading: false});
         if (e.response) {
           if (e.response.status === 400) {
-            return Alert.alert('Oops!', e.response.data.error);
+            return alert('Oops!', e.response.data.error);
           }
         }
-        return Alert.alert(
-          'Oops!',
-          'Something went wrong! Please try again later.',
-        );
+        return alert('Oops!', 'Something went wrong! Please try again later.');
       });
   };
   render() {

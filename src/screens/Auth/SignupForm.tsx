@@ -157,6 +157,8 @@ const styles = StyleSheet.create({
   loginLink: {
     color: 'rgba(255,255,255,0.6)',
     alignSelf: 'center',
-    padding: 20,
+    padding: 10,
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
