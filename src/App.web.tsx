@@ -1,11 +1,20 @@
 import React from 'react';
 import axios from 'axios';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
-import {createStackNavigator} from '@react-navigation/stack';
+import {
+  BrowserRouter as Router,
+  Link,
+  Route,
+  Switch,
+  RouteProps,
+  Redirect,
+} from 'react-router-dom';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 
-import {RootStackParamList} from './navigators/types';
+import AuthScreen from './screens/AuthScreen.web';
+import Main from './navigators/Drawer';
+
 import {StoreState} from './global';
 import {registerToken, removeToken} from './global/actions/token';
 import {registerProfile} from './global/actions/profile';
@@ -14,7 +23,14 @@ import {fetchClasses} from './global/actions/classes';
 import {checkTokenUrl} from './utils/urls';
 import {alert} from './utils/functions';
 
-const Stack = createStackNavigator<RootStackParamList>();
+interface userChecker {
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
+}
 
 interface Props {
   token: string | null;
@@ -28,14 +44,25 @@ interface State {
   loading: boolean;
 }
 
-interface userChecker {
-  user: {
-    name: string;
-    username: string;
-    avatar: string;
-  };
-  message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
+interface PrivateRouteProps extends RouteProps {
+  Component: React.ElementType;
+  token: string | null;
 }
+
+const PrivateRoute: React.FC<PrivateRouteProps> = ({
+  Component,
+  token,
+  ...rest
+}) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        return token ? <Component {...props} /> : <Redirect to="/auth" />;
+      }}
+    />
+  );
+};
 
 class App extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -48,6 +75,8 @@ class App extends React.Component<Props, State> {
 
   componentDidMount() {
     this.checkToken();
+
+    document.title = 'EayTeach - Delightful teaching for everyone';
   }
 
   checkToken = async () => {
@@ -70,6 +99,7 @@ class App extends React.Component<Props, State> {
             'Server Maintenance',
             'You might be facing trouble in accessing services',
           );
+          this.props.removeToken();
           return;
         }
 
@@ -90,22 +120,32 @@ class App extends React.Component<Props, State> {
     }
 
     return (
-      <Stack.Navigator headerMode="none">
-        {this.props.token === null ? (
-          <Stack.Screen
-            name="Auth"
-            component={require('./screens/AuthScreen').default}
+      <Router>
+        <Switch>
+          <Route exact path="/" component={this.props.token ? Main : Home} />
+          <Route path="/auth">
+            {this.props.token ? <AuthScreen /> : <Redirect to="/" />}
+          </Route>
+          <PrivateRoute
+            Component={Home}
+            token={this.props.token}
+            path="/home/efi"
           />
-        ) : (
-          <Stack.Screen
-            name="Drawer"
-            component={require('./screens/People').default}
-          />
-        )}
-      </Stack.Navigator>
+        </Switch>
+      </Router>
     );
   }
 }
+
+const Home = () => {
+  return (
+    <View>
+      <Link to="/auth">
+        <p>Auth</p>
+      </Link>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   loaderContainer: {

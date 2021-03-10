@@ -1,54 +1,37 @@
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {connect} from 'react-redux';
+import {View} from 'react-native';
+import {Theme, makeStyles, createStyles, Drawer} from '@material-ui/core';
+import DrawerContent from './DrawerContent.web';
 
-import DrawerContent from './DrawerContent';
-import {DrawerParamList} from '../types';
-import {StoreState} from '../../global';
-import {Class} from '../../global/actions/classes';
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    drawer: {
+      width: 350,
+      flexShrink: 0,
+    },
+    paper: {
+      width: 350,
+    },
+    content: {
+      padding: theme.spacing(3),
+      flexGrow: 1,
+    },
+  }),
+);
 
-const Drawer = createDrawerNavigator<DrawerParamList>();
+const DrawerNavigator = () => {
+  const styles = useStyles();
 
-type Props = {
-  currentClass: Class | null;
-  profile: {
-    name: string;
-    username: string;
-    avatar: string;
-  };
-  isOwner: boolean;
-};
-
-const DrawerNavigator = (props: Props): JSX.Element => {
-  const width = useWindowDimensions().width;
-  const isLargeScreen = width >= 768;
   return (
-    <Drawer.Navigator
-      hideStatusBar={true}
-      // eslint-disable-next-line react-native/no-inline-styles
-      drawerStyle={{width: isLargeScreen ? 350 : '88%'}}
-      drawerType={isLargeScreen ? 'permanent' : 'front'}
-      // @ts-ignore
-      drawerContent={(pprops) => <DrawerContent {...pprops} />}>
-      <Drawer.Screen
-        name="Home"
-        component={require('../bottom-tabs/Home').default}
-      />
-    </Drawer.Navigator>
+    <View>
+      <Drawer
+        variant="permanent"
+        className={styles.drawer}
+        classes={{paper: styles.paper}}>
+        <DrawerContent />
+      </Drawer>
+    </View>
   );
 };
 
-const mapStateToProps = (state: StoreState) => {
-  let isOwner: boolean = false;
-  if (state.currentClass) {
-    isOwner = state.currentClass.owner.username === state.profile.username;
-  }
-  return {
-    currentClass: state.currentClass,
-    profile: state.profile,
-    isOwner,
-  };
-};
-
-export default connect(mapStateToProps)(DrawerNavigator);
+export default DrawerNavigator;

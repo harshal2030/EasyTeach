@@ -32,18 +32,7 @@ import {Avatar} from '../../components/common';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {mediaUrl, logOutUrl} from '../../utils/urls';
 
-import {DrawerContentComponentProps} from '@react-navigation/drawer';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {DrawerNavigationProp} from '@react-navigation/drawer';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList, DrawerParamList} from '../types';
-
-type HomeScreenNavigationProp = CompositeNavigationProp<
-  DrawerNavigationProp<DrawerParamList, 'Home'>,
-  StackNavigationProp<RootStackParamList>
->;
-
-type Props = DrawerContentComponentProps & {
+type Props = {
   token: string | null;
   removeToken: typeof removeToken;
   classes: Class[];
@@ -51,7 +40,6 @@ type Props = DrawerContentComponentProps & {
   classErrored: boolean;
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
-  navigation: HomeScreenNavigationProp;
   profile: {
     username: string;
     name: string;
@@ -92,7 +80,6 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         onPress={() => {
           props.registerCurrentClass(item);
-          props.navigation.closeDrawer();
         }}>
         <FastImage
           source={{
@@ -188,9 +175,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                 : 'https://easyteach.harshall.codes/noimage',
             }}
             style={mainImage}>
-            <Text
-              style={classText}
-              onPress={() => props.navigation.navigate('EditQuestions')}>
+            <Text style={classText}>
               {currentClass ? currentClass.name : 'Current Class appears here'}
             </Text>
           </ImageBackground>

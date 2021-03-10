@@ -12,6 +12,9 @@ import iconFont from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
 import AntDesign from 'react-native-vector-icons/Fonts/AntDesign.ttf';
 import Entypo from 'react-native-vector-icons/Fonts/Entypo.ttf';
 import EvilIcons from 'react-native-vector-icons/Fonts/EvilIcons.ttf';
+import Ionicons from 'react-native-vector-icons/Fonts/Ionicons.ttf';
+import Octicons from 'react-native-vector-icons/Fonts/Octicons.ttf';
+import Feather from 'react-native-vector-icons/Fonts/Feather.ttf';
 
 const iconFontStyles = `@font-face {
   src: url(${iconFont});
@@ -25,7 +28,22 @@ const iconFontStyles = `@font-face {
   src: url(${EvilIcons});
   font-family: EvilIcons;
 }
-EvilIcons.ttf
+@font-face {
+  src: url(${Entypo});
+  font-family: Entypo;
+}
+@font-face {
+  src: url(${Ionicons});
+  font-family: Ionicons;
+}
+@font-face {
+  src: url(${Octicons});
+  font-family: Octicons;
+}
+@font-face {
+  src: url(${Feather});
+  font-family: Feather;
+}
 `;
 
 // Create stylesheet

@@ -22,7 +22,6 @@ const compileNodeModules = [
   'react-native-svg-transformer',
   '@react-navigation/drawer',
   '@react-navigation/bottom-tabs',
-  'react-native-snackbar',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const babelLoaderConfiguration = {
@@ -92,6 +91,9 @@ module.exports = {
       svgLoaderConfiguration,
       ttfLoaderConf,
     ],
+  },
+  devServer: {
+    historyApiFallback: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
