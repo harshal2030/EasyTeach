@@ -123,6 +123,7 @@ const DrawerContent = (props: Props): JSX.Element => {
         data={props.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
+        style={{padding: 10}}
         removeClippedSubviews
         ListFooterComponent={renderListFooter}
       />

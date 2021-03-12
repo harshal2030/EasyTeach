@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 
-import AuthScreen from './screens/AuthScreen.web';
+import AuthScreen from './screens/AuthScreen/index.web';
 import Main from './navigators/Drawer';
 
 import {StoreState} from './global';
@@ -79,13 +79,21 @@ class App extends React.Component<Props, State> {
     document.title = 'EayTeach - Delightful teaching for everyone';
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (this.props.token !== prevProps.token) {
+      if (this.props.token) {
+        this.props.fetchClasses(this.props.token);
+      }
+    }
+  }
+
   checkToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      this.setState({loading: false});
       if (token !== null) {
         this.props.registerToken(token);
         this.props.fetchClasses(token);
+        this.setState({loading: false});
 
         const res = await axios.get<userChecker>(checkTokenUrl, {
           timeout: 20000,
@@ -104,8 +112,11 @@ class App extends React.Component<Props, State> {
         }
 
         this.props.registerProfile(res.data.user);
+      } else {
+        throw new Error();
       }
     } catch (e) {
+      this.setState({loading: false});
       this.props.removeToken();
     }
   };
@@ -122,14 +133,20 @@ class App extends React.Component<Props, State> {
     return (
       <Router>
         <Switch>
-          <Route exact path="/" component={this.props.token ? Main : Home} />
+          <Route
+            exact
+            path="/"
+            render={() => {
+              return this.props.token ? <Redirect to="/home" /> : <Home />;
+            }}
+          />
           <Route path="/auth">
-            {this.props.token ? <AuthScreen /> : <Redirect to="/" />}
+            {this.props.token ? <Redirect to="/home" /> : <AuthScreen />}
           </Route>
           <PrivateRoute
-            Component={Home}
+            Component={Main}
             token={this.props.token}
-            path="/home/efi"
+            path="/home"
           />
         </Switch>
       </Router>

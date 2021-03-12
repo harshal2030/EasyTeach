@@ -6,15 +6,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
 
-import {StoreState} from '../global';
-import {registerToken} from '../global/actions/token';
-import {registerProfile} from '../global/actions/profile';
+import {StoreState} from '../../global';
+import {registerToken} from '../../global/actions/token';
+import {registerProfile} from '../../global/actions/profile';
 
-import Auth from './Auth';
+import Auth from '../Auth';
 
-import {signUpUrl, loginUrl} from '../utils/urls';
-import {alert} from '../utils/functions';
-import {usernamePattern} from '../utils/regexPatterns';
+import {signUpUrl, loginUrl} from '../../utils/urls';
+import {alert} from '../../utils/functions';
+import {usernamePattern} from '../../utils/regexPatterns';
 
 type Props = RouteComponentProps<{}> & {
   token: string;

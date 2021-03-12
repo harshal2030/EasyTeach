@@ -15,6 +15,10 @@ import EvilIcons from 'react-native-vector-icons/Fonts/EvilIcons.ttf';
 import Ionicons from 'react-native-vector-icons/Fonts/Ionicons.ttf';
 import Octicons from 'react-native-vector-icons/Fonts/Octicons.ttf';
 import Feather from 'react-native-vector-icons/Fonts/Feather.ttf';
+import FA4Icon from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
+import FA5IconSolid from 'react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf';
+import FA5IconRegular from 'react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf';
+import FontAwesome from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
 
 const iconFontStyles = `@font-face {
   src: url(${iconFont});
@@ -43,6 +47,22 @@ const iconFontStyles = `@font-face {
 @font-face {
   src: url(${Feather});
   font-family: Feather;
+}
+@font-face {
+  src: url(${FA4Icon});
+  font-family: FontAwesome;
+}
+@font-face {
+  src: url(${FA5IconSolid});
+  font-family: 'FontAwesome5_Solid';
+}
+@font-face {
+  src: url(${FA5IconRegular});
+  font-family: 'FontAwesome5_Regular';
+}
+@font-face {
+  src: url(${FontAwesome});
+  font-family: 'FontAwesome';
 }
 `;
 
