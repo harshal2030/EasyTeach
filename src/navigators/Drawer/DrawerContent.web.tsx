@@ -10,6 +10,7 @@ import {
   ImageBackground,
   Image as FastImage,
 } from 'react-native';
+import {useRouteMatch} from 'react-router-dom';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
@@ -51,6 +52,7 @@ type Props = {
 
 const DrawerContent = (props: Props): JSX.Element => {
   const {currentClass} = props;
+  const match = useRouteMatch();
 
   const FontAwesome = props.isOwner
     ? require('react-native-vector-icons/FontAwesome').default
@@ -80,6 +82,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         onPress={() => {
           props.registerCurrentClass(item);
+          console.log(match);
         }}>
         <FastImage
           source={{

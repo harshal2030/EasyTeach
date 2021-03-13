@@ -44,6 +44,7 @@ const babelLoaderConfiguration = {
 
 const svgLoaderConfiguration = {
   test: /\.svg$/,
+  exclude: /node_modules/,
   use: [
     {
       loader: '@svgr/webpack',
@@ -52,7 +53,7 @@ const svgLoaderConfiguration = {
 };
 
 const imageLoaderConfiguration = {
-  test: /\.(gif|jpe?g|png|svg)$/,
+  test: /\.(gif|jpe?g|png)$/,
   use: {
     loader: 'url-loader',
     options: {
