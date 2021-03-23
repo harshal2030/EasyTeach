@@ -11,7 +11,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, eucalyptusGreen} from '../styles/colors';
-import {recoveryUrl} from '../utils/urls';
+import {recoveryUrl} from '../../shared/utils/urls';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList, 'Forgot'>;

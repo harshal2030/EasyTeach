@@ -9,9 +9,9 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CommonTest} from '../components/main';
 import {Card} from '../components/common';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
-import {QuizRes, fetchQuiz} from '../global/actions/quiz';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
+import {QuizRes, fetchQuiz} from '../../shared/global/actions/quiz';
 
 import {
   RootStackParamList,

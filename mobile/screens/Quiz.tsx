@@ -19,12 +19,12 @@ import {connect} from 'react-redux';
 import LightBox from 'react-native-lightbox-v2';
 import PhotoView from 'react-native-photo-view-ex';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
-import {mediaUrl, quizUrl} from '../utils/urls';
+import {mediaUrl, quizUrl} from '../../shared/utils/urls';
 import {commonBlue, commonGrey, greyWithAlpha} from '../styles/colors';
 
 interface Props {

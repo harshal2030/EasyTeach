@@ -18,19 +18,19 @@ import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 
-import {StoreState} from '../../global';
-import {removeToken} from '../../global/actions/token';
+import {StoreState} from '../../../shared/global';
+import {removeToken} from '../../../shared/global/actions/token';
 import {
   Class,
   fetchClasses,
   registerCurrentClass,
   removeCurrentClass,
-} from '../../global/actions/classes';
+} from '../../../shared/global/actions/classes';
 
 import {Avatar} from '../../components/common';
 
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
-import {mediaUrl, logOutUrl} from '../../utils/urls';
+import {mediaUrl, logOutUrl} from '../../../shared/utils/urls';
 
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import {CompositeNavigationProp} from '@react-navigation/native';

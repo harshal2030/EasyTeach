@@ -13,11 +13,11 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
-import {Result} from '../global/actions/quiz';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
+import {Result} from '../../shared/global/actions/quiz';
 
-import {resultUrl} from '../utils/urls';
+import {resultUrl} from '../../shared/utils/urls';
 import {RootStackParamList} from '../navigators/types';
 import {commonBlue} from '../styles/colors';
 import {ContainerStyles, TextStyles} from '../styles/styles';

@@ -19,19 +19,19 @@ import {connect} from 'react-redux';
 import {RootStackParamList} from '../navigators/types';
 import {Chip, CheckBox} from '../components/common';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
 import {
   QuizRes,
   addQuiz,
   fetchQuiz,
   removeQuiz,
   ActionTypes,
-} from '../global/actions/quiz';
+} from '../../shared/global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../styles/colors';
-import {quizUrl} from '../utils/urls';
+import {quizUrl} from '../../shared/utils/urls';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
 type RouteProps = RouteProp<RootStackParamList, 'CreateTest'>;

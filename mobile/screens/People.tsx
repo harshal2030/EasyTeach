@@ -22,9 +22,9 @@ import {
   RootStackParamList,
   BottomTabHomeParamList,
 } from '../navigators/types';
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
-import {mediaUrl, studentUrl} from '../utils/urls';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
+import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, flatRed} from '../styles/colors';
 
 type NavigationProp = CompositeNavigationProp<

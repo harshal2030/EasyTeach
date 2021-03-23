@@ -19,7 +19,7 @@ import {
 } from '../../navigators/types';
 import {ContainerStyles} from '../../styles/styles';
 import {commonBlue, commonGrey} from '../../styles/colors';
-import {QuizRes} from '../../global/actions/quiz';
+import {QuizRes} from '../../../shared/global/actions/quiz';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,

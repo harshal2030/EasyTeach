@@ -7,12 +7,12 @@ import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
 
-import {StoreState} from './global';
-import {registerToken, removeToken} from './global/actions/token';
-import {registerProfile} from './global/actions/profile';
-import {Class} from './global/actions/classes';
+import {StoreState} from '../shared/global';
+import {registerToken, removeToken} from '../shared/global/actions/token';
+import {registerProfile} from '../shared/global/actions/profile';
+import {Class} from '../shared/global/actions/classes';
 
-import {checkTokenUrl} from './utils/urls';
+import {checkTokenUrl} from '../shared/utils/urls';
 
 import {RootStackParamList} from './navigators/types';
 

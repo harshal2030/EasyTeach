@@ -11,15 +11,15 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {HeadCom, Avatar} from '../components/common';
 
-import {StoreState} from '../global';
+import {StoreState} from '../../shared/global';
 import {
   Class,
   removeClass,
   registerCurrentClass,
-} from '../global/actions/classes';
+} from '../../shared/global/actions/classes';
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
-import {mediaUrl, studentUrl} from '../utils/urls';
+import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../styles/styles';
 import {flatRed, commonBlue, commonGrey} from '../styles/colors';
 

@@ -13,13 +13,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {CommonSetting} from '../components/main';
 import {PhotoPicker} from '../components/common';
 
-import {StoreState} from '../global';
-import {registerToken} from '../global/actions/token';
-import {registerProfile} from '../global/actions/profile';
-import {updateClassOwner} from '../global/actions/classes';
+import {StoreState} from '../../shared/global';
+import {registerToken} from '../../shared/global/actions/token';
+import {registerProfile} from '../../shared/global/actions/profile';
+import {updateClassOwner} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
-import {mediaUrl, root} from '../utils/urls';
+import {mediaUrl, root} from '../../shared/utils/urls';
 import {flatRed} from '../styles/colors';
 
 type NavigationProps = StackNavigationProp<RootStackParamList, 'EditProfile'>;

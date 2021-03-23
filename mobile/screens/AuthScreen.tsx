@@ -7,14 +7,14 @@ import validator from 'validator';
 import Config from 'react-native-config';
 import {StackNavigationProp} from '@react-navigation/stack';
 
-import {StoreState} from '../global';
-import {registerToken} from '../global/actions/token';
-import {registerProfile} from '../global/actions/profile';
+import {StoreState} from '../../shared/global';
+import {registerToken} from '../../shared/global/actions/token';
+import {registerProfile} from '../../shared/global/actions/profile';
 
 import Auth from './Auth';
 
-import {signUpUrl, loginUrl} from '../utils/urls';
-import {usernamePattern} from '../utils/regexPatterns';
+import {signUpUrl, loginUrl} from '../../shared/utils/urls';
+import {usernamePattern} from '../../shared/utils/regexPatterns';
 import {RootStackParamList} from '../navigators/types';
 
 interface Props {

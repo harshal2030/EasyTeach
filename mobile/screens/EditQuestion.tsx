@@ -9,11 +9,11 @@ import ViewPager from '@react-native-community/viewpager';
 
 import {QuestionCard} from '../components/main';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
-import {questionUrl} from '../utils/urls';
+import {questionUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../styles/styles';
 import {commonBackground, commonBlue} from '../styles/colors';
 

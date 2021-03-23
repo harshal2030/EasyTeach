@@ -14,16 +14,16 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import {CommonSetting} from '../components/main';
 import {CheckBox, PhotoPicker} from '../components/common';
 
-import {StoreState} from '../global';
+import {StoreState} from '../../shared/global';
 import {
   Class,
   updateClasses,
   registerCurrentClass,
   removeClass,
-} from '../global/actions/classes';
+} from '../../shared/global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles} from '../styles/styles';
-import {mediaUrl, classUrl} from '../utils/urls';
+import {mediaUrl, classUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,

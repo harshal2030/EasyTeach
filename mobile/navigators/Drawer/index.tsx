@@ -5,8 +5,8 @@ import {connect} from 'react-redux';
 
 import DrawerContent from './DrawerContent';
 import {DrawerParamList} from '../types';
-import {StoreState} from '../../global';
-import {Class} from '../../global/actions/classes';
+import {StoreState} from '../../../shared/global';
+import {Class} from '../../../shared/global/actions/classes';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 

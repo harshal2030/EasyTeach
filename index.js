@@ -9,11 +9,11 @@ import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
-import {store} from './mobile/global';
+import {store} from './shared/global';
 import PushNotification from 'react-native-push-notification';
 
-import {registerFCM} from './mobile/global/actions/token';
-import {addMsg} from './mobile/global/actions/msgs';
+import {registerFCM} from './shared/global/actions/token';
+import {addMsg} from './shared/global/actions/msgs';
 
 enableScreens(true);
 

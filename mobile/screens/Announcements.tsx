@@ -19,9 +19,9 @@ import MegaText from '../images/announcement.svg';
 
 import {MsgCard} from '../components/common';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
-import {fetchMsgs, Msg, addMsg} from '../global/actions/msgs';
+import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
+import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
 
 import {ContainerStyles} from '../styles/styles';
 import {
@@ -35,7 +35,7 @@ import {
   commonGrey,
   flatRed,
 } from '../styles/colors';
-import {mediaUrl, msgUrl} from '../utils/urls';
+import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,

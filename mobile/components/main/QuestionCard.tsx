@@ -18,7 +18,7 @@ import {ImageOrVideo} from 'react-native-image-crop-picker';
 import {PhotoPicker} from '../common';
 
 import {commonGrey, flatRed, greyWithAlpha} from '../../styles/colors';
-import {mediaUrl, questionUrl} from '../../utils/urls';
+import {mediaUrl, questionUrl} from '../../../shared/utils/urls';
 
 interface Props {
   queNo: number;

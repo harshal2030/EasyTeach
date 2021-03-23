@@ -9,7 +9,7 @@ import {Text} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
-import {formatDate} from '../../utils/functions';
+import {formatDate} from '../../../shared/utils/functions';
 
 type Props = {
   title: string;

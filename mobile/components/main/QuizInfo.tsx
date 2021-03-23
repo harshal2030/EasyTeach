@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import {Header, Text, Button} from 'react-native-elements';
 
-import {QuizRes} from '../../global/actions/quiz';
+import {QuizRes} from '../../../shared/global/actions/quiz';
 import {ContainerStyles} from '../../styles/styles';
 import {commonGrey} from '../../styles/colors';
 

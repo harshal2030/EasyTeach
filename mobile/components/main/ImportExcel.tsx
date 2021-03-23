@@ -6,7 +6,7 @@ import FastImage from 'react-native-fast-image';
 import {Header, Button, Text} from 'react-native-elements';
 
 import {eucalyptusGreen} from '../../styles/colors';
-import {mediaUrl} from '../../utils/urls';
+import {mediaUrl} from '../../../shared/utils/urls';
 
 interface Props {
   onBackPress: () => any;
