@@ -4,16 +4,16 @@
 import React from 'react';
 import 'react-native-gesture-handler';
 import {AppRegistry} from 'react-native';
-import App from './src/App';
+import App from './mobile/App';
 import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
-import {store} from './src/global';
+import {store} from './mobile/global';
 import PushNotification from 'react-native-push-notification';
 
-import {registerFCM} from './src/global/actions/token';
-import {addMsg} from './src/global/actions/msgs';
+import {registerFCM} from './mobile/global/actions/token';
+import {addMsg} from './mobile/global/actions/msgs';
 
 enableScreens(true);
 
