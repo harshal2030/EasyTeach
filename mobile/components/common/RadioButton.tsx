@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {Component} from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
-import {commonBlue} from '../../styles/colors';
+import {commonBlue} from '../../../shared/styles/colors';
 
 interface Props {
   data: {

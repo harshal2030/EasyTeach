@@ -20,8 +20,8 @@ import {
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
-import {ContainerStyles} from '../styles/styles';
-import {flatRed, commonBlue, commonGrey} from '../styles/colors';
+import {ContainerStyles} from '../../shared/styles/styles';
+import {flatRed, commonBlue, commonGrey} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Settings'>,

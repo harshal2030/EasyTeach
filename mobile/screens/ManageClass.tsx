@@ -22,7 +22,7 @@ import {
   removeClass,
 } from '../../shared/global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
-import {ContainerStyles} from '../styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 import {mediaUrl, classUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<

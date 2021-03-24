@@ -19,7 +19,7 @@ import {
   DrawerParamList,
   BottomTabTestParamList,
 } from '../navigators/types';
-import {flatRed, greyWithAlpha} from '../styles/colors';
+import {flatRed, greyWithAlpha} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,

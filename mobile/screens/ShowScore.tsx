@@ -19,8 +19,8 @@ import {Result} from '../../shared/global/actions/quiz';
 
 import {resultUrl} from '../../shared/utils/urls';
 import {RootStackParamList} from '../navigators/types';
-import {commonBlue} from '../styles/colors';
-import {ContainerStyles, TextStyles} from '../styles/styles';
+import {commonBlue} from '../../shared/styles/colors';
+import {ContainerStyles, TextStyles} from '../../shared/styles/styles';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'ShowScore'>;
 type Route = RouteProp<RootStackParamList, 'ShowScore'>;

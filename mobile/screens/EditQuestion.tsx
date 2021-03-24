@@ -14,8 +14,8 @@ import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {questionUrl} from '../../shared/utils/urls';
-import {ContainerStyles} from '../styles/styles';
-import {commonBackground, commonBlue} from '../styles/colors';
+import {ContainerStyles} from '../../shared/styles/styles';
+import {commonBackground, commonBlue} from '../../shared/styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList, 'EditQuestion'>;

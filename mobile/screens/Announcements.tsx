@@ -14,8 +14,8 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Snackbar from 'react-native-snackbar';
-import Megaphone from '../images/Megaphone.svg';
-import MegaText from '../images/announcement.svg';
+import Megaphone from '../../shared/images/Megaphone.svg';
+import MegaText from '../../shared/images/announcement.svg';
 
 import {MsgCard} from '../components/common';
 
@@ -23,7 +23,7 @@ import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
 
-import {ContainerStyles} from '../styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 import {
   RootStackParamList,
   DrawerParamList,
@@ -34,7 +34,7 @@ import {
   commonBlue,
   commonGrey,
   flatRed,
-} from '../styles/colors';
+} from '../../shared/styles/colors';
 import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<

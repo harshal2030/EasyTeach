@@ -1,11 +1,16 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import axios from 'axios';
-import {Alert} from 'react-native';
 import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
-import {StackNavigationProp} from '@react-navigation/stack';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import {StoreState} from '../../shared/global';
 import {registerToken} from '../../shared/global/actions/token';
@@ -15,7 +20,6 @@ import Auth from '../../shared/screens/AuthScreen';
 
 import {signUpUrl, loginUrl} from '../../shared/utils/urls';
 import {usernamePattern} from '../../shared/utils/regexPatterns';
-import {RootStackParamList} from '../navigators/types';
 
 interface Props {
   token: string;
@@ -25,11 +29,13 @@ interface Props {
   };
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
-  navigation: StackNavigationProp<RootStackParamList, 'Auth'>;
 }
 
 interface State {
   loading: boolean;
+  title: string;
+  text: string;
+  alertVisible: boolean;
 }
 
 class AuthScreen extends React.Component<Props, State> {
@@ -38,8 +44,17 @@ class AuthScreen extends React.Component<Props, State> {
 
     this.state = {
       loading: false,
+      title: '',
+      text: '',
+      alertVisible: false,
     };
   }
+
+  openDialog = (title: string, text: string = '') => {
+    this.setState({title, text, alertVisible: true});
+  };
+
+  closeDialog = () => this.setState({alertVisible: false});
 
   storeToken = async (token: string) => {
     try {
@@ -51,7 +66,7 @@ class AuthScreen extends React.Component<Props, State> {
 
   onLogin = (email: string, password: string) => {
     if (password.length < 6 || email === '') {
-      return Alert.alert('Invalid credentials');
+      return this.openDialog('Invalid credentials');
     }
 
     this.setState({loading: true}, () => {
@@ -85,7 +100,7 @@ class AuthScreen extends React.Component<Props, State> {
         })
         .catch(() => {
           this.setState({loading: false});
-          Alert.alert('Invalid Credentials');
+          this.openDialog('Invalid Credentials');
         });
     });
   };
@@ -102,22 +117,22 @@ class AuthScreen extends React.Component<Props, State> {
       email.trim().length === 0 ||
       password.trim().length === 0
     ) {
-      return Alert.alert('', 'All fields are required');
+      return this.openDialog('', 'All fields are required');
     }
 
     if (!usernamePattern.test(username)) {
-      return Alert.alert(
+      return this.openDialog(
         '',
         'Invalid username pattern. Only underscores, periods, alphabets, numbers are allowed',
       );
     }
 
     if (!validator.isEmail(email)) {
-      return Alert.alert('', 'Please enter valid e-mail');
+      return this.openDialog('', 'Please enter valid e-mail');
     }
 
     if (password.length < 6) {
-      return Alert.alert(
+      return this.openDialog(
         '',
         'Password too short. Consider at least 6 characters',
       );
@@ -160,10 +175,10 @@ class AuthScreen extends React.Component<Props, State> {
         this.setState({loading: false});
         if (e.response) {
           if (e.response.status === 400) {
-            return Alert.alert('Oops!', e.response.data.error);
+            return this.openDialog('Oops!', e.response.data.error);
           }
         }
-        return Alert.alert(
+        return this.openDialog(
           'Oops!',
           'Something went wrong! Please try again later.',
         );
@@ -171,14 +186,34 @@ class AuthScreen extends React.Component<Props, State> {
   };
   render() {
     return (
-      <Auth
-        isLoading={this.state.loading}
-        isLoggedIn={false}
-        login={this.onLogin}
-        signup={this.onSignUp}
-        onLoginAnimationCompleted={() => null}
-        onForgotClick={() => this.props.navigation.navigate('Forgot')}
-      />
+      <>
+        <Auth
+          isLoading={this.state.loading}
+          isLoggedIn={false}
+          login={this.onLogin}
+          signup={this.onSignUp}
+          onLoginAnimationCompleted={() => null}
+          onForgotClick={() => alert('You have to complete this')}
+        />
+
+        <Dialog
+          open={this.state.alertVisible}
+          onClose={this.closeDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description">
+          <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {this.state.text}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.closeDialog} color="primary" autoFocus>
+              Ok
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 }

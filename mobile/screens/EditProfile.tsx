@@ -20,7 +20,7 @@ import {updateClassOwner} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {mediaUrl, root} from '../../shared/utils/urls';
-import {flatRed} from '../styles/colors';
+import {flatRed} from '../../shared/styles/colors';
 
 type NavigationProps = StackNavigationProp<RootStackParamList, 'EditProfile'>;
 

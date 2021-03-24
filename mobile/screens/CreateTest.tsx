@@ -29,8 +29,8 @@ import {
   ActionTypes,
 } from '../../shared/global/actions/quiz';
 
-import {TextStyles, ContainerStyles} from '../styles/styles';
-import {commonBlue, commonGrey, flatRed} from '../styles/colors';
+import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
+import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
 import {quizUrl} from '../../shared/utils/urls';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;

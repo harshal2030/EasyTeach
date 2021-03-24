@@ -5,7 +5,7 @@ import {View, StyleSheet, Linking} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Header, Button, Text} from 'react-native-elements';
 
-import {eucalyptusGreen} from '../../styles/colors';
+import {eucalyptusGreen} from '../../../shared/styles/colors';
 import {mediaUrl} from '../../../shared/utils/urls';
 
 interface Props {
@@ -19,7 +19,7 @@ const ImportExcel = (props: Props) => {
   const ZoomImage = () => {
     return (
       <PhotoView
-        source={require('../../images/sheet.png')}
+        source={require('../../../shared/images/sheet.png')}
         resizeMode="contain"
         style={{height: '100%', width: '100%'}}
         maximumZoomScale={4}
@@ -49,7 +49,7 @@ const ImportExcel = (props: Props) => {
 
         <LightBox renderContent={ZoomImage}>
           <FastImage
-            source={require('../../images/sheet.png')}
+            source={require('../../../shared/images/sheet.png')}
             style={imageStyle}
             resizeMode="stretch"
           />

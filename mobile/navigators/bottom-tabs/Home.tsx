@@ -4,7 +4,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import {BottomTabHomeParamList} from '../types';
-import {commonBlue} from '../../styles/colors';
+import {commonBlue} from '../../../shared/styles/colors';
 
 const Tab = createBottomTabNavigator<BottomTabHomeParamList>();
 

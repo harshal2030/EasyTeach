@@ -25,7 +25,7 @@ import {
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
-import {commonBlue, flatRed} from '../styles/colors';
+import {commonBlue, flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,

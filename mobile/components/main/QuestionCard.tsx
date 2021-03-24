@@ -17,7 +17,7 @@ import {ImageOrVideo} from 'react-native-image-crop-picker';
 
 import {PhotoPicker} from '../common';
 
-import {commonGrey, flatRed, greyWithAlpha} from '../../styles/colors';
+import {commonGrey, flatRed, greyWithAlpha} from '../../../shared/styles/colors';
 import {mediaUrl, questionUrl} from '../../../shared/utils/urls';
 
 interface Props {

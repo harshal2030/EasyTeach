@@ -17,8 +17,8 @@ import {
   DrawerParamList,
   RootStackParamList,
 } from '../../navigators/types';
-import {ContainerStyles} from '../../styles/styles';
-import {commonBlue, commonGrey} from '../../styles/colors';
+import {ContainerStyles} from '../../../shared/styles/styles';
+import {commonBlue, commonGrey} from '../../../shared/styles/colors';
 import {QuizRes} from '../../../shared/global/actions/quiz';
 
 type NavigationProp = CompositeNavigationProp<

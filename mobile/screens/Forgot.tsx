@@ -9,8 +9,8 @@ import ViewPager from '@react-native-community/viewpager';
 import Feather from 'react-native-vector-icons/Feather';
 
 import {RootStackParamList} from '../navigators/types';
-import {ContainerStyles} from '../styles/styles';
-import {commonBlue, commonGrey, eucalyptusGreen} from '../styles/colors';
+import {ContainerStyles} from '../../shared/styles/styles';
+import {commonBlue, commonGrey, eucalyptusGreen} from '../../shared/styles/colors';
 import {recoveryUrl} from '../../shared/utils/urls';
 
 interface Props {

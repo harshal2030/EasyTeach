@@ -23,9 +23,9 @@ import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
-import {ContainerStyles} from '../styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 import {mediaUrl, quizUrl} from '../../shared/utils/urls';
-import {commonBlue, commonGrey, greyWithAlpha} from '../styles/colors';
+import {commonBlue, commonGrey, greyWithAlpha} from '../../shared/styles/colors';
 
 interface Props {
   navigation: StackNavigationProp<RootStackParamList>;

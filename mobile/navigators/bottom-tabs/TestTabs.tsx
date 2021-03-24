@@ -5,7 +5,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 
 import {BottomTabTestParamList} from '../types';
-import {commonBlue} from '../../styles/colors';
+import {commonBlue} from '../../../shared/styles/colors';
 
 const Tab = createBottomTabNavigator<BottomTabTestParamList>();
 
