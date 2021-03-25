@@ -5,7 +5,8 @@
     "collapsable",
     "datetimepicker",
     "lightbox",
-    "padder"
+    "padder",
+    "toastify"
   ],
   "compile-hero.disable-compile-files-on-did-save-code": true
 }

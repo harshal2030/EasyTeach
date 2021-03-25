@@ -3,6 +3,9 @@ import {AppRegistry} from 'react-native';
 import {Provider} from 'react-redux';
 import {createMuiTheme} from '@material-ui/core/styles';
 import {ThemeProvider} from '@material-ui/styles';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 import App from './web/App';
 
@@ -23,6 +26,7 @@ import FA4Icon from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
 import FA5IconSolid from 'react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf';
 import FA5IconRegular from 'react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf';
 import FontAwesome from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
+import MaterialIcons from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
 
 const iconFontStyles = `@font-face {
   src: url(${iconFont});
@@ -68,6 +72,10 @@ const iconFontStyles = `@font-face {
   src: url(${FontAwesome});
   font-family: 'FontAwesome';
 }
+@font-face {
+  src: url(${MaterialIcons});
+  font-family: 'MaterialIcons';
+}
 `;
 
 // Create stylesheet
@@ -93,9 +101,12 @@ const theme = createMuiTheme({
 const Wrapper = () => {
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <App />
-      </ThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider theme={theme}>
+          <App />
+          <ToastContainer position="bottom-left" />
+        </ThemeProvider>
+      </SafeAreaProvider>
     </Provider>
   );
 };

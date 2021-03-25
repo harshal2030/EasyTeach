@@ -19,6 +19,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import AuthScreen from './screens/AuthScreen';
+import Main from './screens/Announcement';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -181,14 +182,6 @@ class App extends React.Component<Props, State> {
     );
   }
 }
-
-const Main = () => {
-  return (
-    <View>
-      <p>Hello</p>
-    </View>
-  );
-};
 
 const Home = () => {
   return (

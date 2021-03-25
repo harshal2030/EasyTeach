@@ -68,6 +68,11 @@ const ttfLoaderConf = {
   include: path.resolve(__dirname, 'node_modules/react-native-vector-icons'),
 };
 
+const cssLoader = {
+  test: /\.css$/,
+  use: ['style-loader', 'css-loader'],
+};
+
 module.exports = {
   entry: {
     app: path.join(__dirname, 'index.web.js'),
@@ -90,6 +95,7 @@ module.exports = {
       imageLoaderConfiguration,
       svgLoaderConfiguration,
       ttfLoaderConf,
+      cssLoader,
     ],
   },
   devServer: {
