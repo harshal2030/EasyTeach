@@ -2,7 +2,7 @@ import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-elements';
 import {commonBackground, commonGrey} from '../../../shared/styles/colors';
-import {Avatar} from './Avatar';
+import {Avatar} from '../../../shared/components/common';
 
 type Props = {
   avatar: string;

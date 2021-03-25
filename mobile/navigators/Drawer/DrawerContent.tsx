@@ -27,9 +27,13 @@ import {
   removeCurrentClass,
 } from '../../../shared/global/actions/classes';
 
-import {Avatar} from '../../components/common';
+import {Avatar} from '../../../shared/components/common';
 
-import {commonBackground, commonGrey, greyWithAlpha} from '../../../shared/styles/colors';
+import {
+  commonBackground,
+  commonGrey,
+  greyWithAlpha,
+} from '../../../shared/styles/colors';
 import {mediaUrl, logOutUrl} from '../../../shared/utils/urls';
 
 import {DrawerContentComponentProps} from '@react-navigation/drawer';

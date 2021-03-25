@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import {commonGrey, greyWithAlpha} from '../../../shared/styles/colors';
-import {getDateAndMonth} from '../../../shared/utils/functions';
+import {commonGrey, greyWithAlpha} from '../../styles/colors';
+import {getDateAndMonth} from '../../utils/functions';
 
 import {Avatar} from './Avatar';
 
