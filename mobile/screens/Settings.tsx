@@ -9,7 +9,8 @@ import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {HeadCom, Avatar} from '../components/common';
+import {HeadCom} from '../components/common';
+import {Avatar} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -104,8 +105,8 @@ class Settings extends React.PureComponent<Props> {
           type="outline"
           onPress={() => {
             if (isOwner) {
-              this.props.navigation.navigate('Manage');
               this.props.registerCurrentClass(item);
+              this.props.navigation.navigate('Manage');
             } else {
               this.confirmUnenroll(item.id, item.name);
             }

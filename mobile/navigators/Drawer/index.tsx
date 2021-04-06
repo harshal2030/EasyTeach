@@ -33,7 +33,11 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       drawerContent={(pprops) => <DrawerContent {...pprops} />}>
       <Drawer.Screen
         name="Home"
-        component={require('../bottom-tabs/Home').default}
+        component={require('../../screens/Announcements').default}
+      />
+      <Drawer.Screen
+        name="People"
+        component={require('../../screens/People').default}
       />
       {props.currentClass && (
         <Drawer.Screen

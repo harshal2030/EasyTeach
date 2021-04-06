@@ -45,7 +45,7 @@ type Props = {
   };
   removeCurrentClass: typeof removeCurrentClass;
   isOwner: boolean;
-  onLoginError: () => void;
+  onLogOutError: () => void;
   onClassPress: () => void;
   onPlusPress: () => void;
   onGearPress: () => void;
@@ -76,7 +76,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
-      props.onLoginError();
+      props.onLogOutError();
     }
   };
 

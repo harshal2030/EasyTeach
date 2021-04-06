@@ -29,11 +29,6 @@ type RootStackParamList = {
   };
 };
 
-type BottomTabHomeParamList = {
-  Announcements: undefined;
-  People: undefined;
-};
-
 type BottomTabTestParamList = {
   TestHome: undefined;
   TestScored: undefined;
@@ -44,12 +39,8 @@ type DrawerParamList = {
   Home: undefined;
   Test: undefined;
   Manage: undefined;
+  People: undefined;
   Settings: undefined;
 };
 
-export {
-  RootStackParamList,
-  DrawerParamList,
-  BottomTabHomeParamList,
-  BottomTabTestParamList,
-};
+export {RootStackParamList, DrawerParamList, BottomTabTestParamList};

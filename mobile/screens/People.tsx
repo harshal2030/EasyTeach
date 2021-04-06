@@ -10,29 +10,21 @@ import {
 import {Header, ListItem, Text} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
-import {Avatar} from '../components/common';
+import {Avatar} from '../../shared/components/common';
 
-import {
-  DrawerParamList,
-  RootStackParamList,
-  BottomTabHomeParamList,
-} from '../navigators/types';
+import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<BottomTabHomeParamList, 'People'>,
-  CompositeNavigationProp<
-    DrawerNavigationProp<DrawerParamList>,
-    StackNavigationProp<RootStackParamList>
-  >
+  DrawerNavigationProp<DrawerParamList, 'People'>,
+  StackNavigationProp<RootStackParamList>
 >;
 
 interface Props {

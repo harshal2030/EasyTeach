@@ -180,7 +180,7 @@ class ManageClass extends React.Component<Props, State> {
 
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
-    const {id, joinCode} = this.props.currentClass!;
+    const {joinCode} = this.props.currentClass!;
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -224,16 +224,6 @@ class ManageClass extends React.Component<Props, State> {
               label="Subject"
               disabled={loading}
               onChangeText={(text) => this.setState({subject: text})}
-            />
-            <Input
-              value={id}
-              label="Class Id"
-              disabled
-              rightIcon={{
-                name: 'content-copy',
-                type: 'material',
-                onPress: () => this.setStringToClip(id),
-              }}
             />
             <Input
               value={joinCode}

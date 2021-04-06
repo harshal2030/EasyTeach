@@ -44,4 +44,23 @@ const ContainerStyles = StyleSheet.create({
   },
 });
 
-export {FormStyles, TextStyles, ContainerStyles};
+const BottomSheetStyle = StyleSheet.create({
+  RBOptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  RBTextStyle: {
+    fontSize: 20,
+    fontWeight: '400',
+  },
+  container: {
+    borderTopWidth: 1,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    borderColor: 'transparent',
+  },
+});
+
+export {FormStyles, TextStyles, ContainerStyles, BottomSheetStyle};

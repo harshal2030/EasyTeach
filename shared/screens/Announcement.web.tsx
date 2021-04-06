@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
-
-import {MsgCard} from '../components/common';
 import Megaphone from '../images/Megaphone.svg';
 import MegaText from '../images/announcement.svg';
+
+import {MsgCard} from '../components/common';
 
 import {StoreState} from '../global';
 import {Class} from '../global/actions/classes';
