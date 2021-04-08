@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
+import Share from 'react-native-share';
 
 import {MsgCard} from '../components/common';
 import Megaphone from '../images/Megaphone.svg';
@@ -116,6 +117,17 @@ class Home extends React.Component<Props, State> {
     );
   };
 
+  shareCode = () => {
+    Share.open({
+      title: 'Join my class on EasyTeach',
+      message: `Join my class on EasyTeach, through this code: ${
+        this.props.currentClass!.joinCode
+      }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
+  };
+
   renderContent = () => {
     const {props} = this;
 
@@ -182,6 +194,18 @@ class Home extends React.Component<Props, State> {
           }}>
           <Megaphone height={200} width={200} />
           <MegaText height={50} width={200} />
+          <Text style={{padding: 5}}>
+            Open drawer by swiping or click on menu icon in header to navigate.
+          </Text>
+          {this.props.isOwner && (
+            <Button
+              title="Share Join Code"
+              type="clear"
+              icon={{name: 'share', color: commonBlue}}
+              titleStyle={{color: commonBlue}}
+              onPress={this.shareCode}
+            />
+          )}
         </ScrollView>
       );
     }

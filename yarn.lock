@@ -2894,11 +2894,6 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
-"@react-native-community/clipboard@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/clipboard/-/clipboard-1.5.1.tgz#32abb3ea2eb91ee3f9c5fb1d32d5783253c9fabe"
-  integrity sha512-AHAmrkLEH5UtPaDiRqoULERHh3oNv7Dgs0bTC0hO5Z2GdNokAMPT5w8ci8aMcRemcwbtdHjxChgtjbeA38GBdA==
-
 "@react-native-community/datetimepicker@^3.0.4":
   version "3.0.9"
   resolved "https://registry.yarnpkg.com/@react-native-community/datetimepicker/-/datetimepicker-3.0.9.tgz#14e96c0a9049d76165f77ded95251e50c596b910"
@@ -3375,6 +3370,14 @@
   version "1.5.4"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.4.tgz#15925414e0ad2cd765bfef58842f7e26a7accb24"
   integrity sha512-1HcDas8SEj4z1Wc696tH56G8OlRaH/sqZOynNNB+HF0WOeXPaxTtbYzJY2oEfiUxjSKjhCKr+MvR7dCHcEelug==
+
+"@types/react-native-share@^3.3.2":
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/@types/react-native-share/-/react-native-share-3.3.2.tgz#d2c8af2c708d93a8d8916f4c272a3e974fd4381a"
+  integrity sha512-D/kIZvafsCFBONYZ37pekeE7/b/Zs+K0mRtT05SJ0aGZjSDnPyRmazrfyOrzOOIufEBH/vXrlb3yFkmdbCkwaA==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
 
 "@types/react-native-vector-icons@^6.4.6":
   version "6.4.6"
@@ -10452,6 +10455,11 @@ react-native-screens@^2.10.1:
   version "2.17.1"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-2.17.1.tgz#c3c0ac750af48741c5b1635511e6af2a27b74309"
   integrity sha512-B4gD5e4csvlVwlhf+RNqjQZ9mHTwe/iL3rXondgZxnKz4oW0QAmtLnLRKOrYVxoaJaF9Fy7jhjo//24/472APQ==
+
+react-native-share@^5.1.7:
+  version "5.1.7"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-5.1.7.tgz#081ba94f8d31e0843e4c51aee449939ed26d5921"
+  integrity sha512-BSBh9OpzCoBozc6MfU0erq8KqnAlyrQdAGzGqoS1ugdHbBrhG4UoRiiTPN8AWNpw0gozKV7hLVw0UKEOlsCqwg==
 
 react-native-shared-element@^0.7.0:
   version "0.7.0"

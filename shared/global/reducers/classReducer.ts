@@ -10,6 +10,7 @@ import {
   updatedClassAction,
   removeClassAction,
   updateClassOwnerAction,
+  revokeCurrentClassAction,
 } from '../actions/classes';
 
 const classHasErrored = (
@@ -73,13 +74,23 @@ const classes = (state: Class[] = [], action: ClassesAction) => {
 
 const classReducer = (
   state: Class | null = null,
-  action: registerClassAction | removeCurrentClassAction,
+  action:
+    | registerClassAction
+    | removeCurrentClassAction
+    | revokeCurrentClassAction,
 ) => {
   switch (action.type) {
     case ActionTypes.registerCurrentClass:
       return action.payload;
     case ActionTypes.removeCurrentClass:
       return action.payload;
+    case ActionTypes.revokeCurrentClass:
+      const temp = action.payload;
+      if (temp.length !== 0) {
+        return temp[0];
+      }
+
+      return null;
     default:
       return state;
   }

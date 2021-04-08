@@ -14,7 +14,6 @@
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@react-native-community/async-storage": "^1.12.0",
-    "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/datetimepicker": "^3.0.4",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/push-notification-ios": "^1.8.0",
@@ -43,6 +42,7 @@
     "react-native-reanimated": "^1.13.0",
     "react-native-safe-area-context": "^3.1.7",
     "react-native-screens": "^2.10.1",
+    "react-native-share": "^5.1.7",
     "react-native-shared-element": "^0.7.0",
     "react-native-snackbar": "^2.2.3",
     "react-native-splash-screen": "^3.2.0",
@@ -65,6 +65,7 @@
     "@svgr/webpack": "^5.5.0",
     "@types/react": "^16.9.49",
     "@types/react-native": "^0.63.18",
+    "@types/react-native-share": "^3.3.2",
     "@types/react-native-vector-icons": "^6.4.6",
     "@types/react-native-version-check": "^3.4.1",
     "@types/react-redux": "^7.1.9",

@@ -17,7 +17,7 @@ interface Props {
   onButtonPress(): any;
   buttonLoading?: boolean;
   buttonProps?: ButtonProps;
-  children?: JSX.Element[] | JSX.Element;
+  children?: JSX.Element[] | JSX.Element | null | boolean;
 }
 
 const CommonSetting = (props: Props) => {

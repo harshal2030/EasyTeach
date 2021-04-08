@@ -96,6 +96,8 @@ const People = (props: Props) => {
           SnackBar.show({
             text: `Unable to remove ${name} at the moment`,
             duration: SnackBar.LENGTH_SHORT,
+            backgroundColor: flatRed,
+            textColor: '#fff',
           }),
         );
     };

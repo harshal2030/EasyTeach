@@ -1,17 +1,25 @@
 import React from 'react';
 import axios from 'axios';
-import {View, ScrollView, Platform, Alert} from 'react-native';
-import {Header, Input} from 'react-native-elements';
+import {
+  View,
+  ScrollView,
+  Platform,
+  Alert,
+  ImageBackground,
+  TouchableOpacity,
+} from 'react-native';
+import FastImage from 'react-native-fast-image';
+import {Header, Input, Button} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import {ImageOrVideo} from 'react-native-image-crop-picker';
-import ClipBoard from '@react-native-community/clipboard';
 import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import Share from 'react-native-share';
+import MI from 'react-native-vector-icons/MaterialIcons';
 
-import {CommonSetting} from '../components/main';
 import {CheckBox, PhotoPicker} from '../components/common';
 
 import {StoreState} from '../../shared/global';
@@ -20,10 +28,12 @@ import {
   updateClasses,
   registerCurrentClass,
   removeClass,
+  revokeCurrentClass,
 } from '../../shared/global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
-import {ContainerStyles} from '../../shared/styles/styles';
-import {mediaUrl, classUrl} from '../../shared/utils/urls';
+import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
+import {mediaUrl, classUrl, studentUrl} from '../../shared/utils/urls';
+import {flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -37,6 +47,14 @@ interface Props {
   updateClasses: typeof updateClasses;
   registerCurrentClass: typeof registerCurrentClass;
   removeClass: typeof removeClass;
+  revokeCurrentClass: typeof revokeCurrentClass;
+  isOwner: boolean;
+  profile: {
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  classes: Class[];
 }
 
 interface State {
@@ -94,14 +112,6 @@ class ManageClass extends React.Component<Props, State> {
     }
   }
 
-  setStringToClip = (text: string) => {
-    ClipBoard.setString(text);
-    SnackBar.show({
-      text: 'Copied to ClipBoard',
-      duration: SnackBar.LENGTH_SHORT,
-    });
-  };
-
   onImage = (image: ImageOrVideo) => {
     this.sheet!.close();
     this.setState({
@@ -118,6 +128,54 @@ class ManageClass extends React.Component<Props, State> {
       duration: SnackBar.LENGTH_SHORT,
     });
     this.sheet!.close();
+  };
+
+  unEnroll = () => {
+    const removeFromClass = () => {
+      this.setState({loading: true});
+      axios
+        .delete(
+          `${studentUrl}/${this.props.profile.username}/${
+            this.props.currentClass!.id
+          }`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.props.token}`,
+            },
+          },
+        )
+        .then(() => {
+          this.setState({loading: false});
+          this.props.removeClass(this.props.currentClass!.id);
+          this.props.navigation.navigate('Home');
+          this.props.revokeCurrentClass(this.props.classes);
+        })
+        .catch(() => {
+          this.setState({loading: false});
+          SnackBar.show({
+            text: 'Unable to unenroll at the moment. Please try again later',
+            duration: SnackBar.LENGTH_LONG,
+            textColor: '#fff',
+            backgroundColor: flatRed,
+          });
+        });
+    };
+
+    Alert.alert(
+      'Confirm',
+      `Are you sure to unenroll from ${
+        this.props.currentClass!.name
+      }? You won't have access to this class.`,
+      [
+        {
+          text: 'Cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: removeFromClass,
+        },
+      ],
+    );
   };
 
   updateClass = () => {
@@ -178,14 +236,26 @@ class ManageClass extends React.Component<Props, State> {
       });
   };
 
+  shareCode = () => {
+    Share.open({
+      title: 'Join my class on EasyTeach',
+      message: `Join my class on EasyTeach, through this code: ${
+        this.props.currentClass!.joinCode
+      }, Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
+  };
+
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
     const {joinCode} = this.props.currentClass!;
+    const {isOwner} = this.props;
     return (
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: 'Manage',
+            text: this.props.isOwner ? 'Manage' : 'Info',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -197,24 +267,34 @@ class ManageClass extends React.Component<Props, State> {
         />
 
         <ScrollView keyboardShouldPersistTaps="handled">
-          <CommonSetting
-            buttonProps={{title: 'Save', containerStyle: {marginVertical: 15}}}
-            imageSource={{
-              uri: photo.uri,
-            }}
-            buttonLoading={loading}
-            onButtonPress={this.updateClass}
-            onImagePress={() => this.sheet!.open()}>
+          <View style={{padding: 20}}>
+            {isOwner ? (
+              <ImageBackground
+                style={ImageStyles.classImage}
+                source={{uri: photo.uri}}>
+                <TouchableOpacity
+                  style={ImageStyles.imageOverlay}
+                  onPress={() => this.sheet!.open()}>
+                  <MI name="camera-alt" color="#000" size={28} />
+                </TouchableOpacity>
+              </ImageBackground>
+            ) : (
+              <FastImage
+                style={ImageStyles.classImage}
+                source={{uri: photo.uri}}
+              />
+            )}
+
             <Input
               value={name}
-              disabled={loading}
+              disabled={loading || !isOwner}
               label="Name"
               onChangeText={(text) => this.setState({name: text})}
             />
             <Input
               value={about}
               label="About"
-              disabled={loading}
+              disabled={loading || !isOwner}
               numberOfLines={3}
               multiline
               onChangeText={(text) => this.setState({about: text})}
@@ -222,26 +302,47 @@ class ManageClass extends React.Component<Props, State> {
             <Input
               value={subject}
               label="Subject"
-              disabled={loading}
+              disabled={loading || !isOwner}
               onChangeText={(text) => this.setState({subject: text})}
             />
-            <Input
-              value={joinCode}
-              label="Join Code"
-              rightIcon={{
-                name: 'content-copy',
-                type: 'material',
-                onPress: () => this.setStringToClip(joinCode),
-              }}
-              disabled
-            />
-            <CheckBox
-              checked={lockJoin}
-              title="Lock Join"
-              onPress={() => this.setState({lockJoin: !lockJoin})}
-              desc="Enabling this would not allow anyone to join the class."
-            />
-          </CommonSetting>
+            {isOwner && (
+              <>
+                <Input
+                  value={joinCode}
+                  label="Join Code"
+                  rightIcon={{
+                    name: 'share',
+                    type: 'material',
+                    onPress: this.shareCode,
+                  }}
+                  disabled
+                />
+                <CheckBox
+                  checked={lockJoin}
+                  title="Lock Join"
+                  onPress={() => this.setState({lockJoin: !lockJoin})}
+                  desc="Enabling this will not allow anyone to join the class."
+                />
+              </>
+            )}
+
+            {isOwner ? (
+              <Button
+                title="Save"
+                onPress={this.updateClass}
+                loading={loading}
+                containerStyle={{marginTop: 20}}
+              />
+            ) : (
+              <Button
+                title="Unenroll"
+                loading={loading}
+                buttonStyle={{backgroundColor: flatRed}}
+                onPress={this.unEnroll}
+                containerStyle={{marginTop: 20}}
+              />
+            )}
+          </View>
         </ScrollView>
 
         <PhotoPicker
@@ -257,9 +358,16 @@ class ManageClass extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: StoreState) => {
+  let isOwner = false;
+  if (state.currentClass!.owner.username === state.profile.username) {
+    isOwner = true;
+  }
   return {
     currentClass: state.currentClass,
     token: state.token,
+    isOwner,
+    profile: state.profile,
+    classes: state.classes,
   };
 };
 
@@ -267,4 +375,5 @@ export default connect(mapStateToProps, {
   updateClasses,
   registerCurrentClass,
   removeClass,
+  revokeCurrentClass,
 })(ManageClass);

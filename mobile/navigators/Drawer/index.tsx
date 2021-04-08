@@ -17,7 +17,6 @@ type Props = {
     username: string;
     avatar: string;
   };
-  isOwner: boolean;
 };
 
 const DrawerNavigator = (props: Props): JSX.Element => {
@@ -45,7 +44,7 @@ const DrawerNavigator = (props: Props): JSX.Element => {
           component={require('../bottom-tabs/TestTabs').default}
         />
       )}
-      {props.isOwner && (
+      {props.currentClass && (
         <Drawer.Screen
           name="Manage"
           component={require('../../screens/ManageClass').default}
@@ -60,14 +59,9 @@ const DrawerNavigator = (props: Props): JSX.Element => {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  let isOwner: boolean = false;
-  if (state.currentClass) {
-    isOwner = state.currentClass.owner.username === state.profile.username;
-  }
   return {
     currentClass: state.currentClass,
     profile: state.profile,
-    isOwner,
   };
 };
 

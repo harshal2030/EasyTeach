@@ -14,6 +14,7 @@ enum ActionTypes {
   updateClass = 'update_class',
   removeClass = 'remove_class',
   updateClassOwner = 'update_class_owner',
+  revokeCurrentClass = 'revoke_current_class',
 }
 
 interface Class {
@@ -83,6 +84,11 @@ interface updateClassOwnerAction {
     };
     oldUsername: string;
   };
+}
+
+interface revokeCurrentClassAction {
+  type: ActionTypes.revokeCurrentClass;
+  payload: Class[];
 }
 
 // for getting list of classes enrolled by user or owned
@@ -178,6 +184,13 @@ const updateClassOwner = (
   };
 };
 
+const revokeCurrentClass = (classes: Class[]): revokeCurrentClassAction => {
+  return {
+    type: ActionTypes.revokeCurrentClass,
+    payload: classes,
+  };
+};
+
 export {
   Class,
   registerClassAction,
@@ -197,4 +210,6 @@ export {
   updatedClassAction,
   updateClassOwner,
   updateClassOwnerAction,
+  revokeCurrentClassAction,
+  revokeCurrentClass,
 };

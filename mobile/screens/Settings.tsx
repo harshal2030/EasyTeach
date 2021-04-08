@@ -1,28 +1,22 @@
 import React from 'react';
-import axios from 'axios';
-import {View, FlatList, ActivityIndicator, Alert} from 'react-native';
+import {View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem, Button, Text} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {connect} from 'react-redux';
-import SnackBar from 'react-native-snackbar';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {HeadCom} from '../components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
-import {
-  Class,
-  removeClass,
-  registerCurrentClass,
-} from '../../shared/global/actions/classes';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
-import {mediaUrl, studentUrl} from '../../shared/utils/urls';
+import {mediaUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
-import {flatRed, commonBlue, commonGrey} from '../../shared/styles/colors';
+import {commonBlue, commonGrey} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Settings'>,
@@ -41,7 +35,6 @@ type Props = {
   classIsLoading: boolean;
   classHasErrored: boolean;
   currentClass: Class | null;
-  removeClass: typeof removeClass;
   registerCurrentClass: typeof registerCurrentClass;
 };
 
@@ -49,41 +42,6 @@ class Settings extends React.PureComponent<Props> {
   constructor(props: Props) {
     super(props);
   }
-
-  unEnrollClass = (classId: string, className: string) => {
-    axios
-      .delete(`${studentUrl}/${this.props.profile.username}/${classId}`, {
-        headers: {
-          Authorization: `Bearer ${this.props.token}`,
-        },
-      })
-      .then(() => {
-        this.props.removeClass(classId);
-        SnackBar.show({
-          text: `You've Unenrolled from ${className} successfully`,
-          duration: SnackBar.LENGTH_SHORT,
-        });
-      })
-      .catch(() => {
-        SnackBar.show({
-          text: "Can't Unenroll from class. Please try again later",
-          backgroundColor: flatRed,
-          textColor: '#fff',
-        });
-      });
-  };
-
-  confirmUnenroll = (classId: string, className: string) => {
-    Alert.alert('Confirm', `Are you sure to Unenroll from ${className}`, [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: () => this.unEnrollClass(classId, className),
-      },
-    ]);
-  };
 
   renderItem = ({item}: {item: Class}) => {
     const isOwner = item.owner.username === this.props.profile.username;
@@ -101,18 +59,12 @@ class Settings extends React.PureComponent<Props> {
         </ListItem.Content>
 
         <Button
-          title={isOwner ? 'Manage' : 'Unenroll'}
+          title={isOwner ? 'Manage' : 'Info'}
           type="outline"
           onPress={() => {
-            if (isOwner) {
-              this.props.registerCurrentClass(item);
-              this.props.navigation.navigate('Manage');
-            } else {
-              this.confirmUnenroll(item.id, item.name);
-            }
+            this.props.registerCurrentClass(item);
+            this.props.navigation.navigate('Manage');
           }}
-          buttonStyle={{borderColor: isOwner ? commonBlue : flatRed}}
-          titleStyle={{color: isOwner ? commonBlue : flatRed}}
         />
       </ListItem>
     );
@@ -209,6 +161,4 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {removeClass, registerCurrentClass})(
-  Settings,
-);
+export default connect(mapStateToProps, {registerCurrentClass})(Settings);

@@ -1,5 +1,5 @@
 import {StyleSheet} from 'react-native';
-import {commonBackground, commonGrey} from './colors';
+import {commonBackground, commonGrey, greyWithAlpha} from './colors';
 
 const FormStyles = StyleSheet.create({
   formContainerStyle: {
@@ -63,4 +63,25 @@ const BottomSheetStyle = StyleSheet.create({
   },
 });
 
-export {FormStyles, TextStyles, ContainerStyles, BottomSheetStyle};
+const ImageStyles = StyleSheet.create({
+  classImage: {
+    height: 100,
+    width: 100,
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: 'transparent',
+    overflow: 'hidden',
+    alignSelf: 'center',
+  },
+  imageOverlay: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: greyWithAlpha(0.3),
+  },
+});
+
+export {FormStyles, TextStyles, ContainerStyles, BottomSheetStyle, ImageStyles};
