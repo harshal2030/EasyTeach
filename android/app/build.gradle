@@ -147,8 +147,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 25
-        versionName "1.6.7"
+        versionCode 29
+        versionName "1.6.9"
     }
     signingConfigs {
         release {

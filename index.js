@@ -4,6 +4,7 @@
 import React from 'react';
 import 'react-native-gesture-handler';
 import {AppRegistry} from 'react-native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import App from './mobile/App';
 import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
@@ -58,9 +59,11 @@ PushNotification.configure({
 const Wrapper = () => {
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <App />
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <App />
+        </NavigationContainer>
+      </SafeAreaProvider>
     </Provider>
   );
 };

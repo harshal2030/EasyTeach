@@ -1,6 +1,7 @@
 import React from 'react';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {View, Text, Pressable, StyleSheet, SectionList} from 'react-native';
 import Modal from 'react-native-modal';
+import {Header} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
@@ -8,7 +9,7 @@ import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
 import {connect} from 'react-redux';
 
 import {Card} from '../components/common';
-import {CommonTest, QuizInfo} from '../components/main';
+import {QuizInfo} from '../components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -35,6 +36,8 @@ interface Props {
   quizErrored: boolean;
   quizLoading: boolean;
   quizzes: QuizRes[];
+  expired: QuizRes[];
+  scored: QuizRes[];
   fetchQuiz(token: string, classId: string, quizType?: string): void;
   isOwner: boolean;
 }
@@ -61,6 +64,16 @@ class Test extends React.Component<Props, State> {
   componentDidMount() {
     if (this.props.currentClass) {
       this.fetchQuiz();
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass!.id,
+        'expired',
+      );
+      this.props.fetchQuiz(
+        this.props.token!,
+        this.props.currentClass!.id,
+        'scored',
+      );
     }
   }
 
@@ -70,7 +83,7 @@ class Test extends React.Component<Props, State> {
     }
   }
 
-  renderItem = ({item}: {item: QuizRes}) => {
+  renderItem = ({item, section}: {item: QuizRes; section: {title: string}}) => {
     return (
       <Card
         title={item.title}
@@ -106,24 +119,49 @@ class Test extends React.Component<Props, State> {
   };
 
   render() {
-    const {navigation, isOwner, quizLoading, quizErrored, quizzes} = this.props;
+    const {
+      navigation,
+      isOwner,
+      quizLoading,
+      quizErrored,
+      quizzes,
+      expired,
+      scored,
+    } = this.props;
+    const data = [
+      {
+        title: 'Live',
+        data: quizzes,
+      },
+      {
+        title: 'Expired',
+        data: expired,
+      },
+      {
+        title: 'Scored',
+        data: scored,
+      },
+    ];
 
     return (
       <>
-        <CommonTest
-          navigation={navigation}
-          dataLoading={quizLoading}
-          dataErrored={quizErrored}
-          data={quizzes}
-          onRefreshPress={this.fetchQuiz}
-          headerText="Live"
+        <Header
+          centerComponent={{
+            text: 'Tests',
+            style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
+          }}
+          leftComponent={{icon: 'menu', color: '#ffff', size: 26}}
+        />
+        <SectionList
+          sections={data}
           renderItem={this.renderItem}
-          isOwner={this.props.isOwner}
+          keyExtractor={(item) => item.quizId}
+          renderSectionHeader={({section: {title}}) => <Text>{title}</Text>}
         />
         {isOwner && (
           <View style={styles.footerTextContainer}>
             <Text style={styles.footerText}>
-              Scheduled tests are also shown here for owners
+              Scheduled tests are shown under live for owners
             </Text>
           </View>
         )}
@@ -191,6 +229,8 @@ const mapStateToProps = (state: StoreState) => {
     quizLoading: state.quizLoading.live,
     quizErrored: state.quizErrored.live,
     quizzes: state.quizzes.live,
+    expired: state.quizzes.expired,
+    scored: state.quizzes.scored,
     isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
