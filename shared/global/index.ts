@@ -23,16 +23,8 @@ export interface StoreState {
   classes: Class[];
   classIsLoading: boolean;
   classHasErrored: boolean;
-  quizErrored: {
-    live: boolean;
-    expired: boolean;
-    scored: boolean;
-  };
-  quizLoading: {
-    live: boolean;
-    expired: boolean;
-    scored: boolean;
-  };
+  quizErrored: boolean;
+  quizLoading: boolean;
   quizzes: {
     live: QuizRes[];
     expired: QuizRes[];

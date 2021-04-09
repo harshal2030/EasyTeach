@@ -8,76 +8,25 @@ import {
   QuizRes,
 } from '../actions/quiz';
 
-type quizErroredState = {
-  live: boolean;
-  expired: boolean;
-  scored: boolean;
-};
-
 const quizErrored = (
-  state: quizErroredState = {
-    live: false,
-    expired: false,
-    scored: false,
-  },
+  state: boolean = false,
   action: quizErroredAction,
-): quizErroredState => {
-  const {live, expired, scored} = state;
+): boolean => {
   switch (action.type) {
-    case ActionTypes.quizExpiredErrored:
-      return {
-        live,
-        expired: action.payload,
-        scored,
-      };
-    case ActionTypes.quizLiveErrored:
-      return {
-        live: action.payload,
-        expired,
-        scored,
-      };
-    case ActionTypes.quizScoredErrored:
-      return {
-        live,
-        expired,
-        scored: action.payload,
-      };
+    case ActionTypes.quizErrored:
+      return action.payload;
     default:
       return state;
   }
 };
 
-type quizLoadingState = {
-  live: boolean;
-  expired: boolean;
-  scored: boolean;
-};
-
 const quizLoading = (
-  state: quizLoadingState = {live: true, expired: true, scored: true},
+  state: boolean = true,
   action: quizLoadingAction,
-): quizLoadingState => {
-  const {live, expired, scored} = state;
-
+): boolean => {
   switch (action.type) {
-    case ActionTypes.quizLiveLoading:
-      return {
-        live: action.payload,
-        expired,
-        scored,
-      };
-    case ActionTypes.quizExpiredLoading:
-      return {
-        live,
-        expired: action.payload,
-        scored,
-      };
-    case ActionTypes.quizScoredLoading:
-      return {
-        live,
-        expired,
-        scored: action.payload,
-      };
+    case ActionTypes.quizLoading:
+      return action.payload;
     default:
       return state;
   }
@@ -95,27 +44,9 @@ const quizzes = (
   state: quizState = {live: [], expired: [], scored: []},
   action: quizAction,
 ): quizState => {
-  const {live, expired, scored} = state;
-
   switch (action.type) {
-    case ActionTypes.quizFetchedLive:
-      return {
-        live: action.payload,
-        expired,
-        scored,
-      };
-    case ActionTypes.quizFetchedExpired:
-      return {
-        live,
-        expired: action.payload,
-        scored,
-      };
-    case ActionTypes.quizFetchedScored:
-      return {
-        live,
-        expired,
-        scored: action.payload,
-      };
+    case ActionTypes.quizFetched:
+      return action.payload;
     case ActionTypes.addQuiz:
       const stop = new Date(action.payload.timePeriod[1].value).getTime();
       const now = Date.now();
@@ -134,7 +65,7 @@ const quizzes = (
       return {
         live: liveQuiz,
         expired: expiredQuiz,
-        scored,
+        scored: state.scored,
       };
     case ActionTypes.removeQuiz:
       const liveQ = state.live.filter((quiz) => quiz.quizId !== action.payload);

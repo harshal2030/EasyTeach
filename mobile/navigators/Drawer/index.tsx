@@ -41,7 +41,7 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       {props.currentClass && (
         <Drawer.Screen
           name="Test"
-          component={require('../bottom-tabs/TestTabs').default}
+          component={require('../../screens/Test').default}
         />
       )}
       {props.currentClass && (

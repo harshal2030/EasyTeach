@@ -4,15 +4,9 @@ import axios from 'axios';
 import {quizUrl} from '../../utils/urls';
 
 enum ActionTypes {
-  quizLiveErrored = 'quiz_live_errored',
-  quizLiveLoading = 'quiz_live_loading',
-  quizExpiredErrored = 'quiz_expired_errored',
-  quizExpiredLoading = 'quiz_expired_loading',
-  quizScoredErrored = 'quiz_scored_errored',
-  quizScoredLoading = 'quiz_scored_loading',
-  quizFetchedLive = 'live',
-  quizFetchedExpired = 'expired',
-  quizFetchedScored = 'scored',
+  quizFetched = 'quiz_fetched',
+  quizErrored = 'quiz_errored',
+  quizLoading = 'quiz_loading',
   removeQuiz = 'remove_quiz',
   addQuiz = 'add_quiz',
 }
@@ -33,6 +27,12 @@ interface QuizRes {
   randomQue: boolean;
 }
 
+interface ObQuizRes {
+  live: QuizRes[];
+  expired: QuizRes[];
+  scored: QuizRes[];
+}
+
 interface Result {
   correct: number;
   incorrect: number;
@@ -43,27 +43,18 @@ interface Result {
 }
 
 interface quizErroredAction {
-  type:
-    | ActionTypes.quizLiveErrored
-    | ActionTypes.quizExpiredErrored
-    | ActionTypes.quizScoredErrored;
+  type: ActionTypes.quizErrored;
   payload: boolean;
 }
 
 interface quizLoadingAction {
-  type:
-    | ActionTypes.quizLiveLoading
-    | ActionTypes.quizExpiredLoading
-    | ActionTypes.quizScoredLoading;
+  type: ActionTypes.quizLoading;
   payload: boolean;
 }
 
 interface quizFetchedAction {
-  type:
-    | ActionTypes.quizFetchedLive
-    | ActionTypes.quizFetchedExpired
-    | ActionTypes.quizFetchedScored;
-  payload: QuizRes[];
+  type: ActionTypes.quizFetched;
+  payload: ObQuizRes;
 }
 
 interface quizAddedAction {
@@ -76,75 +67,44 @@ interface quizRemoveAction {
   payload: string;
 }
 
-const quizHasErrored = (
-  errored: boolean,
-  type:
-    | ActionTypes.quizLiveErrored
-    | ActionTypes.quizExpiredErrored
-    | ActionTypes.quizScoredErrored,
-): quizErroredAction => {
+const quizHasErrored = (errored: boolean): quizErroredAction => {
   return {
-    type,
+    type: ActionTypes.quizErrored,
     payload: errored,
   };
 };
 
-const quizIsLoading = (
-  loading: boolean,
-  type:
-    | ActionTypes.quizLiveLoading
-    | ActionTypes.quizExpiredLoading
-    | ActionTypes.quizScoredLoading,
-): quizLoadingAction => {
+const quizIsLoading = (loading: boolean): quizLoadingAction => {
   return {
-    type,
+    type: ActionTypes.quizLoading,
     payload: loading,
   };
 };
 
-const quizFetched = (
-  quiz: QuizRes[],
-  type:
-    | ActionTypes.quizFetchedLive
-    | ActionTypes.quizFetchedExpired
-    | ActionTypes.quizFetchedScored,
-): quizFetchedAction => {
+const quizFetched = (quiz: ObQuizRes): quizFetchedAction => {
   return {
-    type,
+    type: ActionTypes.quizFetched,
     payload: quiz,
   };
 };
 
-const fetchQuiz = (
-  token: string,
-  classId: string,
-  quizType:
-    | ActionTypes.quizFetchedLive
-    | ActionTypes.quizFetchedExpired
-    | ActionTypes.quizFetchedScored = ActionTypes.quizFetchedLive,
-) => {
+const fetchQuiz = (token: string, classId: string) => {
   return async (dispatch: Dispatch) => {
     try {
-      // @ts-ignore
-      dispatch(quizIsLoading(true, `quiz_${quizType}_loading`));
-      const res = await axios.get<{[fieldName: string]: QuizRes[]}>(
-        `${quizUrl}/${classId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            return: quizType,
-          },
+      dispatch(quizIsLoading(true));
+      const res = await axios.get<ObQuizRes>(`${quizUrl}/${classId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+        params: {
+          return: 'live,expired,scored',
+        },
+      });
 
-      // @ts-ignore
-      dispatch(quizIsLoading(false, `quiz_${quizType}_loading`));
-      dispatch(quizFetched(res.data[quizType], quizType));
+      dispatch(quizIsLoading(false));
+      dispatch(quizFetched(res.data));
     } catch (e) {
-      // @ts-ignore
-      dispatch(quizHasErrored(true, `quiz_${quizType}_errored`));
+      dispatch(quizHasErrored(true));
     }
   };
 };
@@ -163,16 +123,15 @@ const removeQuiz = (quizId: string): quizRemoveAction => {
   };
 };
 
-export {
-  QuizRes,
-  ActionTypes,
-  fetchQuiz,
-  addQuiz,
-  removeQuiz,
+export {fetchQuiz, addQuiz, removeQuiz, ActionTypes};
+
+export type {
   quizRemoveAction,
   quizAddedAction,
   quizErroredAction,
   quizFetchedAction,
   quizLoadingAction,
   Result,
+  QuizRes,
+  ObQuizRes,
 };

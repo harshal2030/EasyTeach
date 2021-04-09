@@ -1,32 +1,41 @@
 import React from 'react';
-import {View, Text, Pressable, StyleSheet, SectionList} from 'react-native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  SectionList,
+  ActivityIndicator,
+} from 'react-native';
 import Modal from 'react-native-modal';
-import {Header} from 'react-native-elements';
+import {Header, Button} from 'react-native-elements';
+import Octicons from 'react-native-vector-icons/Octicons';
+import {connect} from 'react-redux';
+import SnackBar from 'react-native-snackbar';
+import DocumentPicker from 'react-native-document-picker';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
-import {connect} from 'react-redux';
 
 import {Card} from '../components/common';
-import {QuizInfo} from '../components/main';
+import {QuizInfo, ImportExcel} from '../components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
-import {QuizRes, fetchQuiz} from '../../shared/global/actions/quiz';
+import {QuizRes, fetchQuiz, ObQuizRes} from '../../shared/global/actions/quiz';
+import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {
-  RootStackParamList,
-  DrawerParamList,
-  BottomTabTestParamList,
-} from '../navigators/types';
-import {commonBackground, greyWithAlpha} from '../../shared/styles/colors';
+  commonBackground,
+  commonBlue,
+  flatRed,
+  greyWithAlpha,
+  commonGrey,
+} from '../../shared/styles/colors';
+import {ContainerStyles} from '../../shared/styles/styles';
 
 type NavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<BottomTabTestParamList, 'TestHome'>,
-  CompositeNavigationProp<
-    DrawerNavigationProp<DrawerParamList>,
-    StackNavigationProp<RootStackParamList>
-  >
+  DrawerNavigationProp<DrawerParamList, 'Test'>,
+  StackNavigationProp<RootStackParamList>
 >;
 
 interface Props {
@@ -35,9 +44,7 @@ interface Props {
   currentClass: Class | null;
   quizErrored: boolean;
   quizLoading: boolean;
-  quizzes: QuizRes[];
-  expired: QuizRes[];
-  scored: QuizRes[];
+  quizzes: ObQuizRes;
   fetchQuiz(token: string, classId: string, quizType?: string): void;
   isOwner: boolean;
 }
@@ -45,6 +52,7 @@ interface Props {
 interface State {
   modalVisible: boolean;
   quiz: QuizRes | null;
+  excelModal: boolean;
 }
 
 class Test extends React.Component<Props, State> {
@@ -54,6 +62,7 @@ class Test extends React.Component<Props, State> {
     this.state = {
       modalVisible: false,
       quiz: null,
+      excelModal: false,
     };
   }
 
@@ -64,16 +73,6 @@ class Test extends React.Component<Props, State> {
   componentDidMount() {
     if (this.props.currentClass) {
       this.fetchQuiz();
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass!.id,
-        'expired',
-      );
-      this.props.fetchQuiz(
-        this.props.token!,
-        this.props.currentClass!.id,
-        'scored',
-      );
     }
   }
 
@@ -83,12 +82,64 @@ class Test extends React.Component<Props, State> {
     }
   }
 
-  renderItem = ({item, section}: {item: QuizRes; section: {title: string}}) => {
+  onCardPress = (title: string, quiz: QuizRes) => {
+    if (title === 'Live') {
+      this.setState({modalVisible: true, quiz});
+    }
+
+    if (title === 'Expired') {
+      SnackBar.show({
+        text: 'This test has expired',
+        backgroundColor: flatRed,
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    if (title === 'Scored') {
+      this.props.navigation.navigate('ShowScore', {
+        quizId: quiz.quizId,
+        title: quiz.title,
+        questions: quiz.questions,
+      });
+    }
+  };
+
+  ImportSheet = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
+      });
+
+      this.setState({excelModal: false});
+      this.props.navigation.navigate('CreateTest', {
+        file: {
+          name: res.name,
+          type: res.type,
+          uri: res.uri,
+        },
+      });
+    } catch (e) {
+      if (!DocumentPicker.isCancel(e)) {
+        SnackBar.show({
+          text: 'Unable to get the sheet.',
+          duration: SnackBar.LENGTH_SHORT,
+        });
+      }
+    }
+  };
+
+  renderItem = ({
+    item,
+    section: {title},
+  }: {
+    item: QuizRes;
+    section: {title: string};
+  }) => {
     return (
       <Card
         title={item.title}
         containerStyle={{margin: 10}}
-        onPress={() => this.setState({modalVisible: true, quiz: item})}
+        onPress={() => this.onCardPress(title, item)}
         expiresOn={new Date(item.timePeriod[1].value)}
         collapseComponent={
           this.props.isOwner ? (
@@ -118,47 +169,94 @@ class Test extends React.Component<Props, State> {
     );
   };
 
-  render() {
-    const {
-      navigation,
-      isOwner,
-      quizLoading,
-      quizErrored,
-      quizzes,
-      expired,
-      scored,
-    } = this.props;
+  renderSectionHeader = ({
+    section: {title, data},
+  }: {
+    section: {title: string; data: QuizRes[]};
+  }) => {
+    if (data.length !== 0) {
+      return <Text style={styles.sectionHeader}>{title}</Text>;
+    }
+
+    return null;
+  };
+
+  renderContent = () => {
+    const {quizLoading, quizErrored, quizzes} = this.props;
     const data = [
       {
         title: 'Live',
-        data: quizzes,
+        data: quizzes.live,
       },
       {
         title: 'Expired',
-        data: expired,
+        data: quizzes.expired,
       },
       {
         title: 'Scored',
-        data: scored,
+        data: quizzes.scored,
       },
     ];
 
+    if (quizErrored) {
+      return (
+        <View style={ContainerStyles.centerElements}>
+          <Text style={{padding: 10}}>
+            We're having trouble in fetching test. Please try again later.
+          </Text>
+        </View>
+      );
+    }
+
+    if (quizLoading) {
+      return (
+        <View style={ContainerStyles.centerElements}>
+          <ActivityIndicator animating size="large" color={commonBlue} />
+        </View>
+      );
+    }
+
+    if (
+      quizzes.live.length === 0 &&
+      quizzes.expired.length === 0 &&
+      quizzes.scored.length === 0
+    ) {
+      return (
+        <View style={ContainerStyles.centerElements}>
+          <Text>Nothing to show here right now</Text>
+        </View>
+      );
+    }
+
     return (
-      <>
+      <SectionList
+        sections={data}
+        renderItem={this.renderItem}
+        keyExtractor={(item) => item.quizId}
+        renderSectionHeader={this.renderSectionHeader}
+        style={{marginBottom: 30, paddingBottom: 30}}
+        stickySectionHeadersEnabled
+      />
+    );
+  };
+
+  render() {
+    return (
+      <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
         <Header
           centerComponent={{
             text: 'Tests',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{icon: 'menu', color: '#ffff', size: 26}}
+          leftComponent={{
+            icon: 'menu',
+            color: '#ffff',
+            size: 26,
+            onPress: () => this.props.navigation.openDrawer(),
+          }}
         />
-        <SectionList
-          sections={data}
-          renderItem={this.renderItem}
-          keyExtractor={(item) => item.quizId}
-          renderSectionHeader={({section: {title}}) => <Text>{title}</Text>}
-        />
-        {isOwner && (
+        {this.renderContent()}
+        {this.props.isOwner && (
           <View style={styles.footerTextContainer}>
             <Text style={styles.footerText}>
               Scheduled tests are shown under live for owners
@@ -166,6 +264,15 @@ class Test extends React.Component<Props, State> {
           </View>
         )}
 
+        {this.props.isOwner && (
+          <Button
+            icon={<Octicons name="plus" size={26} color={commonBlue} />}
+            containerStyle={styles.FABContainer}
+            // eslint-disable-next-line react-native/no-inline-styles
+            buttonStyle={{backgroundColor: '#ffff'}}
+            onPress={() => this.setState({excelModal: true})}
+          />
+        )}
         <Modal
           isVisible={this.state.modalVisible}
           style={styles.modalStyle}
@@ -183,7 +290,21 @@ class Test extends React.Component<Props, State> {
             onBackPress={() => this.setState({modalVisible: false})}
           />
         </Modal>
-      </>
+
+        <Modal
+          isVisible={this.state.excelModal}
+          animationIn="slideInLeft"
+          animationOut="slideOutLeft"
+          hideModalContentWhileAnimating
+          onBackButtonPress={() => this.setState({excelModal: false})}
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{margin: 0}}>
+          <ImportExcel
+            onBackPress={() => this.setState({excelModal: false})}
+            onImportPress={this.ImportSheet}
+          />
+        </Modal>
+      </View>
     );
   }
 }
@@ -212,6 +333,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: commonBackground,
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
   },
   footerText: {
     fontSize: 16,
@@ -220,17 +344,45 @@ const styles = StyleSheet.create({
   modalStyle: {
     margin: 0,
   },
+  FABContainer: {
+    position: 'absolute',
+    height: 60,
+    width: 60,
+    bottom: 50,
+    right: 20,
+    padding: 10,
+    backgroundColor: '#ffff',
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: commonGrey,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+  },
+  sectionHeader: {
+    fontSize: 23,
+    padding: 5,
+    fontWeight: '600',
+    backgroundColor: '#fff',
+    borderBottomWidth: 2,
+    borderBottomColor: commonGrey,
+  },
 });
 
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    quizLoading: state.quizLoading.live,
-    quizErrored: state.quizErrored.live,
-    quizzes: state.quizzes.live,
-    expired: state.quizzes.expired,
-    scored: state.quizzes.scored,
+    quizLoading: state.quizLoading,
+    quizErrored: state.quizErrored,
+    quizzes: state.quizzes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
