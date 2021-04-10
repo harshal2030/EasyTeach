@@ -35,6 +35,7 @@ type DrawerParamList = {
   Manage: undefined;
   People: undefined;
   Settings: undefined;
+  Modules: undefined;
 };
 
 export {RootStackParamList, DrawerParamList};

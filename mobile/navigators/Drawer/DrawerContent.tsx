@@ -18,6 +18,7 @@ import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MI from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../../../shared/global';
 import {removeToken} from '../../../shared/global/actions/token';
@@ -240,6 +241,13 @@ const DrawerContent = (props: Props): JSX.Element => {
                   onPress={() => props.navigation.navigate('Test')}>
                   <Octicons name="checklist" color="#34495e" size={25} />
                   <Text style={optionText}> Tests</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => props.navigation.navigate('Modules')}>
+                  <MI name="view-module" color="#33495e" size={23} />
+                  <Text style={optionText}> Modules</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
