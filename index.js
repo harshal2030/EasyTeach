@@ -3,6 +3,7 @@
  */
 import React from 'react';
 import 'react-native-gesture-handler';
+import 'expo-asset';
 import {AppRegistry} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import App from './mobile/App';
