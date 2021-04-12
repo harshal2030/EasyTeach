@@ -7,8 +7,10 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
+  Alert,
 } from 'react-native';
-import {Header, Icon} from 'react-native-elements';
+import Dialog from 'react-native-dialog';
+import {Header, Icon, Button} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
@@ -24,6 +26,7 @@ import {
   commonBlue,
   greyWithAlpha,
   commonBackground,
+  commonGrey,
 } from '../../shared/styles/colors';
 
 type navigation = CompositeNavigationProp<
@@ -48,6 +51,8 @@ interface State {
   loading: boolean;
   errored: boolean;
   modules: ModuleRes[];
+  dialogVisible: boolean;
+  moduleName: string;
 }
 
 class Module extends React.Component<Props, State> {
@@ -58,6 +63,8 @@ class Module extends React.Component<Props, State> {
       loading: true,
       errored: false,
       modules: [],
+      dialogVisible: false,
+      moduleName: '',
     };
   }
 
@@ -101,6 +108,32 @@ class Module extends React.Component<Props, State> {
         </View>
       </TouchableHighlight>
     );
+  };
+
+  closeDialog = () => {
+    this.setState({dialogVisible: false});
+  };
+
+  createModule = async () => {
+    try {
+      this.closeDialog();
+      const res = await axios.post<ModuleRes>(
+        `${moduleUrl}/${this.props.currentClass!.id}`,
+        {title: this.state.moduleName},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+
+      this.setState({
+        modules: [...this.state.modules, res.data],
+        moduleName: '',
+      });
+    } catch (e) {
+      Alert.alert('Oops!', 'Something went wrong. Please try again later');
+    }
   };
 
   renderContent = () => {
@@ -166,6 +199,32 @@ class Module extends React.Component<Props, State> {
           rightContainerStyle={{justifyContent: 'center'}}
         />
         {this.renderContent()}
+
+        <Dialog.Container visible={this.state.dialogVisible}>
+          <Dialog.Title>Create Module</Dialog.Title>
+          <Dialog.Description>Enter name for your module.</Dialog.Description>
+          <Dialog.Input
+            placeholder="Module Name"
+            onChangeText={(text) => this.setState({moduleName: text})}
+            underlineColorAndroid="green"
+          />
+          <Dialog.Button label="Cancel" onPress={this.closeDialog} />
+          <Dialog.Button label="Create" onPress={this.createModule} />
+        </Dialog.Container>
+
+        {this.props.isOwner && (
+          <Button
+            icon={{
+              name: 'plus',
+              type: 'octicon',
+              color: commonBlue,
+            }}
+            containerStyle={styles.FABContainer}
+            onPress={() => this.setState({dialogVisible: true})}
+            // eslint-disable-next-line react-native/no-inline-styles
+            buttonStyle={{backgroundColor: '#ffff'}}
+          />
+        )}
       </View>
     );
   }
@@ -185,6 +244,27 @@ const styles = StyleSheet.create({
   moduleText: {
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  FABContainer: {
+    position: 'absolute',
+    height: 60,
+    width: 60,
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#ffff',
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: commonGrey,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
 });
 
