@@ -206,7 +206,7 @@ class Module extends React.Component<Props, State> {
           <Dialog.Input
             placeholder="Module Name"
             onChangeText={(text) => this.setState({moduleName: text})}
-            underlineColorAndroid="green"
+            underlineColorAndroid="grey"
           />
           <Dialog.Button label="Cancel" onPress={this.closeDialog} />
           <Dialog.Button label="Create" onPress={this.createModule} />
