@@ -1,15 +1,18 @@
 import React from 'react';
 import {View, StyleSheet, useWindowDimensions} from 'react-native';
-import {toast} from 'react-toastify';
+import {useRouteMatch, Switch, Route} from 'react-router-dom';
 import Modal from 'react-native-modal';
 
 import Drawer from '../Drawer';
-import Announce from '../../shared/screens/Announcement';
+import Announce from './Announcement.web';
+import People from './People';
+import Test from './Test';
 
-const Announcement = () => {
+const Main = () => {
   const [drawerVisible, setDrawer] = React.useState(false);
   const width = useWindowDimensions().width;
   const isLargeScreen = width >= 768;
+  const {path} = useRouteMatch();
 
   return (
     <View style={styles.parent}>
@@ -33,15 +36,20 @@ const Announcement = () => {
       )}
 
       <View style={styles.main}>
-        <Announce
-          onJoinPress={() => console.log('join pressed')} // TODO: create join class screen and route it
-          onLeftTopPress={() => setDrawer(!drawerVisible)}
-          onSendError={() =>
-            toast.error(
-              'Unable to send message at the moment. Please try again later',
-            )
-          }
-        />
+        <Switch>
+          <Route path={`${path}/home`} exact>
+            <Announce onLeftTopPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+          <Route path={`${path}/home/:classId`}>
+            <Announce onLeftTopPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+          <Route path={`${path}/people/:classId`}>
+            <People onLeftTopPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+          <Route path={`${path}/tests/:classId`}>
+            <Test onLeftTopPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+        </Switch>
       </View>
     </View>
   );
@@ -61,4 +69,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Announcement;
+export default Main;

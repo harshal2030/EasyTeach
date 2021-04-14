@@ -17,7 +17,8 @@ const compileNodeModules = [
   'react-native-vector-icons',
   'react-native-elements',
   'react-native-ratings',
-  'react-native-raw-bottom-sheet',
+  'react-native-lightbox-v2',
+  'react-native-dialog',
   'react-native-svg',
   'react-native-svg-transformer',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));

@@ -10,7 +10,7 @@ import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import {CommonSetting} from '../components/main';
+import {CommonSetting} from '../../shared/components/main';
 import {PhotoPicker} from '../components/common';
 
 import {StoreState} from '../../shared/global';

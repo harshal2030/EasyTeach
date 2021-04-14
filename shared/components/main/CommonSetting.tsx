@@ -9,7 +9,7 @@ import {
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Button, ButtonProps} from 'react-native-elements';
 
-import {greyWithAlpha} from '../../../shared/styles/colors';
+import {greyWithAlpha} from '../../styles/colors';
 
 interface Props {
   imageSource: ImageSourcePropType;

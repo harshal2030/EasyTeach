@@ -1,12 +1,11 @@
 import React from 'react';
-import PhotoView from 'react-native-photo-view-ex';
+import {Image as FastImage} from 'react-native';
 import LightBox from 'react-native-lightbox-v2';
 import {View, StyleSheet, Linking} from 'react-native';
-import FastImage from 'react-native-fast-image';
 import {Header, Button, Text} from 'react-native-elements';
 
-import {eucalyptusGreen} from '../../../shared/styles/colors';
-import {mediaUrl} from '../../../shared/utils/urls';
+import {eucalyptusGreen} from '../../styles/colors';
+import {mediaUrl} from '../../utils/urls';
 
 interface Props {
   onBackPress: () => any;
@@ -18,11 +17,10 @@ const ImportExcel = (props: Props) => {
 
   const ZoomImage = () => {
     return (
-      <PhotoView
+      <FastImage
         source={require('../../../shared/images/sheet.png')}
         resizeMode="contain"
         style={{height: '100%', width: '100%'}}
-        maximumZoomScale={4}
       />
     );
   };

@@ -8,46 +8,39 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {Header, Button} from 'react-native-elements';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {connect} from 'react-redux';
-import SnackBar from 'react-native-snackbar';
-import DocumentPicker from 'react-native-document-picker';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {DrawerNavigationProp} from '@react-navigation/drawer';
+import {toast} from 'react-toastify';
 
 import {Card} from '../../shared/components/common';
 import {QuizInfo, ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
-import {Class} from '../../shared/global/actions/classes';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {QuizRes, fetchQuiz, ObQuizRes} from '../../shared/global/actions/quiz';
-import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {
   commonBackground,
   commonBlue,
-  flatRed,
   greyWithAlpha,
   commonGrey,
 } from '../../shared/styles/colors';
 import {ContainerStyles} from '../../shared/styles/styles';
+import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
-type NavigationProp = CompositeNavigationProp<
-  DrawerNavigationProp<DrawerParamList, 'Test'>,
-  StackNavigationProp<RootStackParamList>
->;
-
-interface Props {
+type Props = RouteComponentProps<{classId: string}> & {
   token: string | null;
-  navigation: NavigationProp;
   currentClass: Class | null;
   quizErrored: boolean;
   quizLoading: boolean;
   quizzes: ObQuizRes;
   fetchQuiz(token: string, classId: string, quizType?: string): void;
   isOwner: boolean;
-}
+  registerCurrentClass: typeof registerCurrentClass;
+  classes: Class[];
+  onLeftTopPress: () => void;
+};
 
 interface State {
   modalVisible: boolean;
@@ -56,6 +49,7 @@ interface State {
 }
 
 class Test extends React.Component<Props, State> {
+  upload: HTMLInputElement | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -67,16 +61,42 @@ class Test extends React.Component<Props, State> {
   }
 
   fetchQuiz = () => {
-    this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
+    this.props.fetchQuiz(this.props.token!, this.props.match.params.classId);
   };
 
   componentDidMount() {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+    console.log(classId);
+
+    const classFound = classes.find((cls) => cls.id === classId);
+
+    if (classFound) {
+      this.props.registerCurrentClass(classFound);
+    } else {
+      this.props.history.replace('/*');
+    }
+
     if (this.props.currentClass) {
       this.fetchQuiz();
     }
   }
 
   componentDidUpdate(prevProps: Props) {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+
+    const hasClassChanged = prevProps.match.params.classId !== classId;
+
+    if (hasClassChanged) {
+      const classFound = classes.find((cls) => cls.id === classId);
+      if (classFound) {
+        this.props.registerCurrentClass(classFound);
+      } else {
+        this.props.history.replace('/*');
+      }
+    }
+
     if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
       this.fetchQuiz();
     }
@@ -88,42 +108,24 @@ class Test extends React.Component<Props, State> {
     }
 
     if (title === 'Expired') {
-      SnackBar.show({
-        text: 'This test has expired',
-        backgroundColor: flatRed,
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      toast.error('This test has expired');
     }
 
     if (title === 'Scored') {
-      this.props.navigation.navigate('ShowScore', {
-        quizId: quiz.quizId,
-        title: quiz.title,
-        questions: quiz.questions,
-      });
+      // this.props.navigation.navigate('ShowScore', {
+      //   quizId: quiz.quizId,
+      //   title: quiz.title,
+      //   questions: quiz.questions,
+      // });
+      // TODO: handle nav
     }
   };
 
-  ImportSheet = async () => {
-    try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
-      });
-
-      this.setState({excelModal: false});
-      this.props.navigation.navigate('CreateTest', {
-        file: {
-          name: res.name,
-          type: res.type,
-          uri: res.uri,
-        },
-      });
-    } catch (e) {
-      if (!DocumentPicker.isCancel(e)) {
-        SnackBar.show({
-          text: 'Unable to get the sheet.',
-          duration: SnackBar.LENGTH_SHORT,
-        });
+  ImportSheet = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const sheet = e.target.files[0];
+      if (!excelExtPattern.test(sheet.name)) {
+        return toast.error('Please upload a valid excel sheet');
       }
     }
   };
@@ -146,19 +148,21 @@ class Test extends React.Component<Props, State> {
             <View style={styles.collapseContainer}>
               <Pressable
                 style={styles.collapseButton}
-                onPress={() =>
-                  this.props.navigation.navigate('CreateTest', {
-                    quizId: item.quizId,
-                  })
+                onPress={
+                  () => null // TODO: handle nav
+                  // this.props.navigation.navigate('CreateTest', {
+                  //   quizId: item.quizId,
+                  // })
                 }>
                 <Text style={styles.collapseText}>Edit</Text>
               </Pressable>
               <Pressable
                 style={styles.collapseButton}
-                onPress={() =>
-                  this.props.navigation.navigate('EditQuestion', {
-                    quizId: item.quizId,
-                  })
+                onPress={
+                  () => null // TODO: handle nav
+                  // this.props.navigation.navigate('EditQuestion', {
+                  //   quizId: item.quizId,
+                  // })
                 }>
                 <Text style={styles.collapseText}>Edit Questions</Text>
               </Pressable>
@@ -252,7 +256,7 @@ class Test extends React.Component<Props, State> {
             icon: 'menu',
             color: '#ffff',
             size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
+            onPress: this.props.onLeftTopPress,
           }}
         />
         {this.renderContent()}
@@ -282,10 +286,11 @@ class Test extends React.Component<Props, State> {
             quiz={this.state.quiz!}
             onButtonPress={() => {
               this.setState({modalVisible: false});
-              this.props.navigation.navigate('Quiz', {
-                quizId: this.state.quiz!.quizId,
-                title: this.state.quiz!.title,
-              });
+              // this.props.navigation.navigate('Quiz', {
+              //   quizId: this.state.quiz!.quizId,
+              //   title: this.state.quiz!.title,
+              // });
+              // TODO: handle nav
             }}
             onBackPress={() => this.setState({modalVisible: false})}
           />
@@ -299,9 +304,17 @@ class Test extends React.Component<Props, State> {
           onBackButtonPress={() => this.setState({excelModal: false})}
           // eslint-disable-next-line react-native/no-inline-styles
           style={{margin: 0}}>
+          <input
+            type="file"
+            name="excel-file"
+            style={{display: 'none'}}
+            id="excel-file"
+            onChange={this.ImportSheet}
+            ref={(ref) => (this.upload = ref)}
+          />
           <ImportExcel
             onBackPress={() => this.setState({excelModal: false})}
-            onImportPress={this.ImportSheet}
+            onImportPress={() => this.upload!.click()}
           />
         </Modal>
       </View>
@@ -349,7 +362,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: 60,
     bottom: 50,
-    right: 20,
+    right: 50,
     padding: 10,
     backgroundColor: '#ffff',
     borderWidth: 1,
@@ -383,8 +396,11 @@ const mapStateToProps = (state: StoreState) => {
     quizLoading: state.quizLoading,
     quizErrored: state.quizErrored,
     quizzes: state.quizzes,
+    classes: state.classes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
 
-export default connect(mapStateToProps, {fetchQuiz})(Test);
+export default withRouter(
+  connect(mapStateToProps, {fetchQuiz, registerCurrentClass})(Test),
+);

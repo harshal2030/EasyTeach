@@ -1,15 +1,12 @@
 import React from 'react';
 import {AppRegistry} from 'react-native';
+import {BrowserRouter as Router} from 'react-router-dom';
 import {Provider} from 'react-redux';
-import {createMuiTheme} from '@material-ui/core/styles';
-import {ThemeProvider} from '@material-ui/styles';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 import App from './web/App';
-
-import {commonBlue} from './shared/styles/colors';
 
 import {name as appName} from './app.json';
 import {store} from './shared/global';
@@ -27,6 +24,7 @@ import FA5IconSolid from 'react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf
 import FA5IconRegular from 'react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf';
 import FontAwesome from 'react-native-vector-icons/Fonts/FontAwesome.ttf';
 import MaterialIcons from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
+import MaterialCommunityIcons from 'react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf';
 
 const iconFontStyles = `@font-face {
   src: url(${iconFont});
@@ -76,6 +74,10 @@ const iconFontStyles = `@font-face {
   src: url(${MaterialIcons});
   font-family: 'MaterialIcons';
 }
+@font-face {
+  src: url(${MaterialCommunityIcons});
+  font-family: 'MaterialCommunityIcons';
+}
 `;
 
 // Create stylesheet
@@ -90,22 +92,15 @@ if (style.styleSheet) {
 // Inject stylesheet
 document.head.appendChild(style);
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: commonBlue,
-    },
-  },
-});
-
 const Wrapper = () => {
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-        <ThemeProvider theme={theme}>
+        <Router>
           <App />
-          <ToastContainer position="bottom-left" />
-        </ThemeProvider>
+        </Router>
+
+        <ToastContainer position="bottom-left" />
       </SafeAreaProvider>
     </Provider>
   );

@@ -8,12 +8,8 @@ import {
 import {Text} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import {
-  commonBackground,
-  commonGrey,
-  greyWithAlpha,
-} from '../../../shared/styles/colors';
-import {formatDate} from '../../../shared/utils/functions';
+import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
+import {formatDate} from '../../utils/functions';
 
 type Props = {
   title: string;

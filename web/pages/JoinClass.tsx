@@ -4,21 +4,15 @@ import {
   StyleSheet,
   Text,
   KeyboardAvoidingView,
-  Platform,
   Alert,
   ScrollView,
 } from 'react-native';
 import axios from 'axios';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {ImageOrVideo} from 'react-native-image-crop-picker';
 import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from '../navigators/types';
-import SnackBar from 'react-native-snackbar';
-
-import {PhotoPicker} from '../components/common';
+import {toast} from 'react-toastify';
 
 import {CommonSetting} from '../../shared/components/main';
 import {classUrl} from '../../shared/utils/urls';
@@ -28,10 +22,10 @@ import {
   addClass,
   registerCurrentClass,
 } from '../../shared/global/actions/classes';
+import {staticImageExtPattern} from '../../shared/utils/regexPatterns';
 import {StoreState} from '../../shared/global';
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'JoinClass'>;
+type Props = RouteComponentProps & {
   token: string;
   classes: Class[];
   addClass: typeof addClass;
@@ -40,36 +34,31 @@ type Props = {
 
 type State = {
   selected: number;
-  photo: {
-    uri: string;
-    type: string;
-  };
+  photo: File | null;
   joinCode: string;
   className: string;
   about: string;
+  previewPhoto: string;
   subject: string;
   loading: boolean;
 };
 
 class JoinClass extends React.Component<Props, State> {
+  upload: HTMLInputElement | null = null;
   constructor(props: Props) {
     super(props);
 
     this.state = {
       selected: 0,
-      photo: {
-        uri: 'none',
-        type: '',
-      },
+      photo: null,
       joinCode: '',
       className: '',
       about: '',
       subject: '',
       loading: false,
+      previewPhoto: '',
     };
   }
-
-  private sheet: RBSheet | null = null;
 
   private joinClassRequest = () => {
     this.setState({loading: true});
@@ -88,7 +77,7 @@ class JoinClass extends React.Component<Props, State> {
       .then((res) => {
         this.props.addClass(res.data);
         this.props.registerCurrentClass(res.data);
-        this.props.navigation.navigate('Drawer');
+        this.props.history.push(`/classes/home/${res.data.id}`);
       })
       .catch((e) => {
         this.setState({loading: false});
@@ -96,10 +85,7 @@ class JoinClass extends React.Component<Props, State> {
           return Alert.alert('Oops!', e.response.data.error);
         }
 
-        SnackBar.show({
-          text: 'Unable to join class at the moment',
-          duration: SnackBar.LENGTH_SHORT,
-        });
+        toast('Unable to join class at the moment');
       });
   };
 
@@ -117,16 +103,8 @@ class JoinClass extends React.Component<Props, State> {
       }),
     );
 
-    if (photo.uri !== 'none') {
-      reqBody.append('classPhoto', {
-        // @ts-ignore
-        name: 'photo.jpeg',
-        type: photo.type,
-        uri:
-          Platform.OS === 'android'
-            ? photo.uri
-            : photo.uri.replace('file://', ''),
-      });
+    if (photo) {
+      reqBody.append('classPhoto', photo, photo.name);
     }
 
     axios
@@ -139,7 +117,7 @@ class JoinClass extends React.Component<Props, State> {
       .then((res) => {
         this.props.addClass(res.data);
         this.props.registerCurrentClass(res.data);
-        this.props.navigation.navigate('Drawer');
+        this.props.history.push(`/classes/home/${res.data.id}`);
       })
       .catch((e) => {
         this.setState({loading: false});
@@ -149,10 +127,9 @@ class JoinClass extends React.Component<Props, State> {
           }
         }
 
-        SnackBar.show({
-          text: 'Unable to create class at the moment. Please try again later',
-          duration: SnackBar.LENGTH_LONG,
-        });
+        toast.error(
+          'Unable to create class at the moment. Please try again later',
+        );
       });
   };
 
@@ -178,16 +155,38 @@ class JoinClass extends React.Component<Props, State> {
     );
   }
 
+  onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      if (!staticImageExtPattern.test(e.target.files[0].name)) {
+        return toast.error('Please select a valid image file');
+      }
+
+      this.setState({
+        photo: e.target.files[0],
+        previewPhoto: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
+
   private createClass() {
-    const {className, about, subject, loading, photo} = this.state;
+    const {className, about, subject, loading} = this.state;
     return (
       <ScrollView>
         <CommonSetting
           buttonLoading={loading}
           onButtonPress={this.createClassRequest}
           buttonProps={{title: 'Create Class'}}
-          imageSource={{uri: photo.uri}}
-          onImagePress={() => this.sheet!.open()}>
+          imageSource={{uri: this.state.previewPhoto}}
+          onImagePress={() => this.upload!.click()}>
+          <input
+            id="image"
+            name="avatar-image"
+            type="file"
+            onChange={this.onFileChange}
+            accept="image/*"
+            ref={(ref) => (this.upload = ref)}
+            style={{display: 'none'}}
+          />
           <Input
             label="Class Name"
             value={className}
@@ -210,24 +209,6 @@ class JoinClass extends React.Component<Props, State> {
     );
   }
 
-  private onImage = (image: ImageOrVideo) => {
-    this.sheet!.close();
-    this.setState({
-      photo: {
-        uri: image.path,
-        type: image.mime,
-      },
-    });
-  };
-
-  private onImageError = () => {
-    SnackBar.show({
-      text: 'Unable to pick image',
-      duration: SnackBar.LENGTH_SHORT,
-    });
-    this.sheet!.close();
-  };
-
   render() {
     const {mainContainer, RBContainer} = styles;
     const {loading} = this.state;
@@ -240,7 +221,7 @@ class JoinClass extends React.Component<Props, State> {
               name="arrow-back"
               color="#fff"
               size={28}
-              onPress={() => this.props.navigation.goBack()}
+              onPress={() => this.props.history.goBack()}
             />
           }
           centerComponent={{
@@ -251,6 +232,7 @@ class JoinClass extends React.Component<Props, State> {
         <View style={RBContainer}>
           <ButtonGroup
             buttons={['Join Class', 'Create Class']}
+            containerStyle={{width: ' 50%', height: 50}}
             disabled={loading}
             onPress={(selected) => this.setState({selected})}
             selectedIndex={this.state.selected}
@@ -258,14 +240,6 @@ class JoinClass extends React.Component<Props, State> {
         </View>
 
         {this.state.selected === 0 ? this.joinClass() : this.createClass()}
-
-        <PhotoPicker
-          sheetRef={(ref) => (this.sheet = ref)}
-          onCameraImage={this.onImage}
-          onPickerImage={this.onImage}
-          onCameraError={this.onImageError}
-          onPickerError={this.onImageError}
-        />
       </View>
     );
   }
@@ -301,6 +275,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addClass, registerCurrentClass})(
-  JoinClass,
+export default withRouter(
+  connect(mapStateToProps, {addClass, registerCurrentClass})(JoinClass),
 );

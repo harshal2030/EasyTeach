@@ -1,30 +1,19 @@
 import React from 'react';
 import axios from 'axios';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
-import {
-  BrowserRouter as Router,
-  Link,
-  Route,
-  Switch,
-  RouteProps,
-  Redirect,
-} from 'react-router-dom';
+import {Link, Route, Switch, RouteProps, Redirect} from 'react-router-dom';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from 'react-native-dialog';
 
-import AuthScreen from './screens/AuthScreen';
-import Main from './screens/Announcement';
+import AuthScreen from './pages/AuthScreen';
+import Main from './pages/Main';
+import JoinClass from './pages/JoinClass';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
 import {registerProfile} from '../shared/global/actions/profile';
-import {fetchClasses} from '../shared/global/actions/classes';
+import {fetchClasses, Class} from '../shared/global/actions/classes';
 
 import {checkTokenUrl} from '../shared/utils/urls';
 
@@ -37,13 +26,15 @@ interface userChecker {
   message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
 }
 
-interface Props {
+type Props = {
   token: string | null;
   registerProfile: typeof registerProfile;
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   fetchClasses: Function;
-}
+  classIsLoading: boolean;
+  currentClass: Class | null;
+};
 
 interface State {
   loading: boolean;
@@ -87,7 +78,7 @@ class App extends React.Component<Props, State> {
   componentDidMount() {
     this.checkToken();
 
-    document.title = 'EayTeach - Delightful teaching for everyone';
+    document.title = 'EasyTeach - Delightful teaching for everyone';
   }
 
   openDialog = (title: string, text: string = '') => {
@@ -130,6 +121,14 @@ class App extends React.Component<Props, State> {
     }
   };
 
+  handleRedirect = () => {
+    return !this.props.currentClass ? (
+      <Redirect to="/classes/home" />
+    ) : (
+      <Redirect to={`/classes/home/${this.props.currentClass.id}`} />
+    );
+  };
+
   render() {
     if (this.state.loading) {
       return (
@@ -139,49 +138,55 @@ class App extends React.Component<Props, State> {
       );
     }
 
+    if (this.props.classIsLoading && this.props.token) {
+      return (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator animating color="blue" size="large" />
+        </View>
+      );
+    }
+
     return (
       <>
-        <Router>
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={() => {
-                return this.props.token ? <Redirect to="/home" /> : <Home />;
-              }}
-            />
-            <Route path="/auth">
-              {this.props.token ? <Redirect to="/home" /> : <AuthScreen />}
-            </Route>
-            <PrivateRoute
-              Component={Main}
-              token={this.props.token}
-              path="/home"
-            />
-          </Switch>
-        </Router>
+        <Switch>
+          <Route
+            exact
+            path="/"
+            render={() => {
+              return this.props.token ? this.handleRedirect() : <Home />;
+            }}
+          />
+          <Route path="/auth">
+            {this.props.token ? this.handleRedirect() : <AuthScreen />}
+          </Route>
+          <PrivateRoute
+            Component={Main}
+            token={this.props.token}
+            path="/classes"
+          />
+          <PrivateRoute
+            Component={JoinClass}
+            token={this.props.token}
+            path="/joinclass"
+          />
+          <Route path="*">
+            <NotFound />
+          </Route>
+        </Switch>
 
-        <Dialog
-          open={this.state.alertVisible}
-          onClose={this.closeDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description">
-          <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {this.state.text}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.closeDialog} color="primary" autoFocus>
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <Dialog.Container visible={this.state.alertVisible}>
+          <Dialog.Title>{this.state.title}</Dialog.Title>
+          <Dialog.Description>{this.state.text}</Dialog.Description>
+          <Dialog.Button label="Ok" onPress={this.closeDialog} />
+        </Dialog.Container>
       </>
     );
   }
 }
+
+const NotFound = () => {
+  return <h1>404 NOT FOUND!!</h1>;
+};
 
 const Home = () => {
   return (
@@ -204,6 +209,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
+    classIsLoading: state.classIsLoading,
+    currentClass: state.currentClass,
   };
 };
 

@@ -10,6 +10,7 @@ import {
   Image as FastImage,
   ImageBackground,
 } from 'react-native';
+import {useRouteMatch, useHistory} from 'react-router-dom';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
@@ -19,7 +20,6 @@ import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import MI from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../../shared/global';
 import {removeToken} from '../../shared/global/actions/token';
@@ -58,6 +58,9 @@ type Props = {
 const DrawerContent = (props: Props): JSX.Element => {
   const {currentClass} = props;
 
+  const {url} = useRouteMatch();
+  const history = useHistory();
+
   const logOut = async () => {
     try {
       await axios.post(
@@ -82,7 +85,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         onPress={() => {
           props.registerCurrentClass(item);
-          // TODO: Handle nav
+          history.push(`${url}/home/${item.id}`);
         }}>
         <FastImage
           source={{
@@ -100,7 +103,9 @@ const DrawerContent = (props: Props): JSX.Element => {
   const renderListFooter = () => {
     // TODO: Handle Nav for class join
     return (
-      <TouchableOpacity style={{alignSelf: 'center'}}>
+      <TouchableOpacity
+        style={{alignSelf: 'center'}}
+        onPress={() => history.push('/joinclass')}>
         <Feather name="plus" size={36} color={commonGrey} />
       </TouchableOpacity>
     );
@@ -192,7 +197,11 @@ const DrawerContent = (props: Props): JSX.Element => {
           <View style={optionListContainer}>
             {props.classes.length === 0 ? null : (
               <>
-                <TouchableOpacity style={optionContainer}>
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() =>
+                    history.push(`${url}/home/${currentClass?.id}`)
+                  }>
                   {
                     // TODO: Handle nav for respective routes
                   }
@@ -200,19 +209,22 @@ const DrawerContent = (props: Props): JSX.Element => {
                   <Text style={optionText}> Home</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={optionContainer}>
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() =>
+                    history.push(`${url}/people/${currentClass?.id}`)
+                  }>
                   <FontAwesome name="group" color="#34495e" size={20} />
                   <Text style={optionText}> People</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={optionContainer}>
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() =>
+                    history.push(`${url}/tests/${currentClass?.id}`)
+                  }>
                   <Octicons name="checklist" color="#34495e" size={25} />
                   <Text style={optionText}> Tests</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={optionContainer}>
-                  <MI name="view-module" color="#33495e" size={23} />
-                  <Text style={optionText}> Modules</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={optionContainer}>
