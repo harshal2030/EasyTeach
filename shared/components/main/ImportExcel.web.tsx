@@ -32,12 +32,6 @@ const ImportExcel = (props: Props) => {
           text: 'Before you continue',
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
-        leftComponent={{
-          icon: 'arrow-back',
-          color: '#ffff',
-          size: 26,
-          onPress: props.onBackPress,
-        }}
       />
       <View style={content}>
         <Text h4>We need question sheet</Text>

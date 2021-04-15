@@ -20,7 +20,8 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
 
-import {CheckBox, PhotoPicker} from '../components/common';
+import {PhotoPicker} from '../components/common';
+import {CheckBox} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {

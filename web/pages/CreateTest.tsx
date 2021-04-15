@@ -5,19 +5,19 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Platform,
-  Alert,
+  Alert, // FIXME: use dialogs, not alert.
 } from 'react-native';
+import Modal from 'react-native-modal';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
+import {MuiPickersUtilsProvider, DateTimePicker} from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 import {Header, Input, Text, Button, Icon} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RouteProp} from '@react-navigation/native';
-import SnackBar from 'react-native-snackbar';
-import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import {toast} from 'react-toastify';
 
-import {RootStackParamList} from '../navigators/types';
 import {Chip, CheckBox} from '../../shared/components/common';
+import {ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -31,19 +31,15 @@ import {
 import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
 import {quizUrl} from '../../shared/utils/urls';
+import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
-type RouteProps = RouteProp<RootStackParamList, 'CreateTest'>;
-
-interface Props {
-  navigation: NavigationProp;
+type Props = RouteComponentProps & {
   token: string | null;
   currentClass: Class | null;
-  route: RouteProps;
   addQuiz: typeof addQuiz;
   fetchQuiz(token: string, classId: string): void;
   removeQuiz: typeof removeQuiz;
-}
+};
 
 interface State {
   releaseScore: boolean;
@@ -52,16 +48,20 @@ interface State {
   description: string;
   title: string;
   questions: string;
-  type: 0 | 1;
-  mode: 'date' | 'time';
-  showPicker: boolean;
   timeRange: [Date, Date];
   loading: boolean;
   errored: boolean;
   APILoading: boolean;
+  excelSheet: File | null;
+  excelModal: boolean;
+  datePicker: boolean;
+  type: 0 | 1;
 }
 
 class CreateTest extends React.Component<Props, State> {
+  quizId: string | null = null;
+  upload: HTMLInputElement | null = null;
+
   constructor(props: Props) {
     super(props);
     const today = new Date();
@@ -73,34 +73,38 @@ class CreateTest extends React.Component<Props, State> {
     this.state = {
       releaseScore: true,
       randomOp: false,
+      datePicker: false,
       randomQue: false,
       description: '',
       title: '',
       questions: '1',
-      type: 0,
-      mode: 'date',
-      showPicker: false,
       timeRange: [today, tomorrow],
       loading: false,
       errored: false,
       APILoading: false,
+      excelSheet: null,
+      excelModal: false, // FIXME: set true when query not present
+      type: 0,
     };
   }
 
   componentDidMount() {
+    this.quizId = new URLSearchParams(this.props.location.search).get('quizId');
     this.getQuizDetail();
   }
 
   getQuizDetail = () => {
-    const {quizId} = this.props.route.params;
-    if (quizId) {
+    if (this.quizId) {
       this.setState({loading: true});
       axios
-        .get<QuizRes>(`${quizUrl}/${this.props.currentClass!.id}/${quizId}`, {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
+        .get<QuizRes>(
+          `${quizUrl}/${this.props.currentClass!.id}/${this.quizId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.props.token}`,
+            },
           },
-        })
+        )
         .then((res) => {
           const {
             title,
@@ -142,7 +146,7 @@ class CreateTest extends React.Component<Props, State> {
       randomQue,
       randomOp,
     } = this.state;
-    const {currentClass, route, token} = this.props;
+    const {currentClass, token} = this.props;
 
     const start = timeRange[0].getTime();
     const stop = timeRange[1].getTime();
@@ -150,31 +154,21 @@ class CreateTest extends React.Component<Props, State> {
     const ques = parseInt(questions, 10);
 
     if (ques <= 0) {
-      return SnackBar.show({
-        text: 'You must at least have one question in test.',
-        duration: SnackBar.LENGTH_SHORT,
-        backgroundColor: flatRed,
-      });
+      return toast.error('You must at least have one question in test.');
     }
 
     if (title.trim().length <= 0) {
-      return SnackBar.show({
-        text: "What's the title?",
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      return toast.error('Please enter the title');
     }
 
     if (start > stop) {
-      return SnackBar.show({
-        text: 'Invalid time range.',
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      return toast.error('Invalid time range.');
     }
 
     this.setState({APILoading: true});
     axios
       .put<QuizRes>(
-        `${quizUrl}/${currentClass!.id}/${route.params.quizId}`,
+        `${quizUrl}/${currentClass!.id}/${this.quizId}`,
         {
           questions: ques,
           title,
@@ -194,16 +188,12 @@ class CreateTest extends React.Component<Props, State> {
         if (res.status === 200) {
           this.props.fetchQuiz(token!, currentClass!.id);
           this.setState({APILoading: false});
-          this.props.navigation.goBack();
+          this.props.history.goBack();
         }
       })
       .catch(() => {
         this.setState({APILoading: false});
-        SnackBar.show({
-          text: 'Unable to update quiz, Please try again later',
-          duration: SnackBar.LENGTH_SHORT,
-          backgroundColor: flatRed,
-        });
+        toast.error('Unable to update quiz, Please try again later');
       });
   };
 
@@ -216,6 +206,7 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
+      excelSheet,
     } = this.state;
 
     const start = timeRange[0].getTime(),
@@ -224,24 +215,15 @@ class CreateTest extends React.Component<Props, State> {
     const ques = parseInt(questions, 10);
 
     if (ques <= 0) {
-      return SnackBar.show({
-        text: 'You must at least have one question in test.',
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      toast.error('You must at least have one question in test.');
     }
 
     if (title.trim().length <= 0) {
-      return SnackBar.show({
-        text: "What's the title?",
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      return toast.error('Please enter the title');
     }
 
     if (start > stop) {
-      return SnackBar.show({
-        text: 'Invalid time range.',
-        duration: SnackBar.LENGTH_SHORT,
-      });
+      toast.error('Invalid time range');
     }
 
     const data = new FormData();
@@ -259,17 +241,7 @@ class CreateTest extends React.Component<Props, State> {
       }),
     );
 
-    const {file} = this.props.route.params;
-
-    data.append('sheet', {
-      // @ts-ignore
-      name: file!.name || 'sheet.xlsx',
-      type: file!.type,
-      uri:
-        Platform.OS === 'android'
-          ? file!.uri
-          : file!.uri.replace('file://', ''),
-    });
+    data.append('sheet', excelSheet!, excelSheet!.name);
 
     this.setState({APILoading: true});
     axios
@@ -282,22 +254,18 @@ class CreateTest extends React.Component<Props, State> {
         this.setState({APILoading: false});
         if (res.status === 201) {
           this.props.addQuiz(res.data);
-          return this.props.navigation.goBack();
+          return this.props.history.goBack();
         }
         throw new Error();
       })
       .catch(() => {
         this.setState({APILoading: false});
-        SnackBar.show({
-          text: 'Unable to create Test. Please try again later.',
-          duration: SnackBar.LENGTH_SHORT,
-          backgroundColor: flatRed,
-        });
+        toast.error('Unable to create Test. Please try again later.');
       });
   };
 
   quizRequest = () => {
-    if (this.props.route.params.quizId) {
+    if (this.quizId) {
       this.updateQuiz();
     } else {
       this.postQuiz();
@@ -306,27 +274,23 @@ class CreateTest extends React.Component<Props, State> {
 
   deleteQuiz = () => {
     const deleteReq = () => {
-      const {currentClass, route} = this.props;
+      const {currentClass} = this.props;
 
       this.setState({APILoading: true});
       axios
-        .delete(`${quizUrl}/${currentClass!.id}/${route.params.quizId}`, {
+        .delete(`${quizUrl}/${currentClass!.id}/${this.quizId}`, {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
         })
         .then(() => {
-          this.props.removeQuiz(route.params.quizId!);
+          this.props.removeQuiz(this.quizId!);
           this.setState({APILoading: false});
-          this.props.navigation.goBack();
+          this.props.history.goBack();
         })
         .catch(() => {
           this.setState({APILoading: false});
-          SnackBar.show({
-            text: 'Unable to delete Test. Please try again later.',
-            duration: SnackBar.LENGTH_SHORT,
-            backgroundColor: flatRed,
-          });
+          toast.error('Unable to delete Test. Please try again later.');
         });
     };
 
@@ -345,28 +309,21 @@ class CreateTest extends React.Component<Props, State> {
     );
   };
 
-  handleDate = (_e: Event, dateTime?: Date) => {
-    const {timeRange, mode, type} = this.state;
-    const temp: [Date, Date] = [...timeRange];
+  handleSheet = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      if (!excelExtPattern.test(e.target.files[0].name)) {
+        return toast.error('Please upload a valid excel file');
+      }
 
-    if (!dateTime) {
-      return this.setState({showPicker: false});
+      this.setState({excelSheet: e.target.files[0], excelModal: false});
     }
+  };
 
-    if (mode === 'date') {
-      temp[type] = dateTime;
-      temp[type].setSeconds(0, 0);
-      this.setState({
-        showPicker: true,
-        timeRange: temp,
-        mode: 'time',
-      });
-    }
-
-    if (mode === 'time') {
-      temp[type].setHours(dateTime.getHours(), dateTime.getMinutes());
-      temp[type].setSeconds(0, 0);
-      this.setState({mode: 'date', timeRange: temp, showPicker: false});
+  handleDate = (date: Date | null) => {
+    if (date) {
+      const temp: [Date, Date] = [...this.state.timeRange];
+      temp[this.state.type] = date;
+      this.setState({timeRange: temp});
     }
   };
 
@@ -378,13 +335,11 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomOp,
       randomQue,
-      showPicker,
       timeRange,
-      type,
-      mode,
       loading,
       errored,
       APILoading,
+      excelSheet,
     } = this.state;
 
     if (errored) {
@@ -410,14 +365,14 @@ class CreateTest extends React.Component<Props, State> {
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: this.props.route.params.quizId ? 'Edit Test' : 'Create Test',
+            text: this.quizId ? 'Edit Test' : 'Create Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
             icon: 'arrow-back',
             color: '#ffff',
             size: 26,
-            onPress: () => this.props.navigation.goBack(),
+            onPress: () => this.props.history.goBack(),
             disabled: APILoading,
           }}
         />
@@ -425,13 +380,13 @@ class CreateTest extends React.Component<Props, State> {
         <ScrollView
           style={ContainerStyles.padder}
           keyboardShouldPersistTaps="handled">
-          {!this.props.route.params.quizId && (
+          {!this.quizId && (
             <>
               <Text h4 h4Style={TextStyles.h4Style}>
                 Question Sheet
               </Text>
               <Chip
-                text={this.props.route.params.file!.name}
+                text={excelSheet ? excelSheet.name : ''}
                 rightIcon={
                   <Icon name="microsoft-excel" type="material-community" />
                 }
@@ -462,13 +417,26 @@ class CreateTest extends React.Component<Props, State> {
             onChangeText={(text) => this.setState({description: text})}
           />
 
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <div style={{display: 'none'}}>
+              <DateTimePicker
+                value={timeRange[this.state.type]}
+                open={this.state.datePicker}
+                onClose={() => this.setState({datePicker: false})}
+                onAccept={() => this.setState({datePicker: false})}
+                onChange={this.handleDate}
+              />
+            </div>
+          </MuiPickersUtilsProvider>
           <Text h4 h4Style={TextStyles.h4Style}>
             Time Range
           </Text>
           <View style={styles.timeRangeParent}>
             <TouchableOpacity
               style={styles.timeRangeChild}
-              onPress={() => this.setState({type: 0, showPicker: true})}>
+              onPress={() =>
+                this.setState({datePicker: !this.state.datePicker, type: 0})
+              }>
               <Text style={styles.timeRangeText}>
                 {timeRange[0].toString()}
               </Text>
@@ -476,20 +444,14 @@ class CreateTest extends React.Component<Props, State> {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.timeRangeChild}
-              onPress={() => this.setState({type: 1, showPicker: true})}>
+              onPress={() =>
+                this.setState({datePicker: !this.state.datePicker, type: 1})
+              }>
               <Text style={styles.timeRangeText}>
                 {timeRange[1].toString()}
               </Text>
               <Text style={{color: commonGrey}}>Stop Accepting Response</Text>
             </TouchableOpacity>
-
-            {showPicker && (
-              <DateTimePicker
-                value={timeRange[type]}
-                mode={mode}
-                onChange={this.handleDate}
-              />
-            )}
           </View>
 
           <CheckBox
@@ -514,16 +476,16 @@ class CreateTest extends React.Component<Props, State> {
           />
 
           <Button
-            title={this.props.route.params.quizId ? 'Save' : 'Create Test'}
+            title={this.quizId ? 'Save' : 'Create Test'}
             containerStyle={[
               styles.buttonStyle,
-              {marginBottom: this.props.route.params.quizId ? 0 : 30},
+              {marginBottom: this.quizId ? 0 : 30},
             ]}
             onPress={this.quizRequest}
             loading={APILoading}
           />
 
-          {this.props.route.params.quizId && (
+          {this.quizId && (
             <Button
               title="Delete"
               containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
@@ -533,6 +495,28 @@ class CreateTest extends React.Component<Props, State> {
             />
           )}
         </ScrollView>
+
+        <Modal
+          isVisible={this.state.excelModal}
+          animationIn="slideInUp"
+          animationOut="slideOutUp"
+          hideModalContentWhileAnimating
+          onBackButtonPress={() => this.setState({excelModal: false})}
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{margin: 0}}>
+          <input
+            type="file"
+            name="excel-file"
+            onChange={this.handleSheet}
+            style={{display: 'none'}}
+            id="excel-file"
+            ref={(ref) => (this.upload = ref)}
+          />
+          <ImportExcel
+            onBackPress={() => this.setState({excelModal: false})}
+            onImportPress={() => this.upload!.click()}
+          />
+        </Modal>
       </View>
     );
   }
@@ -567,6 +551,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(
-  CreateTest,
+export default withRouter(
+  connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(CreateTest),
 );

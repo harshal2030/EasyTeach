@@ -8,14 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {withRouter, RouteComponentProps} from 'react-router-dom';
+import {withRouter, RouteComponentProps, Link} from 'react-router-dom';
 import {Header, Button} from 'react-native-elements';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 
 import {Card} from '../../shared/components/common';
-import {QuizInfo, ImportExcel} from '../../shared/components/main';
+import {QuizInfo} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -45,18 +45,15 @@ type Props = RouteComponentProps<{classId: string}> & {
 interface State {
   modalVisible: boolean;
   quiz: QuizRes | null;
-  excelModal: boolean;
 }
 
 class Test extends React.Component<Props, State> {
-  upload: HTMLInputElement | null = null;
   constructor(props: Props) {
     super(props);
 
     this.state = {
       modalVisible: false,
       quiz: null,
-      excelModal: false,
     };
   }
 
@@ -149,10 +146,10 @@ class Test extends React.Component<Props, State> {
               <Pressable
                 style={styles.collapseButton}
                 onPress={
-                  () => null // TODO: handle nav
-                  // this.props.navigation.navigate('CreateTest', {
-                  //   quizId: item.quizId,
-                  // })
+                  () =>
+                    this.props.history.push(
+                      `/createtest/${this.props.match.params.classId}?quizId=${item.quizId}`,
+                    ) // TODO: handle nav
                 }>
                 <Text style={styles.collapseText}>Edit</Text>
               </Pressable>
@@ -269,13 +266,14 @@ class Test extends React.Component<Props, State> {
         )}
 
         {this.props.isOwner && (
-          <Button
-            icon={<Octicons name="plus" size={26} color={commonBlue} />}
-            containerStyle={styles.FABContainer}
-            // eslint-disable-next-line react-native/no-inline-styles
-            buttonStyle={{backgroundColor: '#ffff'}}
-            onPress={() => this.setState({excelModal: true})}
-          />
+          <Link to={`/createtest/${this.props.currentClass!.id}`}>
+            <Button
+              icon={<Octicons name="plus" size={26} color={commonBlue} />}
+              containerStyle={styles.FABContainer}
+              // eslint-disable-next-line react-native/no-inline-styles
+              buttonStyle={{backgroundColor: '#ffff'}}
+            />
+          </Link>
         )}
         <Modal
           isVisible={this.state.modalVisible}
@@ -293,28 +291,6 @@ class Test extends React.Component<Props, State> {
               // TODO: handle nav
             }}
             onBackPress={() => this.setState({modalVisible: false})}
-          />
-        </Modal>
-
-        <Modal
-          isVisible={this.state.excelModal}
-          animationIn="slideInLeft"
-          animationOut="slideOutLeft"
-          hideModalContentWhileAnimating
-          onBackButtonPress={() => this.setState({excelModal: false})}
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{margin: 0}}>
-          <input
-            type="file"
-            name="excel-file"
-            style={{display: 'none'}}
-            id="excel-file"
-            onChange={this.ImportSheet}
-            ref={(ref) => (this.upload = ref)}
-          />
-          <ImportExcel
-            onBackPress={() => this.setState({excelModal: false})}
-            onImportPress={() => this.upload!.click()}
           />
         </Modal>
       </View>

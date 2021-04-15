@@ -3,6 +3,9 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
+
 const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
   .ReactWebConfig;
 
@@ -81,7 +84,7 @@ module.exports = {
   output: {
     path: path.resolve(appDirectory, 'dist'),
     publicPath: '/',
-    filename: 'rnw_blogpost.bundle.js',
+    filename: 'easyteach.bundle.js',
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js'],
@@ -112,5 +115,6 @@ module.exports = {
       __DEV__: JSON.stringify(true),
     }),
     ReactWebConfig(envFilePath),
+    new BundleAnalyzerPlugin(),
   ],
 };

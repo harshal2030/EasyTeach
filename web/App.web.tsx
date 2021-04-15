@@ -9,6 +9,7 @@ import Dialog from 'react-native-dialog';
 import AuthScreen from './pages/AuthScreen';
 import Main from './pages/Main';
 import JoinClass from './pages/JoinClass';
+import CreateTest from './pages/CreateTest';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -168,6 +169,11 @@ class App extends React.Component<Props, State> {
             Component={JoinClass}
             token={this.props.token}
             path="/joinclass"
+          />
+          <PrivateRoute
+            Component={CreateTest}
+            token={this.props.token}
+            path="/createtest/:classId"
           />
           <Route path="*">
             <NotFound />

@@ -24,6 +24,8 @@ DerivedData
 *.env.*
 .VSCodeCounter/
 .expo/
+dist/
+stats.json
 # Android/IntelliJ
 #
 build/
