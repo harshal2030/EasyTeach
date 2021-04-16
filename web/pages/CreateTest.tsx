@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Alert, // FIXME: use dialogs, not alert.
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
@@ -15,6 +14,7 @@ import {Header, Input, Text, Button, Icon} from 'react-native-elements';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
+import Dialog from 'react-native-dialog';
 
 import {Chip, CheckBox} from '../../shared/components/common';
 import {ImportExcel} from '../../shared/components/main';
@@ -56,6 +56,7 @@ interface State {
   excelModal: boolean;
   datePicker: boolean;
   type: 0 | 1;
+  deleteModal: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -69,6 +70,7 @@ class CreateTest extends React.Component<Props, State> {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setSeconds(0, 0);
+    this.quizId = new URLSearchParams(this.props.location.search).get('quizId');
 
     this.state = {
       releaseScore: true,
@@ -83,13 +85,13 @@ class CreateTest extends React.Component<Props, State> {
       errored: false,
       APILoading: false,
       excelSheet: null,
-      excelModal: false, // FIXME: set true when query not present
+      excelModal: this.quizId ? false : true,
       type: 0,
+      deleteModal: false,
     };
   }
 
   componentDidMount() {
-    this.quizId = new URLSearchParams(this.props.location.search).get('quizId');
     this.getQuizDetail();
   }
 
@@ -273,40 +275,25 @@ class CreateTest extends React.Component<Props, State> {
   };
 
   deleteQuiz = () => {
-    const deleteReq = () => {
-      const {currentClass} = this.props;
+    const {currentClass} = this.props;
 
-      this.setState({APILoading: true});
-      axios
-        .delete(`${quizUrl}/${currentClass!.id}/${this.quizId}`, {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        })
-        .then(() => {
-          this.props.removeQuiz(this.quizId!);
-          this.setState({APILoading: false});
-          this.props.history.goBack();
-        })
-        .catch(() => {
-          this.setState({APILoading: false});
-          toast.error('Unable to delete Test. Please try again later.');
-        });
-    };
-
-    Alert.alert(
-      'Confirm',
-      'All related information will get deleted. Are you sure to delete this test?',
-      [
-        {
-          text: 'Cancel',
+    this.setState({APILoading: true, deleteModal: false});
+    axios
+      .delete(`${quizUrl}/${currentClass!.id}/${this.quizId}`, {
+        headers: {
+          Authorization: `Bearer ${this.props.token}`,
         },
-        {
-          text: 'Yes',
-          onPress: deleteReq,
-        },
-      ],
-    );
+      })
+      .then(() => {
+        this.props.removeQuiz(this.quizId!);
+        this.setState({APILoading: false});
+        toast('Test deleted successfully');
+        this.props.history.goBack();
+      })
+      .catch(() => {
+        this.setState({APILoading: false});
+        toast.error('Unable to delete Test. Please try again later.');
+      });
   };
 
   handleSheet = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -490,7 +477,7 @@ class CreateTest extends React.Component<Props, State> {
               title="Delete"
               containerStyle={[styles.buttonStyle, {marginBottom: 50}]}
               buttonStyle={{backgroundColor: flatRed}}
-              onPress={this.deleteQuiz}
+              onPress={() => this.setState({deleteModal: true})}
               loading={APILoading}
             />
           )}
@@ -517,6 +504,19 @@ class CreateTest extends React.Component<Props, State> {
             onImportPress={() => this.upload!.click()}
           />
         </Modal>
+
+        <Dialog.Container visible={this.state.deleteModal}>
+          <Dialog.Title>Confirm</Dialog.Title>
+          <Dialog.Description>
+            All the information related to this test will be deleted. Are you
+            sure to delete this test?
+          </Dialog.Description>
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => this.setState({deleteModal: false})}
+          />
+          <Dialog.Button label="Yes" onPress={this.deleteQuiz} />
+        </Dialog.Container>
       </View>
     );
   }

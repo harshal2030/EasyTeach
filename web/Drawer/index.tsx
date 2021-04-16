@@ -53,6 +53,7 @@ type Props = {
   };
   removeCurrentClass: typeof removeCurrentClass;
   isOwner: boolean;
+  onOptionPress: () => void;
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -85,6 +86,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         onPress={() => {
           props.registerCurrentClass(item);
+          props.onOptionPress();
           history.push(`${url}/home/${item.id}`);
         }}>
         <FastImage
@@ -101,7 +103,6 @@ const DrawerContent = (props: Props): JSX.Element => {
   };
 
   const renderListFooter = () => {
-    // TODO: Handle Nav for class join
     return (
       <TouchableOpacity
         style={{alignSelf: 'center'}}
@@ -199,9 +200,10 @@ const DrawerContent = (props: Props): JSX.Element => {
               <>
                 <TouchableOpacity
                   style={optionContainer}
-                  onPress={() =>
-                    history.push(`${url}/home/${currentClass?.id}`)
-                  }>
+                  onPress={() => {
+                    history.push(`${url}/home/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
                   {
                     // TODO: Handle nav for respective routes
                   }
@@ -211,23 +213,30 @@ const DrawerContent = (props: Props): JSX.Element => {
 
                 <TouchableOpacity
                   style={optionContainer}
-                  onPress={() =>
-                    history.push(`${url}/people/${currentClass?.id}`)
-                  }>
+                  onPress={() => {
+                    history.push(`${url}/people/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
                   <FontAwesome name="group" color="#34495e" size={20} />
                   <Text style={optionText}> People</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={optionContainer}
-                  onPress={() =>
-                    history.push(`${url}/tests/${currentClass?.id}`)
-                  }>
+                  onPress={() => {
+                    history.push(`${url}/tests/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
                   <Octicons name="checklist" color="#34495e" size={25} />
                   <Text style={optionText}> Tests</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={optionContainer}>
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => {
+                    history.push(`${url}/about/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
                   <FontAwesome
                     name={props.isOwner ? 'sliders' : 'info-circle'}
                     color="#34495e"

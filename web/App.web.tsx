@@ -10,6 +10,7 @@ import AuthScreen from './pages/AuthScreen';
 import Main from './pages/Main';
 import JoinClass from './pages/JoinClass';
 import CreateTest from './pages/CreateTest';
+import Quiz from './pages/Quiz';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -174,6 +175,11 @@ class App extends React.Component<Props, State> {
             Component={CreateTest}
             token={this.props.token}
             path="/createtest/:classId"
+          />
+          <PrivateRoute
+            Component={Quiz}
+            token={this.props.token}
+            path="/quiz/:classId/:quizId"
           />
           <Route path="*">
             <NotFound />

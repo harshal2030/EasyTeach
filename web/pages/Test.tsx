@@ -64,7 +64,6 @@ class Test extends React.Component<Props, State> {
   componentDidMount() {
     const {classId} = this.props.match.params;
     const {classes} = this.props;
-    console.log(classId);
 
     const classFound = classes.find((cls) => cls.id === classId);
 
@@ -145,11 +144,10 @@ class Test extends React.Component<Props, State> {
             <View style={styles.collapseContainer}>
               <Pressable
                 style={styles.collapseButton}
-                onPress={
-                  () =>
-                    this.props.history.push(
-                      `/createtest/${this.props.match.params.classId}?quizId=${item.quizId}`,
-                    ) // TODO: handle nav
+                onPress={() =>
+                  this.props.history.push(
+                    `/createtest/${this.props.match.params.classId}?quizId=${item.quizId}`,
+                  )
                 }>
                 <Text style={styles.collapseText}>Edit</Text>
               </Pressable>
@@ -284,11 +282,11 @@ class Test extends React.Component<Props, State> {
             quiz={this.state.quiz!}
             onButtonPress={() => {
               this.setState({modalVisible: false});
-              // this.props.navigation.navigate('Quiz', {
-              //   quizId: this.state.quiz!.quizId,
-              //   title: this.state.quiz!.title,
-              // });
-              // TODO: handle nav
+              this.props.history.push(
+                `/quiz/${this.props.match.params.classId}/${
+                  this.state.quiz!.quizId
+                }`,
+              );
             }}
             onBackPress={() => this.setState({modalVisible: false})}
           />

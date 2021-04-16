@@ -7,6 +7,7 @@ import Drawer from '../Drawer';
 import Announce from './Announcement.web';
 import People from './People';
 import Test from './Test';
+import Manage from './ManageClass';
 
 const Main = () => {
   const [drawerVisible, setDrawer] = React.useState(false);
@@ -19,7 +20,7 @@ const Main = () => {
       {isLargeScreen ? (
         // eslint-disable-next-line react-native/no-inline-styles
         <View style={[styles.drawer, {width: 320}]}>
-          <Drawer />
+          <Drawer onOptionPress={() => setDrawer(false)} />
         </View>
       ) : (
         <Modal
@@ -31,7 +32,7 @@ const Main = () => {
           onBackdropPress={() => setDrawer(!drawerVisible)}
           // eslint-disable-next-line react-native/no-inline-styles
           style={[styles.drawer, {width: '80%'}]}>
-          <Drawer />
+          <Drawer onOptionPress={() => setDrawer(false)} />
         </Modal>
       )}
 
@@ -48,6 +49,9 @@ const Main = () => {
           </Route>
           <Route path={`${path}/tests/:classId`}>
             <Test onLeftTopPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+          <Route path={`${path}/about/:classId`}>
+            <Manage onTopLeftPress={() => setDrawer(!drawerVisible)} />
           </Route>
         </Switch>
       </View>
