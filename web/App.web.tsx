@@ -11,6 +11,10 @@ import Main from './pages/Main';
 import JoinClass from './pages/JoinClass';
 import CreateTest from './pages/CreateTest';
 import Quiz from './pages/Quiz';
+import Settings from './pages/Settings';
+import EditProfile from './pages/EditProfile';
+import ShowScore from './pages/ShowScore';
+import EditQuestions from './pages/EditQuestions';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -180,6 +184,26 @@ class App extends React.Component<Props, State> {
             Component={Quiz}
             token={this.props.token}
             path="/quiz/:classId/:quizId"
+          />
+          <PrivateRoute
+            Component={Settings}
+            token={this.props.token}
+            path="/settings"
+          />
+          <PrivateRoute
+            Component={EditProfile}
+            token={this.props.token}
+            path="/profile"
+          />
+          <PrivateRoute
+            Component={ShowScore}
+            token={this.props.token}
+            path="/result/:classId/:quizId"
+          />
+          <PrivateRoute
+            Component={EditQuestions}
+            token={this.props.token}
+            path="/editque/:classId/:quizId"
           />
           <Route path="*">
             <NotFound />

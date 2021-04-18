@@ -3,8 +3,9 @@ import {View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem, Button, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 
-import {HeadCom} from '../components/common';
+import {HeadCom} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
@@ -12,9 +13,13 @@ import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
 import {mediaUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
-import {commonBlue, commonGrey} from '../../shared/styles/colors';
+import {
+  commonBlue,
+  commonGrey,
+  greyWithAlpha,
+} from '../../shared/styles/colors';
 
-type Props = {
+type Props = RouteComponentProps & {
   token: string | null;
   profile: {
     name: string;
@@ -41,6 +46,7 @@ class Settings extends React.PureComponent<Props> {
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
           }}
+          style={{backgroundColor: greyWithAlpha(0.3)}}
         />
 
         <ListItem.Content>
@@ -53,7 +59,7 @@ class Settings extends React.PureComponent<Props> {
           type="outline"
           onPress={() => {
             this.props.registerCurrentClass(item);
-            this.props.navigation.navigate('Manage');
+            this.props.history.push(`/classes/about/${item.id}`);
           }}
         />
       </ListItem>
@@ -84,7 +90,7 @@ class Settings extends React.PureComponent<Props> {
           </Text>
           <Button
             title="Create or Join class"
-            onPress={() => this.props.navigation.navigate('JoinClass')}
+            onPress={() => this.props.history.push('/joinclass')}
           />
         </>
       );
@@ -113,7 +119,7 @@ class Settings extends React.PureComponent<Props> {
             icon: 'arrow-back',
             color: '#ffff',
             size: 26,
-            onPress: () => this.props.navigation.goBack(),
+            onPress: () => this.props.history.goBack(),
           }}
         />
         <HeadCom
@@ -125,11 +131,7 @@ class Settings extends React.PureComponent<Props> {
               name="account-edit-outline"
               size={28}
               color={commonGrey}
-              onPress={() =>
-                this.props.navigation.navigate('EditProfile', {
-                  username: profile.username,
-                })
-              }
+              onPress={() => this.props.history.push('/profile')}
             />
           }
         />
@@ -151,4 +153,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {registerCurrentClass})(Settings);
+export default withRouter(
+  connect(mapStateToProps, {registerCurrentClass})(Settings),
+);

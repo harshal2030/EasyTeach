@@ -2,7 +2,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Pressable,
   StyleSheet,
   SectionList,
   ActivityIndicator,
@@ -108,12 +107,8 @@ class Test extends React.Component<Props, State> {
     }
 
     if (title === 'Scored') {
-      // this.props.navigation.navigate('ShowScore', {
-      //   quizId: quiz.quizId,
-      //   title: quiz.title,
-      //   questions: quiz.questions,
-      // });
-      // TODO: handle nav
+      const {classId} = this.props.match.params;
+      this.props.history.push(`/result/${classId}/${quiz.quizId}`);
     }
   };
 
@@ -139,31 +134,7 @@ class Test extends React.Component<Props, State> {
         containerStyle={{margin: 10}}
         onPress={() => this.onCardPress(title, item)}
         expiresOn={new Date(item.timePeriod[1].value)}
-        collapseComponent={
-          this.props.isOwner ? (
-            <View style={styles.collapseContainer}>
-              <Pressable
-                style={styles.collapseButton}
-                onPress={() =>
-                  this.props.history.push(
-                    `/createtest/${this.props.match.params.classId}?quizId=${item.quizId}`,
-                  )
-                }>
-                <Text style={styles.collapseText}>Edit</Text>
-              </Pressable>
-              <Pressable
-                style={styles.collapseButton}
-                onPress={
-                  () => null // TODO: handle nav
-                  // this.props.navigation.navigate('EditQuestion', {
-                  //   quizId: item.quizId,
-                  // })
-                }>
-                <Text style={styles.collapseText}>Edit Questions</Text>
-              </Pressable>
-            </View>
-          ) : null
-        }
+        isOwner={this.props.isOwner}
       />
     );
   };

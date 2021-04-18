@@ -7,7 +7,7 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {connect} from 'react-redux';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {HeadCom} from '../components/common';
+import {HeadCom} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';

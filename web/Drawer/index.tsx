@@ -154,7 +154,8 @@ const DrawerContent = (props: Props): JSX.Element => {
           <Button
             icon={<Ionicons name="settings" size={36} color={commonGrey} />}
             type="clear"
-            TouchableComponent={TouchableOpacity} // TODO: Handle nav for going to settings
+            onPress={() => history.push('/settings')}
+            TouchableComponent={TouchableOpacity}
           />
 
           <Button
@@ -204,9 +205,6 @@ const DrawerContent = (props: Props): JSX.Element => {
                     history.push(`${url}/home/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
-                  {
-                    // TODO: Handle nav for respective routes
-                  }
                   <Entypo name="home" color="#34495e" size={23} />
                   <Text style={optionText}> Home</Text>
                 </TouchableOpacity>

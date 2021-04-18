@@ -188,11 +188,9 @@ class Quiz extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.data.releaseScore) {
-          return this.props.navigation.replace('ShowScore', {
-            quizId: route.params.quizId,
-            title: route.params.title,
-            questions: this.state.questions.length,
-          });
+          return this.props.history.replace(
+            `/result/${this.props.match.params.classId}/${this.props.match.params.quizId}`,
+          );
         }
 
         this.Alert('Success', 'Your response has been recorded', [

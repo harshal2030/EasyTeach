@@ -34,6 +34,7 @@
     "react-datepicker": "^3.7.0",
     "react-dom": "^17.0.2",
     "react-native": "0.63.3",
+    "react-native-android-dialog-picker": "^0.1.0",
     "react-native-config": "^1.4.2",
     "react-native-dialog": "^6.2.0",
     "react-native-document-picker": "^4.1.0",
