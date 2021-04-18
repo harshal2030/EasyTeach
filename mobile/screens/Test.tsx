@@ -2,10 +2,12 @@ import React from 'react';
 import {
   View,
   Text,
-  Pressable,
   StyleSheet,
   SectionList,
   ActivityIndicator,
+  Platform,
+  Linking,
+  ActionSheetIOS,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {Header, Button} from 'react-native-elements';
@@ -16,6 +18,7 @@ import DocumentPicker from 'react-native-document-picker';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
+import AndroidPicker from 'react-native-android-dialog-picker';
 
 import {Card} from '../components/common';
 import {QuizInfo, ImportExcel} from '../components/main';
@@ -32,6 +35,7 @@ import {
   commonGrey,
 } from '../../shared/styles/colors';
 import {ContainerStyles} from '../../shared/styles/styles';
+import {resultUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Test'>,
@@ -128,6 +132,62 @@ class Test extends React.Component<Props, State> {
     }
   };
 
+  onGearPress = (quizId: string) => {
+    const {navigation} = this.props;
+    if (Platform.OS === 'android') {
+      AndroidPicker.show(
+        {
+          title: 'Choose Option',
+          items: ['Edit Quiz', 'Add Image to questions', 'Download Result'],
+          cancelText: 'Cancel',
+        },
+        (index) => {
+          if (index === 0) {
+            return navigation.navigate('CreateTest', {quizId});
+          }
+
+          if (index === 1) {
+            return navigation.navigate('EditQuestion', {quizId});
+          }
+
+          if (index === 2) {
+            Linking.openURL(
+              `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
+            );
+          }
+        },
+      );
+    } else {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: 'Choose Option',
+          options: [
+            'Edit Quiz',
+            'Add Image to questions',
+            'Download Result',
+            'Cancel',
+          ],
+          cancelButtonIndex: 3,
+        },
+        (index) => {
+          if (index === 0) {
+            return navigation.navigate('CreateTest', {quizId});
+          }
+
+          if (index === 1) {
+            return navigation.navigate('EditQuestion', {quizId});
+          }
+
+          if (index === 2) {
+            return Linking.openURL(
+              `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
+            );
+          }
+        },
+      );
+    }
+  };
+
   renderItem = ({
     item,
     section: {title},
@@ -141,30 +201,8 @@ class Test extends React.Component<Props, State> {
         containerStyle={{margin: 10}}
         onPress={() => this.onCardPress(title, item)}
         expiresOn={new Date(item.timePeriod[1].value)}
-        collapseComponent={
-          this.props.isOwner ? (
-            <View style={styles.collapseContainer}>
-              <Pressable
-                style={styles.collapseButton}
-                onPress={() =>
-                  this.props.navigation.navigate('CreateTest', {
-                    quizId: item.quizId,
-                  })
-                }>
-                <Text style={styles.collapseText}>Edit</Text>
-              </Pressable>
-              <Pressable
-                style={styles.collapseButton}
-                onPress={() =>
-                  this.props.navigation.navigate('EditQuestion', {
-                    quizId: item.quizId,
-                  })
-                }>
-                <Text style={styles.collapseText}>Edit Questions</Text>
-              </Pressable>
-            </View>
-          ) : null
-        }
+        isOwner={this.props.isOwner}
+        onGearPress={() => this.onGearPress(item.quizId)}
       />
     );
   };

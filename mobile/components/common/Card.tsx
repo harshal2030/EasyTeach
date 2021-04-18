@@ -20,12 +20,11 @@ type Props = {
   onPress?(): any;
   containerStyle?: ViewStyle;
   expiresOn: Date;
-  collapseComponent?: JSX.Element | null;
+  onGearPress?(): void;
+  isOwner: boolean;
 };
 
 const Card = (props: Props) => {
-  const [collapsed, updateCollapse] = React.useState(false);
-
   return (
     <View style={[styles.main, props.containerStyle]}>
       <TouchableWithoutFeedback onPress={props.onPress}>
@@ -43,16 +42,11 @@ const Card = (props: Props) => {
             </Text>
           </View>
 
-          {props.collapseComponent && (
-            <Octicons
-              name="gear"
-              size={23}
-              onPress={() => updateCollapse(!collapsed)}
-            />
+          {props.isOwner && (
+            <Octicons name="gear" size={23} onPress={props.onGearPress} />
           )}
         </View>
       </TouchableWithoutFeedback>
-      {collapsed && props.collapseComponent}
     </View>
   );
 };
