@@ -1,7 +1,7 @@
 const formatDate = (date: Date) => {
   const dateNum = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
   const month =
-    date.getMonth() + 1 < 10 ? `0${date.getMonth()}` : date.getMonth();
+    date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : date.getMonth() + 1;
   const y = date.getFullYear();
 
   const hr = date.getHours() + 1 < 10 ? `0${date.getHours()}` : date.getHours();

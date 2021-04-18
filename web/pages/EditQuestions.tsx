@@ -68,10 +68,10 @@ class EditQuestion extends React.Component<Props, State> {
 
   fetchQues = () => {
     this.setState({loading: true});
-    const {currentClass, token, match} = this.props;
+    const {token, match} = this.props;
     axios
       .get<Questions[]>(
-        `${questionUrl}/${currentClass.id}/${match.params.quizId}`,
+        `${questionUrl}/${this.props.match.params.classId}/${match.params.quizId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -137,7 +137,7 @@ class EditQuestion extends React.Component<Props, State> {
     }
 
     return (
-      <View style={{alignItems: 'center'}}>
+      <View>
         <FlatList
           data={questions}
           keyExtractor={(_item, i) => i.toString()}

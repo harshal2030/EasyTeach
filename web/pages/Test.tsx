@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SectionList,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {withRouter, RouteComponentProps, Link} from 'react-router-dom';
@@ -12,6 +13,7 @@ import {Header, Button} from 'react-native-elements';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
+import Dialog from 'react-native-dialog';
 
 import {Card} from '../../shared/components/common';
 import {QuizInfo} from '../../shared/components/main';
@@ -27,6 +29,7 @@ import {
 } from '../../shared/styles/colors';
 import {ContainerStyles} from '../../shared/styles/styles';
 import {excelExtPattern} from '../../shared/utils/regexPatterns';
+import {resultUrl} from '../../shared/utils/urls';
 
 type Props = RouteComponentProps<{classId: string}> & {
   token: string | null;
@@ -44,6 +47,7 @@ type Props = RouteComponentProps<{classId: string}> & {
 interface State {
   modalVisible: boolean;
   quiz: QuizRes | null;
+  optionModalVisible: boolean;
 }
 
 class Test extends React.Component<Props, State> {
@@ -53,6 +57,7 @@ class Test extends React.Component<Props, State> {
     this.state = {
       modalVisible: false,
       quiz: null,
+      optionModalVisible: false,
     };
   }
 
@@ -135,6 +140,9 @@ class Test extends React.Component<Props, State> {
         onPress={() => this.onCardPress(title, item)}
         expiresOn={new Date(item.timePeriod[1].value)}
         isOwner={this.props.isOwner}
+        onGearPress={() =>
+          this.setState({optionModalVisible: true, quiz: item})
+        }
       />
     );
   };
@@ -244,6 +252,48 @@ class Test extends React.Component<Props, State> {
             />
           </Link>
         )}
+
+        {this.props.isOwner && (
+          <Dialog.Container
+            visible={this.state.optionModalVisible}
+            animationIn="fadeIn"
+            animationOut="fadeOut"
+            onBackdropPress={() => this.setState({optionModalVisible: false})}
+            style={styles.optionModalStyle}>
+            <Dialog.Title>Choose Option</Dialog.Title>
+            <Dialog.Button
+              label="Edit Quiz"
+              onPress={() =>
+                this.props.history.push(
+                  `/createtest/${this.props.match.params.classId}?quizId=${
+                    this.state.quiz!.quizId
+                  }`,
+                )
+              }
+            />
+            <Dialog.Button
+              label="Add Image to question"
+              onPress={() =>
+                this.props.history.push(
+                  `/editque/${this.props.match.params.classId}/${
+                    this.state.quiz!.quizId
+                  }`,
+                )
+              }
+            />
+            <Dialog.Button
+              label="Download Result"
+              onPress={() =>
+                Linking.openURL(
+                  `${resultUrl}/file/${this.props.currentClass!.id}/${
+                    this.state.quiz!.quizId
+                  }`,
+                )
+              }
+            />
+          </Dialog.Container>
+        )}
+
         <Modal
           isVisible={this.state.modalVisible}
           style={styles.modalStyle}
@@ -301,6 +351,10 @@ const styles = StyleSheet.create({
   },
   modalStyle: {
     margin: 0,
+  },
+  optionModalStyle: {
+    backgroundColor: '#ffff',
+    flex: 0,
   },
   FABContainer: {
     position: 'absolute',

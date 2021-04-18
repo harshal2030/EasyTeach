@@ -20,7 +20,7 @@ import {Chip, CheckBox} from '../../shared/components/common';
 import {ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
-import {Class} from '../../shared/global/actions/classes';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {
   QuizRes,
   addQuiz,
@@ -33,12 +33,14 @@ import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
 import {quizUrl} from '../../shared/utils/urls';
 import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
-type Props = RouteComponentProps & {
+type Props = RouteComponentProps<{classId: string}> & {
   token: string | null;
   currentClass: Class | null;
   addQuiz: typeof addQuiz;
   fetchQuiz(token: string, classId: string): void;
   removeQuiz: typeof removeQuiz;
+  classes: Class[];
+  registerCurrentClass: typeof registerCurrentClass;
 };
 
 interface State {
@@ -92,6 +94,16 @@ class CreateTest extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+
+    const classFound = classes.find((cls) => cls.id === classId);
+
+    if (classFound) {
+      this.props.registerCurrentClass(classFound);
+    } else {
+      this.props.history.replace('/*');
+    }
     this.getQuizDetail();
   }
 
@@ -100,7 +112,7 @@ class CreateTest extends React.Component<Props, State> {
       this.setState({loading: true});
       axios
         .get<QuizRes>(
-          `${quizUrl}/${this.props.currentClass!.id}/${this.quizId}`,
+          `${quizUrl}/${this.props.match.params.classId}/${this.quizId}`,
           {
             headers: {
               Authorization: `Bearer ${this.props.token}`,
@@ -548,9 +560,15 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
+    classes: state.classes,
   };
 };
 
 export default withRouter(
-  connect(mapStateToProps, {addQuiz, removeQuiz, fetchQuiz})(CreateTest),
+  connect(mapStateToProps, {
+    addQuiz,
+    removeQuiz,
+    fetchQuiz,
+    registerCurrentClass,
+  })(CreateTest),
 );

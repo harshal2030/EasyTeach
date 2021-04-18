@@ -6,8 +6,6 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  AppState,
-  AppStateStatus,
   Image as FastImage,
 } from 'react-native';
 import {withRouter, RouteComponentProps} from 'react-router';
@@ -98,19 +96,17 @@ class Quiz extends React.Component<Props, State> {
     } else {
       this.props.history.replace('/*');
     }
-    AppState.addEventListener('change', this.appStateHandler);
+
+    if (!document.hasFocus()) {
+      this.fetchQues();
+    }
+
+    window.addEventListener('blur', this.fetchQues);
     this.fetchQues();
   }
 
-  appStateHandler = (state: AppStateStatus) => {
-    if (state === 'background' || state === 'inactive') {
-      this.setState({currentIndex: 0});
-      this.fetchQues();
-    }
-  };
-
   componentWillUnmount() {
-    AppState.removeEventListener('change', this.appStateHandler);
+    window.removeEventListener('blur', this.fetchQues);
   }
 
   fetchQues = () => {
@@ -275,7 +271,7 @@ class Quiz extends React.Component<Props, State> {
     }
 
     return (
-      <ScrollView style={[ContainerStyles.padder, {width: '100%'}]}>
+      <ScrollView style={[ContainerStyles.padder, {width: '90%'}]}>
         <Text style={{color: commonGrey}}>
           Question {currentIndex + 1} of {questions.length},{' '}
           {questions[currentIndex].score} marks
