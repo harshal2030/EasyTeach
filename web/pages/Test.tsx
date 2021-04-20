@@ -261,36 +261,38 @@ class Test extends React.Component<Props, State> {
             onBackdropPress={() => this.setState({optionModalVisible: false})}
             style={styles.optionModalStyle}>
             <Dialog.Title>Choose Option</Dialog.Title>
-            <Dialog.Button
-              label="Edit Quiz"
-              onPress={() =>
-                this.props.history.push(
-                  `/createtest/${this.props.match.params.classId}?quizId=${
-                    this.state.quiz!.quizId
-                  }`,
-                )
-              }
-            />
-            <Dialog.Button
-              label="Add Image to question"
-              onPress={() =>
-                this.props.history.push(
-                  `/editque/${this.props.match.params.classId}/${
-                    this.state.quiz!.quizId
-                  }`,
-                )
-              }
-            />
-            <Dialog.Button
-              label="Download Result"
-              onPress={() =>
-                Linking.openURL(
-                  `${resultUrl}/file/${this.props.currentClass!.id}/${
-                    this.state.quiz!.quizId
-                  }`,
-                )
-              }
-            />
+            <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+              <Dialog.Button
+                label="Edit Quiz"
+                onPress={() =>
+                  this.props.history.push(
+                    `/createtest/${this.props.match.params.classId}?quizId=${
+                      this.state.quiz!.quizId
+                    }`,
+                  )
+                }
+              />
+              <Dialog.Button
+                label="Add Image to question"
+                onPress={() =>
+                  this.props.history.push(
+                    `/editque/${this.props.match.params.classId}/${
+                      this.state.quiz!.quizId
+                    }`,
+                  )
+                }
+              />
+              <Dialog.Button
+                label="Download Result"
+                onPress={() =>
+                  Linking.openURL(
+                    `${resultUrl}/file/${this.props.currentClass!.id}/${
+                      this.state.quiz!.quizId
+                    }`,
+                  )
+                }
+              />
+            </View>
           </Dialog.Container>
         )}
 

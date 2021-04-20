@@ -99,7 +99,6 @@ class App extends React.Component<Props, State> {
       if (token !== null) {
         this.props.registerToken(token);
         this.props.fetchClasses(token);
-        this.setState({loading: false});
 
         const res = await axios.get<userChecker>(checkTokenUrl, {
           timeout: 20000,
@@ -107,6 +106,7 @@ class App extends React.Component<Props, State> {
             Authorization: `Bearer ${token}`,
           },
         });
+        this.setState({loading: false});
 
         if (res.data.message === 'SERVER_MAINTENANCE') {
           this.openDialog(

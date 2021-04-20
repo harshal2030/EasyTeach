@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import {View, Text, ActivityIndicator, FlatList} from 'react-native';
-import {Header} from 'react-native-elements';
+import {Header, Button} from 'react-native-elements';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
@@ -83,7 +83,7 @@ class EditQuestion extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.data.length === 0) {
-          this.setState({loading: false, end: false});
+          this.setState({loading: false, end: true});
           return;
         }
         this.setState({
@@ -114,6 +114,20 @@ class EditQuestion extends React.Component<Props, State> {
     );
   };
 
+  renderFooter = () => {
+    if (!this.state.end && this.state.questions.length % 10 === 0) {
+      return (
+        <Button
+          title="Load more"
+          onPress={this.onLoadNextPress}
+          style={{marginBottom: 20}}
+        />
+      );
+    }
+
+    return null;
+  };
+
   renderContent = () => {
     const {errored, loading, questions} = this.state;
 
@@ -137,11 +151,12 @@ class EditQuestion extends React.Component<Props, State> {
     }
 
     return (
-      <View>
+      <View style={{margin: 25}}>
         <FlatList
           data={questions}
           keyExtractor={(_item, i) => i.toString()}
           renderItem={this.renderItem}
+          ListFooterComponent={this.renderFooter}
         />
       </View>
     );

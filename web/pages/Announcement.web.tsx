@@ -71,7 +71,9 @@ class Home extends React.Component<Props, State> {
     if (classFound) {
       this.props.registerCurrentClass(classFound);
     } else {
-      this.props.history.replace('/*');
+      if (classes.length !== 0) {
+        this.props.history.replace('/*');
+      }
     }
 
     if (this.props.currentClass) {
@@ -175,7 +177,7 @@ class Home extends React.Component<Props, State> {
           </Text>
           <Button
             title="Create or Join class"
-            onPress={() => console.log('Join Pressed')}
+            onPress={() => this.props.history.push('/joinclass')}
           />
         </View>
       );

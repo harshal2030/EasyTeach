@@ -19,10 +19,6 @@ import {usernamePattern} from '../../shared/utils/regexPatterns';
 
 interface Props {
   token: string;
-  fcm: {
-    os: string;
-    fcmToken: string;
-  };
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
   fetchClasses: Function;
@@ -78,7 +74,10 @@ class AuthScreen extends React.Component<Props, State> {
               username: email,
               password,
             },
-            device: this.props.fcm,
+            device: {
+              os: 'web',
+              fcm: '',
+            },
           },
           {
             timeout: 20000,
@@ -90,10 +89,10 @@ class AuthScreen extends React.Component<Props, State> {
         )
         .then((res) => {
           if (res.status === 200) {
+            this.props.fetchClasses(res.data.token);
             this.storeToken(res.data.token);
             this.props.registerToken(res.data.token);
             this.props.registerProfile(res.data.user);
-            this.props.fetchClasses(res.data.token);
           }
         })
         .catch(() => {
@@ -136,7 +135,6 @@ class AuthScreen extends React.Component<Props, State> {
       );
     }
 
-    const {fcm} = this.props;
     this.setState({loading: true});
     axios
       .post<{
@@ -151,7 +149,10 @@ class AuthScreen extends React.Component<Props, State> {
             email,
             password,
           },
-          device: fcm,
+          device: {
+            os: 'web',
+            fcmToken: '',
+          },
         },
         {
           timeout: 20000,
@@ -163,11 +164,11 @@ class AuthScreen extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 201) {
+          this.props.fetchClasses(res.data.token);
           this.storeToken(res.data.token);
           this.setState({loading: false});
           this.props.registerToken(res.data.token);
           this.props.registerProfile(res.data.user);
-          this.props.fetchClasses(res.data.token);
         }
       })
       .catch((e) => {
@@ -207,7 +208,6 @@ class AuthScreen extends React.Component<Props, State> {
 
 const mapStateToProps = (state: StoreState) => {
   return {
-    fcm: state.fcm!,
     token: state.token!,
   };
 };

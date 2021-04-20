@@ -1,16 +1,11 @@
 import React from 'react';
 import axios from 'axios';
-import {
-  View,
-  StyleSheet,
-  Alert,
-  FlatList,
-  ActivityIndicator,
-} from 'react-native';
+import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
 import {useHistory, useParams} from 'react-router-dom';
 import {Header, ListItem, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
+import Dialog from 'react-native-dialog';
 
 import {Avatar} from '../../shared/components/common';
 
@@ -42,6 +37,11 @@ interface peopleProp {
 const People = (props: Props) => {
   const [people, setPeople] = React.useState<peopleProp[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [alertVisible, setAlert] = React.useState<boolean>(false);
+  const [user, setUser] = React.useState<{name: string; username: string}>({
+    name: '',
+    username: '',
+  });
 
   const history = useHistory();
 
@@ -78,32 +78,23 @@ const People = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.currentClass, classId]);
 
-  const removeStudent = (name: string, username: string) => {
-    const removeReq = () => {
-      axios
-        .delete(`${studentUrl}/${username}/${props.currentClass!.id}`, {
-          headers: {
-            Authorization: `Bearer ${props.token}`,
-          },
-        })
-        .then(() => {
-          toast.info(`${name} removed successfully from the class`);
+  const removeStudent = () => {
+    setAlert(false);
+    axios
+      .delete(`${studentUrl}/${user.username}/${props.currentClass!.id}`, {
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      })
+      .then(() => {
+        toast.info(`${user.name} removed successfully from the class`);
 
-          const newPeople = people.filter((ppl) => ppl.username !== username);
-          setPeople(newPeople);
-        })
-        .catch(() => toast.error(`Unable to remove ${name} at the moment`));
-    };
-
-    Alert.alert('Confirm', `Are you sure to remove ${name} from the class?`, [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Yes',
-        onPress: removeReq,
-      },
-    ]);
+        const newPeople = people.filter(
+          (ppl) => ppl.username !== user.username,
+        );
+        setPeople(newPeople);
+      })
+      .catch(() => toast.error(`Unable to remove ${user.name} at the moment`));
   };
 
   const renderListItem = ({item}: {item: peopleProp}) => {
@@ -124,7 +115,10 @@ const People = (props: Props) => {
             name="cross"
             type="entypo"
             size={24}
-            onPress={() => removeStudent(item.name, item.username)}
+            onPress={() => {
+              setUser({name: item.name, username: item.username});
+              setAlert(true);
+            }}
           />
         )}
       </ListItem>
@@ -194,6 +188,15 @@ const People = (props: Props) => {
       ) : (
         <Text>Enroll in a class to see people</Text>
       )}
+
+      <Dialog.Container visible={alertVisible}>
+        <Dialog.Title>Confirm</Dialog.Title>
+        <Dialog.Description>
+          {`Are you sure to remove ${user.name} from the class`}
+        </Dialog.Description>
+        <Dialog.Button label="Cancel" onPress={() => setAlert(false)} />
+        <Dialog.Button label="Yes" onPress={removeStudent} />
+      </Dialog.Container>
     </View>
   );
 };

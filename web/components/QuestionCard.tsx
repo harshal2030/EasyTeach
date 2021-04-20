@@ -123,7 +123,10 @@ class QuestionCard extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   queContainer: {
-    padding: 10,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 2,
     margin: 5,
     backgroundColor: commonBackground,
   },
