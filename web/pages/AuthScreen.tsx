@@ -76,7 +76,7 @@ class AuthScreen extends React.Component<Props, State> {
             },
             device: {
               os: 'web',
-              fcm: '',
+              fcmToken: '',
             },
           },
           {

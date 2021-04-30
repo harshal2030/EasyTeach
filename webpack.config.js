@@ -3,9 +3,6 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
-
 const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
   .ReactWebConfig;
 
@@ -115,6 +112,5 @@ module.exports = {
       __DEV__: JSON.stringify(true),
     }),
     ReactWebConfig(envFilePath),
-    new BundleAnalyzerPlugin(),
   ],
 };
