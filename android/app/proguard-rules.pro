@@ -30,6 +30,7 @@
 -keep,allowobfuscation @interface com.facebook.proguard.annotations.KeepGettersAndSetters
 -keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
 -keep,allowobfuscation @interface com.facebook.jni.annotations.DoNotStrip
+-keep class com.facebook.react.turbomodule.** { *; }
 
 # Do not strip any method/class that is annotated with @DoNotStrip
 -keep @com.facebook.proguard.annotations.DoNotStrip class *

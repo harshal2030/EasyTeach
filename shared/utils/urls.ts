@@ -20,6 +20,7 @@ const msgUrl = `${root}/msg`;
 const questionUrl = `${root}/que`;
 const recoveryUrl = `${root}/users/recover`;
 const moduleUrl = `${root}/module`;
+const fileUrl = `${root}/file`;
 
 export {
   root,
@@ -36,4 +37,5 @@ export {
   questionUrl,
   recoveryUrl,
   moduleUrl,
+  fileUrl,
 };

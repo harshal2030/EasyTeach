@@ -27,6 +27,9 @@ type RootStackParamList = {
   EditQuestion: {
     quizId: string;
   };
+  Files: {
+    moduleId: string;
+  };
 };
 
 type DrawerParamList = {

@@ -101,7 +101,9 @@ class Module extends React.Component<Props, State> {
     return (
       <TouchableHighlight
         underlayColor={greyWithAlpha(0.4)}
-        onPress={() => console.log('hii')}>
+        onPress={() =>
+          this.props.navigation.navigate('Files', {moduleId: item.id})
+        }>
         <View style={styles.moduleContainer}>
           <Text style={styles.moduleText}>{item.title}</Text>
           {this.props.isOwner && <Icon name="more-horizontal" type="feather" />}

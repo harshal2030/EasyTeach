@@ -3059,6 +3059,11 @@
   dependencies:
     invariant "^2.2.4"
 
+"@react-native-community/slider@^3.0.3":
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-3.0.3.tgz#830167fd757ba70ac638747ba3169b2dbae60330"
+  integrity sha512-8IeHfDwJ9/CTUwFs6x90VlobV3BfuPgNLjTgC6dRZovfCWigaZwVNIFFJnHBakK3pW2xErAPwhdvNR4JeNoYbw==
+
 "@react-native-community/viewpager@^4.2.2":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@react-native-community/viewpager/-/viewpager-4.2.2.tgz#e05d618829c589284326896c806200af90ae0986"
@@ -3516,6 +3521,14 @@
   integrity sha512-NPRAJeCJ0p9bm1xh+yhel0SE5KzhA85V1gT4noGpZI7knFL482d8XlryMEVAbbKZIKuMGtCYPKcFsw+7jQRn/A==
   dependencies:
     "@types/node-fetch" "*"
+
+"@types/react-native-video@^5.0.4":
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/@types/react-native-video/-/react-native-video-5.0.4.tgz#259ece17ccaf8a274008d77d105eeab5972117d1"
+  integrity sha512-0NzgoA1e8vMr0lvTJ4qDmwfiBXh0ju6GXLEHUUsgFuxtaqKGXsMDogzDFwqJ4gqsq5T3oQuiLffw2Se/rQAfFw==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
 
 "@types/react-native@*", "@types/react-native@^0.63.18":
   version "0.63.46"
@@ -5777,6 +5790,11 @@ electron-to-chromium@^1.3.649:
   version "1.3.697"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.697.tgz#4ba8af135d72d06534bd78f68d1be0dca3d2c590"
   integrity sha512-VTAS+IWwGlfaL7VtfUMzFeV55PT/HglNFqQ6eW9E3PfjvPqhZfqJj+8dd9zrqrJYcouUfCgQw0OIse85Dz9V9Q==
+
+eme-encryption-scheme-polyfill@^2.0.1:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.3.tgz#2ca6e06480e06cceb5e50efd27943ac46c959878"
+  integrity sha512-44CNFMsqzHdKHrzWxlS7xZ8KUHn5XutBqpmCuWzNIynmAyFInHrrD3ozv/RvK9ZhgV6QY6Easx8EWAmxteNodg==
 
 emittery@^0.7.1:
   version "0.7.2"
@@ -8560,6 +8578,11 @@ jss@10.6.0, jss@^10.5.1:
     array-includes "^3.1.2"
     object.assign "^4.1.2"
 
+keymirror@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/keymirror/-/keymirror-0.1.1.tgz#918889ea13f8d0a42e7c557250eee713adc95c35"
+  integrity sha1-kYiJ6hP40KQufFVyUO7nE63JXDU=
+
 killable@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/killable/-/killable-1.0.1.tgz#4c8ce441187a061c7474fb87ca08e2a638194892"
@@ -10533,6 +10556,11 @@ react-native-animatable@1.3.3:
   dependencies:
     prop-types "^15.7.2"
 
+react-native-background-upload@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-background-upload/-/react-native-background-upload-6.2.0.tgz#c7a5db94c2def8e464f5f770eaa7e62899660921"
+  integrity sha512-cGDRprAeu6nKNdg4wbcffruDc/vHO4JpNk6cnfmuVYyZOGJ1Ei8b7vf7inQHgx38PLCpB3seNgyQoM9enGzksA==
+
 react-native-bundle-visualizer@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-native-bundle-visualizer/-/react-native-bundle-visualizer-2.2.1.tgz#0079d866a8a4f9cacfe818311db969b4dbd66634"
@@ -10609,6 +10637,10 @@ react-native-lightbox-v2@^0.8.6:
   integrity sha512-rw97PJL8kKyNgvN1CrMj+amQz3A+ClKFkSNi9zOKq2+GgqttOdZ4sZ4piQTwfdE+fAEzCazLGhaKtWhHsBBYxQ==
   dependencies:
     prop-types "^15.7.2"
+
+"react-native-media-controls@git+https://github.com/harshal2030/react-native-media-controls.git":
+  version "2.3.0"
+  resolved "git+https://github.com/harshal2030/react-native-media-controls.git#dfd0d8e4079963535f9f8a172c4b4d1bba9774da"
 
 react-native-modal@>=9.0.0:
   version "11.9.0"
@@ -10759,6 +10791,15 @@ react-native-vector-icons@^7.1.0:
     lodash.template "^4.5.0"
     prop-types "^15.7.2"
     yargs "^15.0.2"
+
+react-native-video@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-5.1.1.tgz#89a7989efeb8d404611c06154d1da227a745d7d8"
+  integrity sha512-zee8gRUrjPWRoZSEBiMebClqu1iAuCQNLjzqpmXFrRWEoJj7azM3BPqLQWJgsnfLiYUYGySeApC/G60THM5+tw==
+  dependencies:
+    keymirror "^0.1.1"
+    prop-types "^15.7.2"
+    shaka-player "^2.5.9"
 
 react-native-web@^0.15.0:
   version "0.15.0"
@@ -11494,6 +11535,13 @@ setprototypeof@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.1.tgz#7e95acb24aa92f5885e0abef5ba131330d4ae683"
   integrity sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==
+
+shaka-player@^2.5.9:
+  version "2.5.22"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.22.tgz#64b4547b742b2a3a022be9fbe0686d944f9d0300"
+  integrity sha512-PAoeNLUQ/hT/9dY7QvNFgIiDtXSqbYVFuXXtLHh7ytVVqTvI/p4HLwfYShiR+sE/sbsDOr9D5l9D/ztLPhxgtw==
+  dependencies:
+    eme-encryption-scheme-polyfill "^2.0.1"
 
 shallow-clone@^0.1.2:
   version "0.1.2"
