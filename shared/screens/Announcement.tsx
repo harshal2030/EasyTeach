@@ -213,6 +213,7 @@ class Home extends React.Component<Props, State> {
     return (
       <FlatList
         data={this.props.msgs}
+        removeClippedSubviews
         keyExtractor={(_item, i) => i.toString()}
         inverted
         renderItem={this.renderListItem}

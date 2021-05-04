@@ -172,6 +172,7 @@ class Module extends React.Component<Props, State> {
         data={modules}
         style={{padding: 10}}
         keyExtractor={(item) => item.id}
+        removeClippedSubviews
         renderItem={this.renderItem}
       />
     );

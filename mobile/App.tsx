@@ -141,6 +141,10 @@ const App = (props: Props): JSX.Element => {
             name="Files"
             component={require('./screens/Files').default}
           />
+          <Stack.Screen
+            name="Video"
+            component={require('./screens/Video').default}
+          />
           {props.isOwner && (
             <Stack.Screen
               name="CreateTest"

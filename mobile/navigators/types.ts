@@ -30,6 +30,10 @@ type RootStackParamList = {
   Files: {
     moduleId: string;
   };
+  Video: {
+    url: string;
+    title?: string;
+  };
 };
 
 type DrawerParamList = {

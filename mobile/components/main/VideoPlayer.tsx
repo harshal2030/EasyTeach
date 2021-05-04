@@ -11,6 +11,7 @@ type Props = {
   source: {uri?: string; headers?: {[key: string]: string}} | number;
   onFullScreenPress?: () => void;
   style?: ViewStyle;
+  children?: JSX.Element | JSX.Element[];
 };
 
 const VideoPlayer = (props: Props) => {
@@ -77,7 +78,7 @@ const VideoPlayer = (props: Props) => {
         ref={videoPlayer}
         source={props.source}
         style={[styles.mediaPlayer, props.style]}
-        volume={10}
+        useTextureView={false}
       />
       {/* @ts-ignore */}
       <MediaControls
@@ -90,8 +91,11 @@ const VideoPlayer = (props: Props) => {
         onSeek={onSeek}
         onSeeking={onSeeking}
         playerState={playerState}
-        progress={currentTime}
-      />
+        progress={currentTime}>
+        {props.children && (
+          <MediaControls.Toolbar>{props.children}</MediaControls.Toolbar>
+        )}
+      </MediaControls>
     </View>
   );
 };
