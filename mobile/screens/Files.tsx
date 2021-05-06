@@ -8,6 +8,8 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import {Header, FAB, Button, Input} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -20,15 +22,21 @@ import {connect} from 'react-redux';
 import Modal from 'react-native-modal';
 import SnackBar from 'react-native-snackbar';
 import AD from 'react-native-vector-icons/AntDesign';
+import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
-import {commonBlue, commonGrey} from '../../shared/styles/colors';
+import {
+  commonBlue,
+  commonGrey,
+  greyWithAlpha,
+} from '../../shared/styles/colors';
 import {fileUrl} from '../../shared/utils/urls';
 import {flatRed} from '../../shared/styles/colors';
-import {ContainerStyles} from '../../shared/styles/styles';
+import {ContainerStyles, BottomSheetStyle} from '../../shared/styles/styles';
 
 type navigation = StackNavigationProp<RootStackParamList, 'Files'>;
 
@@ -37,6 +45,7 @@ type Props = {
   currentClass: Class;
   route: RouteProp<RootStackParamList, 'Files'>;
   token: string;
+  isOwner: boolean;
 };
 
 type State = {
@@ -46,6 +55,7 @@ type State = {
   files: FileRes[];
   loading: boolean;
   errored: boolean;
+  fileId: string;
 };
 
 type FileRes = {
@@ -58,6 +68,7 @@ type FileRes = {
 };
 
 class Files extends React.Component<Props, State> {
+  sheet: RBSheet | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -68,6 +79,7 @@ class Files extends React.Component<Props, State> {
       files: [],
       loading: true,
       errored: false,
+      fileId: '',
     };
   }
 
@@ -77,6 +89,7 @@ class Files extends React.Component<Props, State> {
 
   getModules = async () => {
     try {
+      this.setState({loading: true});
       const res = await axios.get<FileRes[]>(
         `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,
         {
@@ -98,6 +111,44 @@ class Files extends React.Component<Props, State> {
     })
       .then((res) => this.setState({videoUri: res.path, videoModal: true}))
       .catch((e) => console.log(e));
+  };
+
+  confirmDelete = () => {
+    this.sheet!.close();
+    Alert.alert('Confirm', 'Are you sure to delete this video?', [
+      {
+        text: 'Cancel',
+      },
+      {
+        text: 'Yes',
+        onPress: this.deleteVideo,
+      },
+    ]);
+  };
+
+  deleteVideo = async () => {
+    try {
+      await axios.delete(
+        `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.state.fileId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+
+      const newFiles = this.state.files.filter(
+        (file) => file.id !== this.state.fileId,
+      );
+      this.setState({files: newFiles});
+    } catch (e) {
+      SnackBar.show({
+        text: 'Unable to delete video. Please try again later',
+        backgroundColor: flatRed,
+        textColor: '#fff',
+        duration: SnackBar.LENGTH_LONG,
+      });
+    }
   };
 
   uploadVideo = () => {
@@ -126,11 +177,17 @@ class Files extends React.Component<Props, State> {
         title: this.state.videoTitle,
       },
     })
-      .then(() => {
+      .then((id) => {
         this.setState({videoModal: false});
         SnackBar.show({
           text: 'Uploading in background.',
           duration: SnackBar.LENGTH_LONG,
+        });
+
+        Upload.addListener('completed', id, (data) => {
+          const temp = JSON.parse(data.responseBody);
+
+          this.setState({files: [temp, ...this.state.files]});
         });
       })
       .catch(() => {
@@ -147,25 +204,45 @@ class Files extends React.Component<Props, State> {
   renderItem = ({item}: {item: FileRes}) => {
     return (
       <View style={styles.itemContainer}>
-        <FastImage
-          source={{
-            uri: `${fileUrl}/preview/${this.props.currentClass.id}/${item.preview}`,
-            headers: {Authorization: `Bearer ${this.props.token}`},
-          }}
-          style={styles.image}>
-          <AD
-            name="playcircleo"
-            size={40}
-            color="#ffff"
-            onPress={() => {
-              this.props.navigation.navigate('Video', {
-                url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
-                title: item.title,
-              });
+        <TouchableWithoutFeedback
+          onPress={() => {
+            this.props.navigation.navigate('Video', {
+              url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
+              title: item.title,
+            });
+          }}>
+          <FastImage
+            source={{
+              uri: `${fileUrl}/preview/${this.props.currentClass.id}/${item.preview}`,
+              headers: {Authorization: `Bearer ${this.props.token}`},
             }}
-          />
-        </FastImage>
-        <Text style={styles.itemTitle}>{item.title}</Text>
+            style={styles.image}>
+            <AD
+              name="playcircleo"
+              size={40}
+              color="#ffff"
+              onPress={() => {
+                this.props.navigation.navigate('Video', {
+                  url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
+                  title: item.title,
+                });
+              }}
+            />
+          </FastImage>
+        </TouchableWithoutFeedback>
+        <View style={styles.itemTextContainer}>
+          <Text style={styles.itemTitle}>{item.title}</Text>
+          {this.props.isOwner && (
+            <MCI
+              name="dots-horizontal"
+              size={25}
+              onPress={() => {
+                this.setState({fileId: item.id});
+                this.sheet!.open();
+              }}
+            />
+          )}
+        </View>
       </View>
     );
   };
@@ -189,6 +266,14 @@ class Files extends React.Component<Props, State> {
       );
     }
 
+    if (files.length === 0) {
+      return (
+        <View style={ContainerStyles.centerElements}>
+          <Text>Nothing to show here right now</Text>
+        </View>
+      );
+    }
+
     return (
       <FlatList
         data={files}
@@ -201,7 +286,7 @@ class Files extends React.Component<Props, State> {
 
   render() {
     return (
-      <View style={ContainerStyles.parent}>
+      <View style={[ContainerStyles.parent]}>
         <Header
           centerComponent={{
             text: 'Files',
@@ -218,9 +303,11 @@ class Files extends React.Component<Props, State> {
             type: 'feather',
             size: 20,
             color: '#ffff',
+            onPress: this.getModules,
           }}
           rightContainerStyle={{justifyContent: 'center'}}
         />
+        {this.renderContent()}
 
         <Modal
           isVisible={this.state.videoModal}
@@ -250,6 +337,30 @@ class Files extends React.Component<Props, State> {
           icon={{name: 'plus', type: 'octicon', color: '#fff'}}
           color={commonBlue}
         />
+
+        <RBSheet
+          height={140}
+          ref={(ref) => (this.sheet = ref)}
+          closeOnPressMask
+          closeOnDragDown
+          customStyles={{
+            container: BottomSheetStyle.container,
+          }}>
+          <View>
+            <TouchableOpacity style={BottomSheetStyle.RBOptionContainer}>
+              <MCI name="information-outline" color="#000" size={24} />
+              <Text style={BottomSheetStyle.RBTextStyle}>Info</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={BottomSheetStyle.RBOptionContainer}
+              onPress={this.confirmDelete}>
+              <MCI name="delete-outline" color={flatRed} size={24} />
+              <Text style={[BottomSheetStyle.RBTextStyle, {color: flatRed}]}>
+                Delete
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </RBSheet>
       </View>
     );
   }
@@ -262,6 +373,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#000',
+    borderWidth: 1,
+    borderColor: greyWithAlpha(0.2),
   },
   itemContainer: {
     marginHorizontal: 10,
@@ -270,6 +383,12 @@ const styles = StyleSheet.create({
     borderColor: commonGrey,
     padding: 10,
     borderRadius: 4,
+  },
+  itemTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5,
   },
   itemTitle: {
     fontWeight: '900',
@@ -282,6 +401,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     currentClass: state.currentClass!,
     token: state.token!,
+    isOwner: state.currentClass!.owner.username === state.profile.username,
   };
 };
 

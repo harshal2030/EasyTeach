@@ -272,6 +272,7 @@ class Test extends React.Component<Props, State> {
         renderItem={this.renderItem}
         keyExtractor={(item) => item.quizId}
         renderSectionHeader={this.renderSectionHeader}
+        ListFooterComponent={<View style={{height: 80}} />}
         style={{marginBottom: 30, paddingBottom: 30}}
         stickySectionHeadersEnabled
       />
