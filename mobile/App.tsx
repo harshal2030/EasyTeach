@@ -126,6 +126,10 @@ const App = (props: Props): JSX.Element => {
             component={require('./navigators/Drawer').default}
           />
           <Stack.Screen
+            name="Info"
+            component={require('./screens/Info').default}
+          />
+          <Stack.Screen
             name="JoinClass"
             component={require('./screens/JoinClass').default}
           />

@@ -32,7 +32,14 @@ type RootStackParamList = {
   };
   Video: {
     url: string;
+    id: string;
+    moduleId: string;
     title?: string;
+  };
+  Info: {
+    moduleId: string;
+    videoId: string;
+    title: string;
   };
 };
 

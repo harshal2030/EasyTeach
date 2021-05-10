@@ -19,9 +19,13 @@ import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
+import Config from 'react-native-config';
+// @ts-ignore
+import RazorPay from 'react-native-razorpay';
 
 import {PhotoPicker} from '../components/common';
 import {CheckBox} from '../../shared/components/common';
+import {Pricing} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -33,8 +37,13 @@ import {
 } from '../../shared/global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
-import {mediaUrl, classUrl, studentUrl} from '../../shared/utils/urls';
-import {flatRed} from '../../shared/styles/colors';
+import {
+  mediaUrl,
+  classUrl,
+  studentUrl,
+  paymentUrl,
+} from '../../shared/utils/urls';
+import {commonBlue, flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -248,6 +257,34 @@ class ManageClass extends React.Component<Props, State> {
       .catch(() => null);
   };
 
+  getSubscription = async () => {
+    try {
+      const res = await axios.post<{id: string; url: string}>(
+        `${paymentUrl}/${this.props.currentClass!.id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+      console.log(Config.key_id);
+
+      const pay = await RazorPay.open({
+        key: Config.key_id,
+        subscription_id: res.data.id,
+        name: 'Easy Teach',
+        description: 'Test plan',
+        theme: {
+          color: commonBlue,
+        },
+      });
+      console.log(pay);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
     const {joinCode} = this.props.currentClass!;
@@ -328,12 +365,22 @@ class ManageClass extends React.Component<Props, State> {
             )}
 
             {isOwner ? (
-              <Button
-                title="Save"
-                onPress={this.updateClass}
-                loading={loading}
-                containerStyle={{marginTop: 20}}
-              />
+              <>
+                <Button
+                  title="Save"
+                  onPress={this.updateClass}
+                  loading={loading}
+                  containerStyle={{marginTop: 20}}
+                />
+
+                <Button
+                  title="Upgrade"
+                  containerStyle={{marginTop: 20}}
+                  onPress={this.getSubscription}
+                />
+
+                <Pricing />
+              </>
             ) : (
               <Button
                 title="Unenroll"

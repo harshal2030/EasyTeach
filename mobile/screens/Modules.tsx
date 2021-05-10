@@ -7,7 +7,6 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
 import Dialog from 'react-native-dialog';
@@ -15,8 +14,6 @@ import {Header, Icon, Button} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
-import RBSheet from 'react-native-raw-bottom-sheet';
 import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
 
@@ -25,7 +22,7 @@ import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {moduleUrl} from '../../shared/utils/urls';
-import {ContainerStyles, BottomSheetStyle} from '../../shared/styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 import {
   commonBlue,
   greyWithAlpha,
@@ -62,7 +59,6 @@ interface State {
 }
 
 class Module extends React.Component<Props, State> {
-  sheet: RBSheet | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -105,32 +101,30 @@ class Module extends React.Component<Props, State> {
     }
   };
 
-  renderItem = ({item}: {item: {id: string; title: string}}) => {
-    return (
-      <TouchableHighlight
-        underlayColor={greyWithAlpha(0.4)}
-        onPress={() =>
-          this.props.navigation.navigate('Files', {moduleId: item.id})
-        }>
-        <View style={styles.moduleContainer}>
-          <Text style={styles.moduleText}>{item.title}</Text>
-          {this.props.isOwner && (
-            <Icon
-              name="more-horizontal"
-              type="feather"
-              onPress={() => {
-                this.sheet!.open();
-                this.setState({moduleId: item.id, moduleName: item.title});
-              }}
-            />
-          )}
-        </View>
-      </TouchableHighlight>
-    );
-  };
+  confirmDelete = (id: string) => {
+    const deleteModule = () => {
+      axios
+        .delete(`${moduleUrl}/${this.props.currentClass.id}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        })
+        .then(() => {
+          const temp = this.state.modules.filter(
+            (val) => val.id !== this.state.moduleId,
+          );
+          this.setState({modules: temp, moduleId: null});
+        })
+        .catch(() => {
+          SnackBar.show({
+            text: 'Unable to delete module. Please try again later',
+            backgroundColor: flatRed,
+            textColor: '#fff',
+            duration: SnackBar.LENGTH_LONG,
+          });
+        });
+    };
 
-  confirmDelete = () => {
-    this.sheet!.close();
     Alert.alert(
       'Confirm',
       'Are you sure to delete? You will lose all related information.',
@@ -140,40 +134,14 @@ class Module extends React.Component<Props, State> {
         },
         {
           text: 'Yes',
-          onPress: this.deleteModule,
+          onPress: deleteModule,
         },
       ],
     );
   };
 
-  deleteModule = () => {
-    axios
-      .delete(
-        `${moduleUrl}/${this.props.currentClass.id}/${this.state.moduleId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      )
-      .then(() => {
-        const temp = this.state.modules.filter(
-          (val) => val.id !== this.state.moduleId,
-        );
-        this.setState({modules: temp, moduleId: null});
-      })
-      .catch(() => {
-        SnackBar.show({
-          text: 'Unable to delete module. Please try again later',
-          backgroundColor: flatRed,
-          textColor: '#fff',
-          duration: SnackBar.LENGTH_LONG,
-        });
-      });
-  };
-
   closeDialog = () => {
-    this.setState({dialogVisible: false});
+    this.setState({dialogVisible: false, moduleId: null, moduleName: ''});
   };
 
   createModule = async () => {
@@ -237,6 +205,42 @@ class Module extends React.Component<Props, State> {
     } else {
       this.createModule();
     }
+  };
+
+  renderItem = ({item}: {item: {id: string; title: string}}) => {
+    return (
+      <TouchableHighlight
+        underlayColor={greyWithAlpha(0.4)}
+        onPress={() =>
+          this.props.navigation.navigate('Files', {moduleId: item.id})
+        }>
+        <View style={styles.moduleContainer}>
+          <Text style={styles.moduleText}>{item.title}</Text>
+          {this.props.isOwner && (
+            <View style={styles.iconContainer}>
+              <Icon
+                name="pencil"
+                type="material-community"
+                color="#000"
+                onPress={() =>
+                  this.setState({
+                    moduleId: item.id,
+                    moduleName: item.title,
+                    dialogVisible: true,
+                  })
+                }
+              />
+              <Icon
+                name="delete-outline"
+                type="material-community"
+                color={flatRed}
+                onPress={() => this.confirmDelete(item.id)}
+              />
+            </View>
+          )}
+        </View>
+      </TouchableHighlight>
+    );
   };
 
   renderContent = () => {
@@ -335,35 +339,6 @@ class Module extends React.Component<Props, State> {
             buttonStyle={{backgroundColor: '#ffff'}}
           />
         )}
-
-        <RBSheet
-          height={140}
-          ref={(ref) => (this.sheet = ref)}
-          closeOnPressMask
-          closeOnDragDown
-          customStyles={{
-            container: BottomSheetStyle.container,
-          }}>
-          <View>
-            <TouchableOpacity
-              style={BottomSheetStyle.RBOptionContainer}
-              onPress={() => {
-                this.setState({dialogVisible: true});
-                this.sheet!.close();
-              }}>
-              <MCI name="pencil" color="#000" size={24} />
-              <Text style={BottomSheetStyle.RBTextStyle}>Edit Name</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={BottomSheetStyle.RBOptionContainer}
-              onPress={this.confirmDelete}>
-              <MCI name="delete-outline" color={flatRed} size={24} />
-              <Text style={[BottomSheetStyle.RBTextStyle, {color: flatRed}]}>
-                Delete
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
       </View>
     );
   }
@@ -379,10 +354,14 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   moduleText: {
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  iconContainer: {
+    flexDirection: 'row',
   },
   FABContainer: {
     position: 'absolute',

@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {StatusBar, Text, StyleSheet} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
@@ -8,16 +9,21 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {VideoPlayer} from '../components/main';
 
 import {StoreState} from '../../shared/global';
+import {Class} from '../../shared/global/actions/classes';
+
 import {RootStackParamList} from '../navigators/types';
 import {greyWithAlpha} from '../../shared/styles/colors';
+import {vidTrackerUrl} from '../../shared/utils/urls';
 
 type Props = {
   route: RouteProp<RootStackParamList, 'Video'>;
   token: string;
   navigation: StackNavigationProp<RootStackParamList, 'Video'>;
+  currentClass: Class;
 };
 
 class Video extends React.Component<Props> {
+  start: Date = new Date();
   componentDidMount() {
     Orientation.lockToLandscape();
     StatusBar.setHidden(true);
@@ -26,6 +32,21 @@ class Video extends React.Component<Props> {
   componentWillUnmount() {
     Orientation.unlockAllOrientations();
     StatusBar.setHidden(false);
+
+    axios
+      .post(
+        `${vidTrackerUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.props.route.params.id}`,
+        {
+          start: this.start,
+          stop: new Date(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .catch(() => null);
   }
 
   render() {
@@ -64,6 +85,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token!,
+    currentClass: state.currentClass!,
   };
 };
 

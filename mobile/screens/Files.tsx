@@ -9,9 +9,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableWithoutFeedback,
-  TouchableOpacity,
 } from 'react-native';
-import {Header, FAB, Button, Input} from 'react-native-elements';
+import {Header, FAB, Button, Input, Icon} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import Picker from 'react-native-image-crop-picker';
@@ -22,8 +21,6 @@ import {connect} from 'react-redux';
 import Modal from 'react-native-modal';
 import SnackBar from 'react-native-snackbar';
 import AD from 'react-native-vector-icons/AntDesign';
-import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
-import RBSheet from 'react-native-raw-bottom-sheet';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -34,9 +31,9 @@ import {
   commonGrey,
   greyWithAlpha,
 } from '../../shared/styles/colors';
-import {fileUrl} from '../../shared/utils/urls';
+import {fileUrl, vidTrackerUrl} from '../../shared/utils/urls';
 import {flatRed} from '../../shared/styles/colors';
-import {ContainerStyles, BottomSheetStyle} from '../../shared/styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 
 type navigation = StackNavigationProp<RootStackParamList, 'Files'>;
 
@@ -68,7 +65,6 @@ type FileRes = {
 };
 
 class Files extends React.Component<Props, State> {
-  sheet: RBSheet | null = null;
   constructor(props: Props) {
     super(props);
 
@@ -110,26 +106,39 @@ class Files extends React.Component<Props, State> {
       mediaType: 'video',
     })
       .then((res) => this.setState({videoUri: res.path, videoModal: true}))
+      .catch(() => null);
+  };
+
+  getInfo = () => {
+    axios
+      .get(
+        `${vidTrackerUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.state.fileId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then((res) => console.log(res.data))
       .catch((e) => console.log(e));
   };
 
-  confirmDelete = () => {
-    this.sheet!.close();
+  confirmDelete = (fileId: string) => {
     Alert.alert('Confirm', 'Are you sure to delete this video?', [
       {
         text: 'Cancel',
       },
       {
         text: 'Yes',
-        onPress: this.deleteVideo,
+        onPress: () => this.deleteVideo(fileId),
       },
     ]);
   };
 
-  deleteVideo = async () => {
+  deleteVideo = async (fileId: string) => {
     try {
       await axios.delete(
-        `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.state.fileId}`,
+        `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${fileId}`,
         {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
@@ -209,6 +218,8 @@ class Files extends React.Component<Props, State> {
             this.props.navigation.navigate('Video', {
               url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
               title: item.title,
+              id: item.id,
+              moduleId: item.moduleId,
             });
           }}>
           <FastImage
@@ -225,6 +236,8 @@ class Files extends React.Component<Props, State> {
                 this.props.navigation.navigate('Video', {
                   url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
                   title: item.title,
+                  id: item.id,
+                  moduleId: item.moduleId,
                 });
               }}
             />
@@ -233,14 +246,26 @@ class Files extends React.Component<Props, State> {
         <View style={styles.itemTextContainer}>
           <Text style={styles.itemTitle}>{item.title}</Text>
           {this.props.isOwner && (
-            <MCI
-              name="dots-horizontal"
-              size={25}
-              onPress={() => {
-                this.setState({fileId: item.id});
-                this.sheet!.open();
-              }}
-            />
+            <View style={{flexDirection: 'row'}}>
+              <Icon
+                name="information-outline"
+                color="#000"
+                type="material-community"
+                onPress={() =>
+                  this.props.navigation.navigate('Info', {
+                    videoId: item.id,
+                    moduleId: this.props.route.params.moduleId,
+                    title: item.title,
+                  })
+                }
+              />
+              <Icon
+                name="delete-outline"
+                color={flatRed}
+                type="material-community"
+                onPress={() => this.confirmDelete(item.id)}
+              />
+            </View>
           )}
         </View>
       </View>
@@ -289,7 +314,7 @@ class Files extends React.Component<Props, State> {
       <View style={[ContainerStyles.parent]}>
         <Header
           centerComponent={{
-            text: 'Files',
+            text: 'Videos',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
           leftComponent={{
@@ -329,38 +354,16 @@ class Files extends React.Component<Props, State> {
           </ScrollView>
         </Modal>
 
-        <FAB
-          placement="right"
-          upperCase
-          title="Add Video"
-          onPress={this.onVideoPress}
-          icon={{name: 'plus', type: 'octicon', color: '#fff'}}
-          color={commonBlue}
-        />
-
-        <RBSheet
-          height={140}
-          ref={(ref) => (this.sheet = ref)}
-          closeOnPressMask
-          closeOnDragDown
-          customStyles={{
-            container: BottomSheetStyle.container,
-          }}>
-          <View>
-            <TouchableOpacity style={BottomSheetStyle.RBOptionContainer}>
-              <MCI name="information-outline" color="#000" size={24} />
-              <Text style={BottomSheetStyle.RBTextStyle}>Info</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={BottomSheetStyle.RBOptionContainer}
-              onPress={this.confirmDelete}>
-              <MCI name="delete-outline" color={flatRed} size={24} />
-              <Text style={[BottomSheetStyle.RBTextStyle, {color: flatRed}]}>
-                Delete
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </RBSheet>
+        {this.props.isOwner && (
+          <FAB
+            placement="right"
+            upperCase
+            title="Add Video"
+            onPress={this.onVideoPress}
+            icon={{name: 'plus', type: 'octicon', color: '#fff'}}
+            color={commonBlue}
+          />
+        )}
       </View>
     );
   }

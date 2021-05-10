@@ -21,6 +21,8 @@ const questionUrl = `${root}/que`;
 const recoveryUrl = `${root}/users/recover`;
 const moduleUrl = `${root}/module`;
 const fileUrl = `${root}/file`;
+const vidTrackerUrl = `${root}/vidtracker`;
+const paymentUrl = `${root}/pay`;
 
 export {
   root,
@@ -38,4 +40,6 @@ export {
   recoveryUrl,
   moduleUrl,
   fileUrl,
+  vidTrackerUrl,
+  paymentUrl,
 };
