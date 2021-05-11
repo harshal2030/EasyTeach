@@ -76,3 +76,4 @@
   **[] $VALUES;
   public *;
 }
+-keep class com.facebook.react.turbomodule.** { *; }

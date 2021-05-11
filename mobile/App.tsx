@@ -6,6 +6,8 @@ import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
+import * as Update from 'expo-updates';
+import Config from 'react-native-config';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -45,11 +47,31 @@ interface userChecker {
   message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
 }
 
-interface State {
-  loading: boolean;
-}
-
 const App = (props: Props): JSX.Element => {
+  const checkForUpdate = async () => {
+    try {
+      if (Config.env === 'production') {
+        const update = await Update.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Update.fetchUpdateAsync();
+
+          Alert.alert(
+            'Update available',
+            "An update is available for the app. This won't take much of your time",
+            [
+              {
+                text: 'Ok, update my app',
+                onPress: Update.reloadAsync,
+              },
+            ],
+          );
+        }
+      }
+    } catch (e) {
+      // move on
+    }
+  };
+
   const checkToken = async () => {
     const token = await AsyncStorage.getItem('token');
     if (token) {
@@ -103,6 +125,7 @@ const App = (props: Props): JSX.Element => {
 
   React.useEffect(() => {
     checkToken();
+    checkForUpdate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
