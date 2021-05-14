@@ -66,14 +66,7 @@ const VideoPlayer = (props: Props) => {
         onLoad={onLoad}
         onLoadStart={onLoadStart}
         onProgress={onProgress}
-        onBuffer={(data) => console.log(data)}
         paused={paused}
-        bufferConfig={{
-          minBufferMs: 15000,
-          maxBufferMs: 50000,
-          bufferForPlaybackMs: 2500,
-          bufferForPlaybackAfterRebufferMs: 5000,
-        }}
         resizeMode="contain"
         ref={videoPlayer}
         source={props.source}

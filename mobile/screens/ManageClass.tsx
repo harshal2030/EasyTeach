@@ -25,7 +25,6 @@ import RazorPay from 'react-native-razorpay';
 
 import {PhotoPicker} from '../components/common';
 import {CheckBox} from '../../shared/components/common';
-import {Pricing} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -35,6 +34,7 @@ import {
   removeClass,
   revokeCurrentClass,
 } from '../../shared/global/actions/classes';
+
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
 import {
@@ -44,6 +44,7 @@ import {
   paymentUrl,
 } from '../../shared/utils/urls';
 import {commonBlue, flatRed} from '../../shared/styles/colors';
+import {pricing} from '../../shared/utils/pricing';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -259,27 +260,34 @@ class ManageClass extends React.Component<Props, State> {
 
   getSubscription = async () => {
     try {
-      const res = await axios.post<{id: string; url: string}>(
-        `${paymentUrl}/${this.props.currentClass!.id}`,
-        {},
+      const res = await axios.get(
+        `${paymentUrl}/${this.props.currentClass!.id}/${pricing.standard.id}`,
         {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
         },
       );
-      console.log(Config.key_id);
 
-      const pay = await RazorPay.open({
+      console.log(res.data.orderId, res.data);
+
+      const options = {
         key: Config.key_id,
-        subscription_id: res.data.id,
         name: 'Easy Teach',
-        description: 'Test plan',
+        description: 'Standard Plan',
+        amount: '10000',
+        orderId: res.data.orderId,
+        currency: 'INR',
         theme: {
           color: commonBlue,
         },
-      });
-      console.log(pay);
+      };
+
+      console.log(options);
+
+      RazorPay.open(options)
+        .then((data) => console.log(data))
+        .catch((e) => console.log(e));
     } catch (e) {
       console.log(e);
     }
@@ -378,8 +386,6 @@ class ManageClass extends React.Component<Props, State> {
                   containerStyle={{marginTop: 20}}
                   onPress={this.getSubscription}
                 />
-
-                <Pricing />
               </>
             ) : (
               <Button
