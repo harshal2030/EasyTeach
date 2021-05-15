@@ -3,9 +3,9 @@ import Axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
+import {MMKV} from 'react-native-mmkv';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -51,7 +51,7 @@ interface State {
 
 const App = (props: Props): JSX.Element => {
   const checkToken = async () => {
-    const token = await AsyncStorage.getItem('token');
+    const token = MMKV.getString('token');
     if (token) {
       props.registerToken(token);
       SplashScreen.hide();

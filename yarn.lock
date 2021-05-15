@@ -10642,6 +10642,11 @@ react-native-lightbox-v2@^0.8.6:
   version "2.3.0"
   resolved "git+https://github.com/harshal2030/react-native-media-controls.git#dfd0d8e4079963535f9f8a172c4b4d1bba9774da"
 
+react-native-mmkv@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-1.1.6.tgz#562699c57fc55ec84b17ef675f6f609339096dfd"
+  integrity sha512-mvpnGLkXsEwlhGc2IoiqwI+7F9PwkcoJdt3PZOMtSCrt1ngDPJXXfyIxJ4/Ia8vd/gm7K3G+/mfusjEoiOsjxw==
+
 react-native-modal@>=9.0.0:
   version "11.9.0"
   resolved "https://registry.yarnpkg.com/react-native-modal/-/react-native-modal-11.9.0.tgz#fd88fc2317fa1c08c0e034b3bd3f81fd9e2e554d"

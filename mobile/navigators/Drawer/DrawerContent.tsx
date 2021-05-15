@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
-import AsyncStorage from '@react-native-community/async-storage';
+import {MMKV} from 'react-native-mmkv';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -87,7 +87,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      await AsyncStorage.removeItem('token');
+      MMKV.delete('token');
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
@@ -164,9 +164,7 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center', height: '85%'}}>
-          {renderClasses()}
-        </View>
+        <View style={{alignItems: 'center', flex: 1}}>{renderClasses()}</View>
 
         <View style={actionButtonContainer}>
           <Button
@@ -279,10 +277,8 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     alignItems: 'center',
-    height: '15%',
     justifyContent: 'space-between',
     padding: 5,
-    marginBottom: 5,
   },
   avatarImageStyle: {
     height: 60,

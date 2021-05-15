@@ -110,9 +110,7 @@ class Module extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          const temp = this.state.modules.filter(
-            (val) => val.id !== this.state.moduleId,
-          );
+          const temp = this.state.modules.filter((val) => val.id !== id);
           this.setState({modules: temp, moduleId: null});
         })
         .catch(() => {

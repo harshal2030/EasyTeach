@@ -146,9 +146,7 @@ class Files extends React.Component<Props, State> {
         },
       );
 
-      const newFiles = this.state.files.filter(
-        (file) => file.id !== this.state.fileId,
-      );
+      const newFiles = this.state.files.filter((file) => file.id !== fileId);
       this.setState({files: newFiles});
     } catch (e) {
       SnackBar.show({
@@ -177,7 +175,6 @@ class Files extends React.Component<Props, State> {
       notification: {
         enabled: true,
         onProgressTitle: 'Uploading ....',
-        onCompleteTitle: 'Uploaded successfully',
         onErrorTitle: 'Uploading errored. Please try again later',
       },
       type: 'multipart',
@@ -186,21 +183,15 @@ class Files extends React.Component<Props, State> {
         title: this.state.videoTitle,
       },
     })
-      .then((id) => {
-        this.setState({videoModal: false});
+      .then(() => {
+        this.setState({videoModal: false, videoTitle: ''});
         SnackBar.show({
           text: 'Uploading in background.',
           duration: SnackBar.LENGTH_LONG,
         });
-
-        Upload.addListener('completed', id, (data) => {
-          const temp = JSON.parse(data.responseBody);
-
-          this.setState({files: [temp, ...this.state.files]});
-        });
       })
       .catch(() => {
-        this.setState({videoModal: false});
+        this.setState({videoModal: false, videoTitle: ''});
         SnackBar.show({
           text: 'Unable to upload your module. Please try again later.',
           backgroundColor: flatRed,
@@ -305,6 +296,7 @@ class Files extends React.Component<Props, State> {
         keyExtractor={(item) => item.id}
         renderItem={this.renderItem}
         removeClippedSubviews
+        ListFooterComponent={<View style={{height: 100}} />}
       />
     );
   };
