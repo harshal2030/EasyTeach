@@ -45,7 +45,7 @@
     "react-native-image-crop-picker": "0.33.2",
     "react-native-lightbox-v2": "^0.8.6",
     "react-native-media-controls": "git+https://github.com/harshal2030/react-native-media-controls.git",
-    "react-native-mmkv": "^1.1.6",
+    "react-native-mmkv-storage": "^0.5.8",
     "react-native-modal": "^11.5.6",
     "react-native-orientation-locker": "^1.2.0",
     "react-native-photo-view-ex": "git+https://github.com/harshal2030/react-native-photo-view-ex.git",

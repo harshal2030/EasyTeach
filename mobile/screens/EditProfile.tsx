@@ -8,7 +8,7 @@ import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {MMKV} from 'react-native-mmkv';
+import {MMKV} from '../MMKV';
 
 import {CommonSetting} from '../../shared/components/main';
 import {PhotoPicker} from '../components/common';
@@ -68,7 +68,7 @@ class EditProfile extends React.Component<Props, State> {
   }
 
   storeNewToken = (token: string) => {
-    MMKV.set('token', token);
+    MMKV.setString('token', token);
   };
 
   onImage = (image: ImageOrVideo) => {

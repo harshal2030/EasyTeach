@@ -1,11 +1,12 @@
 import React from 'react';
 import Axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
-import {MMKV} from 'react-native-mmkv';
+import {MMKV} from './MMKV';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -51,6 +52,14 @@ interface State {
 
 const App = (props: Props): JSX.Element => {
   const checkToken = async () => {
+    const hasMigrated = MMKV.getBool('hasMigrated');
+    if (!hasMigrated) {
+      const t = await AsyncStorage.getItem('token');
+      MMKV.setBool('hasMigrated', true);
+      if (t) {
+        MMKV.setString('token', t);
+      }
+    }
     const token = MMKV.getString('token');
     if (token) {
       props.registerToken(token);

@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
-import {MMKV} from 'react-native-mmkv';
+import {MMKV} from '../../MMKV';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -87,7 +87,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      MMKV.delete('token');
+      MMKV.removeItem('token');
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
