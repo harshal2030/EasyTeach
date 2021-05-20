@@ -84,3 +84,4 @@
 -keepclasseswithmembers class * {
   public void onPayment*(...);
 }
+-keep class com.facebook.react.turbomodule.** { *; }

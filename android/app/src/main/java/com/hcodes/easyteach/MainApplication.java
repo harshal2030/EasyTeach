@@ -52,6 +52,11 @@ public class MainApplication extends Application implements ReactApplication {
           return "index";
         }
 
+      @Override
+      protected JSIModulePackage getJSIModulePackage() {
+        return new EasyJSI();
+      }
+
         @Override
         protected JSIModulePackage getJSIModulePackage() {
           return new EasyJSI();

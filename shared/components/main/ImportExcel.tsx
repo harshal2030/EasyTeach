@@ -43,8 +43,15 @@ const ImportExcel = (props: Props) => {
       />
       <View style={content}>
         <Text h4>We need question sheet</Text>
+        <Text>
+          {`You're accessing most secure way to conduct tests:
+1. Students cannot take screenshots during test.
+2. Switching between apps will result in restart of test with shuffled questions.
+3. Even options order are randomized.
+4. Automated result generation.`}
+        </Text>
         <Text style={secondaryText}>
-          You need to import excel file in given format
+          Create your own test by importing excel file in given format
         </Text>
 
         <LightBox renderContent={ZoomImage}>
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
   },
   secondaryText: {
     color: 'grey',
+    marginTop: 10,
   },
   imageStyle: {
     height: 140,
