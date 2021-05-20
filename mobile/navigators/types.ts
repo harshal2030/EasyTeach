@@ -27,6 +27,21 @@ type RootStackParamList = {
   EditQuestion: {
     quizId: string;
   };
+  Files: {
+    moduleId: string;
+  };
+  Video: {
+    url: string;
+    id: string;
+    moduleId: string;
+    title?: string;
+  };
+  Info: {
+    moduleId: string;
+    videoId: string;
+    title: string;
+  };
+  Checkout: undefined;
 };
 
 type DrawerParamList = {
@@ -35,6 +50,7 @@ type DrawerParamList = {
   Manage: undefined;
   People: undefined;
   Settings: undefined;
+  Modules: undefined;
 };
 
 export {RootStackParamList, DrawerParamList};

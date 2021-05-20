@@ -12,12 +12,13 @@ import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
-import AsyncStorage from '@react-native-community/async-storage';
+import {MMKV} from '../../MMKV';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MI from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../../../shared/global';
 import {removeToken} from '../../../shared/global/actions/token';
@@ -86,7 +87,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      await AsyncStorage.removeItem('token');
+      MMKV.removeItem('token');
       props.removeToken();
       props.removeCurrentClass();
     } catch (e) {
@@ -163,9 +164,7 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center', height: '85%'}}>
-          {renderClasses()}
-        </View>
+        <View style={{alignItems: 'center', flex: 1}}>{renderClasses()}</View>
 
         <View style={actionButtonContainer}>
           <Button
@@ -244,6 +243,13 @@ const DrawerContent = (props: Props): JSX.Element => {
 
                 <TouchableOpacity
                   style={optionContainer}
+                  onPress={() => props.navigation.navigate('Modules')}>
+                  <MI name="view-module" color="#33495e" size={23} />
+                  <Text style={optionText}> Modules</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
                   onPress={() => props.navigation.navigate('Manage')}>
                   <FontAwesome
                     name={props.isOwner ? 'sliders' : 'info-circle'}
@@ -271,10 +277,8 @@ const styles = StyleSheet.create({
   },
   actionButtonContainer: {
     alignItems: 'center',
-    height: '15%',
     justifyContent: 'space-between',
     padding: 5,
-    marginBottom: 5,
   },
   avatarImageStyle: {
     height: 60,

@@ -31,6 +31,10 @@ interface Class {
   collaborators: string[];
   joinCode: string;
   lockJoin: boolean;
+  payId: string;
+  planId: string;
+  payedOn: string;
+  storageUsed: number;
 }
 
 // return action types of each action
@@ -126,8 +130,9 @@ const fetchClasses = (token: string) => {
       if (classes.data.length !== 0) {
         dispatch(registerCurrentClass(classes.data[0]));
       }
-      dispatch(classesLoading(false));
+
       dispatch(classesFetchedSuccess(classes.data));
+      dispatch(classesLoading(false));
     } catch (e) {
       dispatch(classesLoading(false));
       dispatch(classesHasErrored(true));
@@ -192,24 +197,27 @@ const revokeCurrentClass = (classes: Class[]): revokeCurrentClassAction => {
 };
 
 export {
-  Class,
-  registerClassAction,
-  removeClassAction,
   removeCurrentClass,
   registerCurrentClass,
   removeClass,
-  removeCurrentClassAction,
   ActionTypes,
   fetchClasses,
   addClass,
+  updateClasses,
+  updateClassOwner,
+  revokeCurrentClass,
+};
+
+export type {
+  updateClassOwnerAction,
+  revokeCurrentClassAction,
   classHasErroredAction,
   classLoadingAction,
   classFetchedAction,
   addedClassAction,
-  updateClasses,
+  removeCurrentClassAction,
+  Class,
+  registerClassAction,
+  removeClassAction,
   updatedClassAction,
-  updateClassOwner,
-  updateClassOwnerAction,
-  revokeCurrentClassAction,
-  revokeCurrentClass,
 };

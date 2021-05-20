@@ -20,10 +20,14 @@ import SnackBar from 'react-native-snackbar';
 
 import {PhotoPicker} from '../components/common';
 
-import {CommonSetting} from '../components/main';
+import {CommonSetting} from '../../shared/components/main';
 import {classUrl} from '../../shared/utils/urls';
 
-import {Class, addClass, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  Class,
+  addClass,
+  registerCurrentClass,
+} from '../../shared/global/actions/classes';
 import {StoreState} from '../../shared/global';
 
 type Props = {

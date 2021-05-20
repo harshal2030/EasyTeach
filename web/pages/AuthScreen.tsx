@@ -2,19 +2,15 @@
 import React from 'react';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 
 import {StoreState} from '../../shared/global';
 import {registerToken} from '../../shared/global/actions/token';
 import {registerProfile} from '../../shared/global/actions/profile';
+import {fetchClasses} from '../../shared/global/actions/classes';
 
 import Auth from '../../shared/screens/AuthScreen';
 
@@ -23,12 +19,9 @@ import {usernamePattern} from '../../shared/utils/regexPatterns';
 
 interface Props {
   token: string;
-  fcm: {
-    os: string;
-    fcmToken: string;
-  };
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
+  fetchClasses: Function;
 }
 
 interface State {
@@ -81,7 +74,10 @@ class AuthScreen extends React.Component<Props, State> {
               username: email,
               password,
             },
-            device: this.props.fcm,
+            device: {
+              os: 'web',
+              fcmToken: '',
+            },
           },
           {
             timeout: 20000,
@@ -93,6 +89,7 @@ class AuthScreen extends React.Component<Props, State> {
         )
         .then((res) => {
           if (res.status === 200) {
+            this.props.fetchClasses(res.data.token);
             this.storeToken(res.data.token);
             this.props.registerToken(res.data.token);
             this.props.registerProfile(res.data.user);
@@ -138,7 +135,6 @@ class AuthScreen extends React.Component<Props, State> {
       );
     }
 
-    const {fcm} = this.props;
     this.setState({loading: true});
     axios
       .post<{
@@ -153,7 +149,10 @@ class AuthScreen extends React.Component<Props, State> {
             email,
             password,
           },
-          device: fcm,
+          device: {
+            os: 'web',
+            fcmToken: '',
+          },
         },
         {
           timeout: 20000,
@@ -165,6 +164,7 @@ class AuthScreen extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 201) {
+          this.props.fetchClasses(res.data.token);
           this.storeToken(res.data.token);
           this.setState({loading: false});
           this.props.registerToken(res.data.token);
@@ -196,23 +196,11 @@ class AuthScreen extends React.Component<Props, State> {
           onForgotClick={() => alert('You have to complete this')}
         />
 
-        <Dialog
-          open={this.state.alertVisible}
-          onClose={this.closeDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description">
-          <DialogTitle id="alert-dialog-title">{this.state.title}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              {this.state.text}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.closeDialog} color="primary" autoFocus>
-              Ok
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <Dialog.Container visible={this.state.alertVisible}>
+          <Dialog.Title>{this.state.title}</Dialog.Title>
+          <Dialog.Description>{this.state.text}</Dialog.Description>
+          <Dialog.Button label="Ok" onPress={this.closeDialog} />
+        </Dialog.Container>
       </>
     );
   }
@@ -220,11 +208,12 @@ class AuthScreen extends React.Component<Props, State> {
 
 const mapStateToProps = (state: StoreState) => {
   return {
-    fcm: state.fcm!,
     token: state.token!,
   };
 };
 
-export default connect(mapStateToProps, {registerProfile, registerToken})(
-  AuthScreen,
-);
+export default connect(mapStateToProps, {
+  registerProfile,
+  registerToken,
+  fetchClasses,
+})(AuthScreen);

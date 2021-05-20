@@ -20,8 +20,8 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import AndroidPicker from 'react-native-android-dialog-picker';
 
-import {Card} from '../components/common';
-import {QuizInfo, ImportExcel} from '../components/main';
+import {Card} from '../../shared/components/common';
+import {QuizInfo, ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -272,6 +272,7 @@ class Test extends React.Component<Props, State> {
         renderItem={this.renderItem}
         keyExtractor={(item) => item.quizId}
         renderSectionHeader={this.renderSectionHeader}
+        ListFooterComponent={<View style={{height: 80}} />}
         style={{marginBottom: 30, paddingBottom: 30}}
         stickySectionHeadersEnabled
       />

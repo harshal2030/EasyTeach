@@ -1,11 +1,12 @@
 import React from 'react';
 import Axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
+import {MMKV} from './MMKV';
 import * as Update from 'expo-updates';
 import Config from 'react-native-config';
 
@@ -73,7 +74,15 @@ const App = (props: Props): JSX.Element => {
   };
 
   const checkToken = async () => {
-    const token = await AsyncStorage.getItem('token');
+    const hasMigrated = MMKV.getBool('hasMigrated');
+    if (!hasMigrated) {
+      const t = await AsyncStorage.getItem('token');
+      MMKV.setBool('hasMigrated', true);
+      if (t) {
+        MMKV.setString('token', t);
+      }
+    }
+    const token = MMKV.getString('token');
     if (token) {
       props.registerToken(token);
       SplashScreen.hide();
@@ -149,6 +158,10 @@ const App = (props: Props): JSX.Element => {
             component={require('./navigators/Drawer').default}
           />
           <Stack.Screen
+            name="Info"
+            component={require('./screens/Info').default}
+          />
+          <Stack.Screen
             name="JoinClass"
             component={require('./screens/JoinClass').default}
           />
@@ -160,6 +173,14 @@ const App = (props: Props): JSX.Element => {
             name="EditProfile"
             component={require('./screens/EditProfile').default}
           />
+          <Stack.Screen
+            name="Files"
+            component={require('./screens/Files').default}
+          />
+          <Stack.Screen
+            name="Video"
+            component={require('./screens/Video').default}
+          />
           {props.isOwner && (
             <Stack.Screen
               name="CreateTest"
@@ -170,6 +191,12 @@ const App = (props: Props): JSX.Element => {
             <Stack.Screen
               name="EditQuestion"
               component={require('./screens/EditQuestion').default}
+            />
+          )}
+          {props.isOwner && (
+            <Stack.Screen
+              name="Checkout"
+              component={require('./screens/Checkout').default}
             />
           )}
           {props.currentClass && (

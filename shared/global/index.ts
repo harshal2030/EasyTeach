@@ -16,6 +16,11 @@ import {
 import {msgErrored, msgLoading, msgs} from './reducers/msgReducer';
 import {quizErrored, quizLoading, quizzes} from './reducers/quizReducer';
 
+const oneMonthFromNow = new Date();
+oneMonthFromNow.setDate(oneMonthFromNow.getDate() + 30);
+
+const oneMonthDiff = oneMonthFromNow.getTime() - new Date().getTime();
+
 export interface StoreState {
   token: string | null;
   profile: {name: string; username: string; avatar: string};
@@ -37,6 +42,7 @@ export interface StoreState {
   msgErrored: boolean;
   msgLoading: boolean;
   msgs: Msg[];
+  oneMonthDiff: number;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -53,6 +59,7 @@ export const reducers = combineReducers<StoreState>({
   msgErrored,
   msgLoading,
   msgs,
+  oneMonthDiff: () => oneMonthDiff,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));

@@ -20,7 +20,8 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
 
-import {CheckBox, PhotoPicker} from '../components/common';
+import {PhotoPicker} from '../components/common';
+import {CheckBox} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -30,10 +31,11 @@ import {
   removeClass,
   revokeCurrentClass,
 } from '../../shared/global/actions/classes';
+
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
 import {mediaUrl, classUrl, studentUrl} from '../../shared/utils/urls';
-import {flatRed} from '../../shared/styles/colors';
+import {flatRed, eucalyptusGreen} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -55,6 +57,7 @@ interface Props {
     avatar: string;
   };
   classes: Class[];
+  premiumAllowed: boolean;
 }
 
 interface State {
@@ -67,6 +70,15 @@ interface State {
     type: string;
   };
   loading: boolean;
+}
+
+interface RazorPayCheckOutSuccess {
+  checkout_logo: string;
+  org_logo: string;
+  org_name: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
 }
 
 class ManageClass extends React.Component<Props, State> {
@@ -247,10 +259,23 @@ class ManageClass extends React.Component<Props, State> {
       .catch(() => null);
   };
 
+  renderUpgradeButton = () => {
+    if (this.props.isOwner && this.props.currentClass!.planId === 'free') {
+      return (
+        <Button
+          title="Upgrade"
+          buttonStyle={{backgroundColor: eucalyptusGreen}}
+          containerStyle={{marginTop: 20}}
+          onPress={() => this.props.navigation.navigate('Checkout')}
+        />
+      );
+    }
+  };
+
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
     const {joinCode} = this.props.currentClass!;
-    const {isOwner} = this.props;
+    const {isOwner, premiumAllowed} = this.props;
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -288,8 +313,13 @@ class ManageClass extends React.Component<Props, State> {
             <Input
               value={name}
               disabled={loading || !isOwner}
-              label="Name"
+              label="Class Name"
               onChangeText={(text) => this.setState({name: text})}
+            />
+            <Input
+              value={this.props.currentClass!.owner.name}
+              label="Class Owner"
+              disabled
             />
             <Input
               value={about}
@@ -327,12 +357,14 @@ class ManageClass extends React.Component<Props, State> {
             )}
 
             {isOwner ? (
-              <Button
-                title="Save"
-                onPress={this.updateClass}
-                loading={loading}
-                containerStyle={{marginTop: 20}}
-              />
+              <>
+                <Button
+                  title="Save"
+                  onPress={this.updateClass}
+                  loading={loading}
+                  containerStyle={{marginTop: 20}}
+                />
+              </>
             ) : (
               <Button
                 title="Unenroll"
@@ -340,6 +372,14 @@ class ManageClass extends React.Component<Props, State> {
                 buttonStyle={{backgroundColor: flatRed}}
                 onPress={this.unEnroll}
                 containerStyle={{marginTop: 20}}
+              />
+            )}
+
+            {isOwner && !premiumAllowed && (
+              <Button
+                title="Upgrade"
+                containerStyle={{marginTop: 20}}
+                onPress={() => this.props.navigation.navigate('Checkout')}
               />
             )}
           </View>
@@ -362,12 +402,19 @@ const mapStateToProps = (state: StoreState) => {
   if (state.currentClass!.owner.username === state.profile.username) {
     isOwner = true;
   }
+
+  let premiumAllowed: boolean = false;
+
+  if (state.currentClass!.planId !== 'free') {
+    premiumAllowed = true;
+  }
   return {
     currentClass: state.currentClass,
     token: state.token,
     isOwner,
     profile: state.profile,
     classes: state.classes,
+    premiumAllowed,
   };
 };
 

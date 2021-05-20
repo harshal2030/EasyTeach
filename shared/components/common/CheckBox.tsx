@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {CheckBox as CheckBoxCom, Text} from 'react-native-elements';
 
-import {TextStyles} from '../../../shared/styles/styles';
-import {commonBackground, commonGrey} from '../../../shared/styles/colors';
+import {TextStyles} from '../../styles/styles';
+import {commonBackground, commonGrey} from '../../styles/colors';
 
 const CheckBox = (props: {
   checked: boolean;

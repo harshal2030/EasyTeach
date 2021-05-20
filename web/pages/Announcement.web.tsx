@@ -7,18 +7,20 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
+import {toast} from 'react-toastify';
 import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
-import Megaphone from '../images/Megaphone.svg';
-import MegaText from '../images/announcement.svg';
+import Megaphone from '../../shared/images/Megaphone.svg';
+import MegaText from '../../shared/images/announcement.svg';
 
-import {MsgCard} from '../components/common';
+import {MsgCard} from '../../shared/components/common';
 
-import {StoreState} from '../global';
-import {Class} from '../global/actions/classes';
-import {fetchMsgs, Msg, addMsg} from '../global/actions/msgs';
+import {StoreState} from '../../shared/global';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
 
-import {ContainerStyles} from '../styles/styles';
+import {ContainerStyles} from '../../shared/styles/styles';
 import {
   commonBackground,
   commonBlue,
@@ -26,7 +28,7 @@ import {
 } from '../../shared/styles/colors';
 import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 
-interface Props {
+type Props = RouteComponentProps<{classId: string}> & {
   profile: {
     name: string;
     username: string;
@@ -42,11 +44,10 @@ interface Props {
   msgs: Msg[];
   msgErrored: boolean;
   msgLoading: boolean;
+  registerCurrentClass: typeof registerCurrentClass;
   isOwner: boolean;
-  onJoinPress: () => void;
   onLeftTopPress: () => void;
-  onSendError: (e: any) => void;
-}
+};
 
 interface State {
   message: string;
@@ -62,12 +63,39 @@ class Home extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+
+    const classFound = classes.find((cls) => cls.id === classId);
+
+    if (classFound) {
+      this.props.registerCurrentClass(classFound);
+    } else {
+      if (classes.length !== 0) {
+        this.props.history.replace('/*');
+      }
+    }
+
     if (this.props.currentClass) {
       this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
     }
   }
 
   componentDidUpdate(prevProps: Props) {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+
+    const hasClassChanged = prevProps.match.params.classId !== classId;
+
+    if (hasClassChanged) {
+      const classFound = classes.find((cls) => cls.id === classId);
+      if (classFound) {
+        this.props.registerCurrentClass(classFound);
+      } else {
+        this.props.history.replace('/*');
+      }
+    }
+
     const {currentClass} = this.props;
 
     const prevClassId = prevProps.currentClass
@@ -101,7 +129,9 @@ class Home extends React.Component<Props, State> {
         },
       )
       .then((res) => this.props.addMsg(res.data))
-      .catch(this.props.onSendError);
+      .catch(() =>
+        toast.error('Unable to message at the moment. Please try again later'),
+      );
   };
 
   renderListItem = ({item}: {item: Msg}) => {
@@ -147,7 +177,7 @@ class Home extends React.Component<Props, State> {
           </Text>
           <Button
             title="Create or Join class"
-            onPress={this.props.onJoinPress}
+            onPress={() => this.props.history.push('/joinclass')}
           />
         </View>
       );
@@ -268,4 +298,6 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {fetchMsgs, addMsg})(Home);
+export default withRouter(
+  connect(mapStateToProps, {fetchMsgs, addMsg, registerCurrentClass})(Home),
+);

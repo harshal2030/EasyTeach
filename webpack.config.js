@@ -17,7 +17,8 @@ const compileNodeModules = [
   'react-native-vector-icons',
   'react-native-elements',
   'react-native-ratings',
-  'react-native-raw-bottom-sheet',
+  'react-native-lightbox-v2',
+  'react-native-dialog',
   'react-native-svg',
   'react-native-svg-transformer',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));
@@ -80,7 +81,7 @@ module.exports = {
   output: {
     path: path.resolve(appDirectory, 'dist'),
     publicPath: '/',
-    filename: 'rnw_blogpost.bundle.js',
+    filename: 'easyteach.bundle.js',
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js'],

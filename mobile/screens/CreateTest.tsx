@@ -17,7 +17,7 @@ import axios from 'axios';
 import {connect} from 'react-redux';
 
 import {RootStackParamList} from '../navigators/types';
-import {Chip, CheckBox} from '../components/common';
+import {Chip, CheckBox} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -26,7 +26,6 @@ import {
   addQuiz,
   fetchQuiz,
   removeQuiz,
-  ActionTypes,
 } from '../../shared/global/actions/quiz';
 
 import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
@@ -42,14 +41,7 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  fetchQuiz(
-    token: string,
-    classId: string,
-    screen:
-      | ActionTypes.quizFetchedLive
-      | ActionTypes.quizFetchedExpired
-      | ActionTypes.quizFetchedScored,
-  ): void;
+  fetchQuiz(token: string, classId: string): void;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -200,21 +192,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedLive,
-          );
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedExpired,
-          );
-          this.props.fetchQuiz(
-            token!,
-            currentClass!.id,
-            ActionTypes.quizFetchedScored,
-          );
+          this.props.fetchQuiz(token!, currentClass!.id);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }

@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {greyWithAlpha} from '../../../shared/styles/colors';
+import {greyWithAlpha} from '../../styles/colors';
 
 interface Props {
   text: string;

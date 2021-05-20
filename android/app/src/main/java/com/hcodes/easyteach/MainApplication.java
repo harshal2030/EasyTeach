@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Arrays;
 import com.facebook.react.bridge.JSIModulePackage;
-import com.swmansion.reanimated.ReanimatedJSIModulePackage;
+import com.hcodes.easyteach.EasyJSI;
 
 import org.unimodules.adapters.react.ModuleRegistryAdapter;
 import org.unimodules.adapters.react.ReactModuleRegistryProvider;
@@ -54,8 +54,13 @@ public class MainApplication extends Application implements ReactApplication {
 
       @Override
       protected JSIModulePackage getJSIModulePackage() {
-        return new ReanimatedJSIModulePackage();
+        return new EasyJSI();
       }
+
+        @Override
+        protected JSIModulePackage getJSIModulePackage() {
+          return new EasyJSI();
+        }
 
         @Override
         protected @Nullable String getJSBundleFile() {

@@ -30,6 +30,7 @@
 -keep,allowobfuscation @interface com.facebook.proguard.annotations.KeepGettersAndSetters
 -keep,allowobfuscation @interface com.facebook.common.internal.DoNotStrip
 -keep,allowobfuscation @interface com.facebook.jni.annotations.DoNotStrip
+-keep class com.facebook.react.turbomodule.** { *; }
 
 # Do not strip any method/class that is annotated with @DoNotStrip
 -keep @com.facebook.proguard.annotations.DoNotStrip class *
@@ -75,5 +76,12 @@
 -keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
   **[] $VALUES;
   public *;
+}
+-keepattributes *Annotation*
+-dontwarn com.razorpay.**
+-keep class com.razorpay.** {*;}
+-optimizations !method/inlining/
+-keepclasseswithmembers class * {
+  public void onPayment*(...);
 }
 -keep class com.facebook.react.turbomodule.** { *; }

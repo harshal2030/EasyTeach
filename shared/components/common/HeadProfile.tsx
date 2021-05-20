@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-elements';
-import {commonBackground, commonGrey} from '../../../shared/styles/colors';
-import {Avatar} from '../../../shared/components/common';
+import {commonBackground, commonGrey} from '../../styles/colors';
+import {Avatar} from './Avatar';
 
 type Props = {
   avatar: string;
