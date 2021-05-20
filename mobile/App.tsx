@@ -170,6 +170,12 @@ const App = (props: Props): JSX.Element => {
               component={require('./screens/EditQuestion').default}
             />
           )}
+          {props.isOwner && (
+            <Stack.Screen
+              name="Checkout"
+              component={require('./screens/Checkout').default}
+            />
+          )}
           {props.currentClass && (
             <Stack.Screen
               name="ShowScore"

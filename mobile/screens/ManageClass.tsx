@@ -19,9 +19,6 @@ import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
-import Config from 'react-native-config';
-// @ts-ignore
-import RazorPay from 'react-native-razorpay';
 
 import {PhotoPicker} from '../components/common';
 import {CheckBox} from '../../shared/components/common';
@@ -37,14 +34,8 @@ import {
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
-import {
-  mediaUrl,
-  classUrl,
-  studentUrl,
-  paymentUrl,
-} from '../../shared/utils/urls';
-import {commonBlue, flatRed} from '../../shared/styles/colors';
-import {pricing} from '../../shared/utils/pricing';
+import {mediaUrl, classUrl, studentUrl} from '../../shared/utils/urls';
+import {flatRed, eucalyptusGreen} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -66,6 +57,7 @@ interface Props {
     avatar: string;
   };
   classes: Class[];
+  premiumAllowed: boolean;
 }
 
 interface State {
@@ -78,6 +70,15 @@ interface State {
     type: string;
   };
   loading: boolean;
+}
+
+interface RazorPayCheckOutSuccess {
+  checkout_logo: string;
+  org_logo: string;
+  org_name: string;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
 }
 
 class ManageClass extends React.Component<Props, State> {
@@ -258,45 +259,23 @@ class ManageClass extends React.Component<Props, State> {
       .catch(() => null);
   };
 
-  getSubscription = async () => {
-    try {
-      const res = await axios.get(
-        `${paymentUrl}/${this.props.currentClass!.id}/${pricing.standard.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
+  renderUpgradeButton = () => {
+    if (this.props.isOwner && this.props.currentClass!.planId === 'free') {
+      return (
+        <Button
+          title="Upgrade"
+          buttonStyle={{backgroundColor: eucalyptusGreen}}
+          containerStyle={{marginTop: 20}}
+          onPress={() => this.props.navigation.navigate('Checkout')}
+        />
       );
-
-      console.log(res.data.orderId, res.data);
-
-      const options = {
-        key: Config.key_id,
-        name: 'Easy Teach',
-        description: 'Standard Plan',
-        amount: '10000',
-        orderId: res.data.orderId,
-        currency: 'INR',
-        theme: {
-          color: commonBlue,
-        },
-      };
-
-      console.log(options);
-
-      RazorPay.open(options)
-        .then((data) => console.log(data))
-        .catch((e) => console.log(e));
-    } catch (e) {
-      console.log(e);
     }
   };
 
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
     const {joinCode} = this.props.currentClass!;
-    const {isOwner} = this.props;
+    const {isOwner, premiumAllowed} = this.props;
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -334,8 +313,13 @@ class ManageClass extends React.Component<Props, State> {
             <Input
               value={name}
               disabled={loading || !isOwner}
-              label="Name"
+              label="Class Name"
               onChangeText={(text) => this.setState({name: text})}
+            />
+            <Input
+              value={this.props.currentClass!.owner.name}
+              label="Class Owner"
+              disabled
             />
             <Input
               value={about}
@@ -380,12 +364,6 @@ class ManageClass extends React.Component<Props, State> {
                   loading={loading}
                   containerStyle={{marginTop: 20}}
                 />
-
-                <Button
-                  title="Upgrade"
-                  containerStyle={{marginTop: 20}}
-                  onPress={this.getSubscription}
-                />
               </>
             ) : (
               <Button
@@ -394,6 +372,14 @@ class ManageClass extends React.Component<Props, State> {
                 buttonStyle={{backgroundColor: flatRed}}
                 onPress={this.unEnroll}
                 containerStyle={{marginTop: 20}}
+              />
+            )}
+
+            {isOwner && !premiumAllowed && (
+              <Button
+                title="Upgrade"
+                containerStyle={{marginTop: 20}}
+                onPress={() => this.props.navigation.navigate('Checkout')}
               />
             )}
           </View>
@@ -416,12 +402,19 @@ const mapStateToProps = (state: StoreState) => {
   if (state.currentClass!.owner.username === state.profile.username) {
     isOwner = true;
   }
+
+  let premiumAllowed: boolean = false;
+
+  if (state.currentClass!.planId !== 'free') {
+    premiumAllowed = true;
+  }
   return {
     currentClass: state.currentClass,
     token: state.token,
     isOwner,
     profile: state.profile,
     classes: state.classes,
+    premiumAllowed,
   };
 };
 

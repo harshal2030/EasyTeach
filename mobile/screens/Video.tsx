@@ -22,10 +22,22 @@ type Props = {
   currentClass: Class;
 };
 
-class Video extends React.Component<Props> {
+type State = {
+  isFullScreen: boolean;
+};
+
+class Video extends React.Component<Props, State> {
   start: Date = new Date();
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      isFullScreen: false,
+    };
+  }
+
   componentDidMount() {
-    Orientation.lockToLandscape();
     StatusBar.setHidden(true);
   }
 
@@ -49,6 +61,16 @@ class Video extends React.Component<Props> {
       .catch(() => null);
   }
 
+  onFullScreenPress = () => {
+    if (!this.state.isFullScreen) {
+      Orientation.lockToLandscape();
+    } else {
+      Orientation.lockToPortrait();
+    }
+
+    this.setState({isFullScreen: !this.state.isFullScreen});
+  };
+
   render() {
     return (
       <VideoPlayer
@@ -58,6 +80,7 @@ class Video extends React.Component<Props> {
             Authorization: `Bearer ${this.props.token}`,
           },
         }}
+        onFullScreenPress={this.onFullScreenPress}
         style={styles.video}>
         <Text style={styles.title}>{this.props.route.params.title}</Text>
       </VideoPlayer>

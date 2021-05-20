@@ -16,6 +16,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
+import LottieView from 'lottie-react-native';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -41,6 +42,7 @@ interface Props {
   currentClass: Class;
   token: string;
   isOwner: boolean;
+  premiumAllowed: boolean;
 }
 
 interface ModuleRes {
@@ -244,6 +246,30 @@ class Module extends React.Component<Props, State> {
   renderContent = () => {
     const {loading, errored, modules} = this.state;
 
+    if (!this.props.premiumAllowed) {
+      return (
+        <View style={styles.promotionView}>
+          <Text style={styles.promotionText}>
+            {this.props.isOwner
+              ? 'Upgrade your class to unlock video lessons.'
+              : 'Ask class owner to unlock video lessons'}
+          </Text>
+          <LottieView
+            source={require('../../shared/images/rocket.json')}
+            autoPlay
+            style={styles.rocket}
+            loop
+          />
+          {this.props.isOwner && (
+            <Button
+              title="Upgrade Now"
+              onPress={() => this.props.navigation.navigate('Checkout')}
+            />
+          )}
+        </View>
+      );
+    }
+
     if (loading) {
       return (
         <View style={ContainerStyles.centerElements}>
@@ -324,7 +350,7 @@ class Module extends React.Component<Props, State> {
           />
         </Dialog.Container>
 
-        {this.props.isOwner && (
+        {this.props.isOwner && this.props.premiumAllowed && (
           <Button
             icon={{
               name: 'plus',
@@ -361,6 +387,21 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: 'row',
   },
+  promotionText: {
+    fontSize: 18,
+    padding: 10,
+    fontWeight: '800',
+    alignSelf: 'center',
+  },
+  rocket: {
+    position: 'relative',
+    height: 450,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  promotionView: {
+    padding: 20,
+  },
   FABContainer: {
     position: 'absolute',
     height: 60,
@@ -389,6 +430,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass!,
     token: state.token!,
     isOwner: state.currentClass!.owner.username === state.profile.username,
+    premiumAllowed: state.currentClass!.planId !== 'free',
   };
 };
 

@@ -41,6 +41,7 @@ type RootStackParamList = {
     videoId: string;
     title: string;
   };
+  Checkout: undefined;
 };
 
 type DrawerParamList = {

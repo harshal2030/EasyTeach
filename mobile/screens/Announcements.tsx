@@ -10,7 +10,7 @@ import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
-  DrawerNavigationProp<DrawerParamList, 'People'>,
+  DrawerNavigationProp<DrawerParamList, 'Home'>,
   StackNavigationProp<RootStackParamList>
 >;
 

@@ -185,19 +185,23 @@ class Files extends React.Component<Props, State> {
     })
       .then(() => {
         this.setState({videoModal: false, videoTitle: ''});
-        SnackBar.show({
-          text: 'Uploading in background.',
-          duration: SnackBar.LENGTH_LONG,
-        });
+        setTimeout(() => {
+          SnackBar.show({
+            text: 'Uploading in background.',
+            duration: SnackBar.LENGTH_LONG,
+          });
+        }, 1000);
       })
       .catch(() => {
         this.setState({videoModal: false, videoTitle: ''});
-        SnackBar.show({
-          text: 'Unable to upload your module. Please try again later.',
-          backgroundColor: flatRed,
-          textColor: '#ffff',
-          duration: SnackBar.LENGTH_LONG,
-        });
+        setTimeout(() => {
+          SnackBar.show({
+            text: 'Unable to upload your module. Please try again later.',
+            backgroundColor: flatRed,
+            textColor: '#ffff',
+            duration: SnackBar.LENGTH_LONG,
+          });
+        }, 1000);
       });
   };
 

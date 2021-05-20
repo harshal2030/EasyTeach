@@ -31,6 +31,10 @@ interface Class {
   collaborators: string[];
   joinCode: string;
   lockJoin: boolean;
+  payId: string;
+  planId: string;
+  payedOn: string;
+  storageUsed: number;
 }
 
 // return action types of each action
