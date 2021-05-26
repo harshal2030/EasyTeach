@@ -31,6 +31,7 @@ import {
   commonGrey,
   flatRed,
 } from '../../shared/styles/colors';
+import {bytesToGB} from '../../shared/utils/functions';
 
 type navigation = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Modules'>,
@@ -351,17 +352,25 @@ class Module extends React.Component<Props, State> {
         </Dialog.Container>
 
         {this.props.isOwner && this.props.premiumAllowed && (
-          <Button
-            icon={{
-              name: 'plus',
-              type: 'octicon',
-              color: commonBlue,
-            }}
-            containerStyle={styles.FABContainer}
-            onPress={() => this.setState({dialogVisible: true})}
-            // eslint-disable-next-line react-native/no-inline-styles
-            buttonStyle={{backgroundColor: '#ffff'}}
-          />
+          <>
+            <Button
+              icon={{
+                name: 'plus',
+                type: 'octicon',
+                color: commonBlue,
+              }}
+              containerStyle={styles.FABContainer}
+              onPress={() => this.setState({dialogVisible: true})}
+              // eslint-disable-next-line react-native/no-inline-styles
+              buttonStyle={{backgroundColor: '#ffff'}}
+            />
+
+            <View style={styles.bottomView}>
+              <Text>
+                Used {bytesToGB(this.props.currentClass.storageUsed)}GB of 20GB
+              </Text>
+            </View>
+          </>
         )}
       </View>
     );
@@ -401,6 +410,12 @@ const styles = StyleSheet.create({
   },
   promotionView: {
     padding: 20,
+  },
+  bottomView: {
+    padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: commonBackground,
   },
   FABContainer: {
     position: 'absolute',

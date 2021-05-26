@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import axios from 'axios';
 import {
@@ -20,7 +21,8 @@ import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
-import {commonBlue, flatRed} from '../../shared/styles/colors';
+import {commonBlue, flatRed, greyWithAlpha} from '../../shared/styles/colors';
+import {TextStyles} from '../../shared/styles/styles';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'People'>,
@@ -37,6 +39,7 @@ interface Props {
   currentClass: Class | null;
   token: string | null;
   isOwner: boolean;
+  premiumAllowed: boolean;
 }
 
 interface peopleProp {
@@ -51,6 +54,8 @@ const People = (props: Props) => {
 
   React.useEffect(() => {
     if (props.currentClass) {
+      setPeople([]);
+      setLoading(true);
       axios
         .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
           headers: {
@@ -172,6 +177,8 @@ const People = (props: Props) => {
     if (loading) {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
     }
+
+    return <View style={{height: 50}} />;
   };
 
   return (
@@ -201,6 +208,20 @@ const People = (props: Props) => {
       ) : (
         <Text>Enroll in a class to see people</Text>
       )}
+
+      {props.isOwner && !props.premiumAllowed && (
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>
+            You can only have 100 students in your class.{' '}
+            <Text
+              style={TextStyles.link}
+              onPress={() => props.navigation.navigate('Checkout')}>
+              Click here
+            </Text>{' '}
+            to upgrade now
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -210,18 +231,31 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
+  footerContainer: {
+    padding: 8,
+    borderTopColor: greyWithAlpha(0.5),
+    borderTopWidth: 1,
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 const mapStateToProps = (state: StoreState) => {
   let isOwner: boolean = false;
+  let premiumAllowed = false;
+
   if (state.currentClass) {
     isOwner = state.currentClass.owner.username === state.profile.username;
+    premiumAllowed = state.currentClass.planId !== 'free';
   }
   return {
     token: state.token,
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,
+    premiumAllowed,
   };
 };
 

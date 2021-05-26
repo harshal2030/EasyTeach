@@ -33,4 +33,10 @@ const getDateAndMonth = (date: Date) => {
   return `${month} ${dateNum}`;
 };
 
-export {formatDate, getDateAndMonth};
+const bytesToGB = (size: number): number => {
+  const GB = size / (1024 * 1024 * 1024);
+
+  return Math.round((GB + Number.EPSILON) * 100) / 100;
+};
+
+export {formatDate, getDateAndMonth, bytesToGB};

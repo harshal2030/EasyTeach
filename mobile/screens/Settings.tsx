@@ -16,7 +16,11 @@ import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {mediaUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
-import {commonBlue, commonGrey} from '../../shared/styles/colors';
+import {
+  commonBlue,
+  commonGrey,
+  greyWithAlpha,
+} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Settings'>,
@@ -51,6 +55,7 @@ class Settings extends React.PureComponent<Props> {
           source={{
             uri: `${mediaUrl}/class/avatar/${item.photo}`,
           }}
+          style={{backgroundColor: greyWithAlpha(0.5)}}
         />
 
         <ListItem.Content>

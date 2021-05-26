@@ -27,6 +27,11 @@ const TextStyles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '800',
   },
+  link: {
+    color: '#0000EE',
+    textDecorationLine: 'underline',
+    textDecorationColor: '#0000EE',
+  },
 });
 
 const ContainerStyles = StyleSheet.create({

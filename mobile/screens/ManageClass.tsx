@@ -274,8 +274,14 @@ class ManageClass extends React.Component<Props, State> {
 
   render() {
     const {name, about, subject, lockJoin, photo, loading} = this.state;
-    const {joinCode} = this.props.currentClass!;
+    const {joinCode, payedOn} = this.props.currentClass!;
     const {isOwner, premiumAllowed} = this.props;
+
+    const nextPay = new Date();
+    if (payedOn) {
+      nextPay.setDate(new Date(payedOn).getDate() + 1);
+    }
+
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -335,6 +341,13 @@ class ManageClass extends React.Component<Props, State> {
               disabled={loading || !isOwner}
               onChangeText={(text) => this.setState({subject: text})}
             />
+            {isOwner && premiumAllowed && (
+              <Input
+                value={nextPay.toDateString()}
+                disabled
+                label="Next Payment Date"
+              />
+            )}
             {isOwner && (
               <>
                 <Input
