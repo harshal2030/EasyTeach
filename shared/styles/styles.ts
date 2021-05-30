@@ -77,6 +77,7 @@ const ImageStyles = StyleSheet.create({
     borderColor: 'transparent',
     overflow: 'hidden',
     alignSelf: 'center',
+    backgroundColor: greyWithAlpha(0.4),
   },
   imageOverlay: {
     flex: 1,

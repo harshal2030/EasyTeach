@@ -40,7 +40,7 @@ type navigation = CompositeNavigationProp<
 
 interface Props {
   navigation: navigation;
-  currentClass: Class;
+  currentClass: Class | null;
   token: string;
   isOwner: boolean;
   premiumAllowed: boolean;
@@ -76,11 +76,21 @@ class Module extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.fetchModules();
+    if (this.props.premiumAllowed) {
+      this.fetchModules();
+    }
   }
 
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
+    if (
+      prevProps.currentClass?.id === this.props.currentClass?.id &&
+      this.props.premiumAllowed !== prevProps.premiumAllowed
+    ) {
+      this.fetchModules();
+      return;
+    }
+
+    if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
       this.fetchModules();
     }
   }
@@ -89,7 +99,7 @@ class Module extends React.Component<Props, State> {
     try {
       this.setState({loading: true});
       const res = await axios.get<ModuleRes[]>(
-        `${moduleUrl}/${this.props.currentClass.id}`,
+        `${moduleUrl}/${this.props.currentClass?.id}`,
         {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
@@ -107,7 +117,7 @@ class Module extends React.Component<Props, State> {
   confirmDelete = (id: string) => {
     const deleteModule = () => {
       axios
-        .delete(`${moduleUrl}/${this.props.currentClass.id}/${id}`, {
+        .delete(`${moduleUrl}/${this.props.currentClass?.id}/${id}`, {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
@@ -172,7 +182,7 @@ class Module extends React.Component<Props, State> {
       this.closeDialog();
 
       const res = await axios.put<ModuleRes>(
-        `${moduleUrl}/${this.props.currentClass.id}/${this.state.moduleId}`,
+        `${moduleUrl}/${this.props.currentClass?.id}/${this.state.moduleId}`,
         {
           title: this.state.moduleName,
         },
@@ -246,15 +256,23 @@ class Module extends React.Component<Props, State> {
 
   renderContent = () => {
     const {loading, errored, modules} = this.state;
+    const {isOwner, currentClass} = this.props;
+
+    let upgradeText = '';
+
+    if (isOwner && currentClass?.payedOn) {
+      upgradeText =
+        'Upgrade to resume services. All things automatically recovers';
+    } else if (!isOwner) {
+      upgradeText = 'Ask class owner to unlock video lessons';
+    } else {
+      upgradeText = 'Upgrade your class to unlock video lessons';
+    }
 
     if (!this.props.premiumAllowed) {
       return (
         <View style={styles.promotionView}>
-          <Text style={styles.promotionText}>
-            {this.props.isOwner
-              ? 'Upgrade your class to unlock video lessons.'
-              : 'Ask class owner to unlock video lessons'}
-          </Text>
+          <Text style={styles.promotionText}>{upgradeText}</Text>
           <LottieView
             source={require('../../shared/images/rocket.json')}
             autoPlay
@@ -367,7 +385,7 @@ class Module extends React.Component<Props, State> {
 
             <View style={styles.bottomView}>
               <Text>
-                Used {bytesToGB(this.props.currentClass.storageUsed)}GB of 20GB
+                Used {bytesToGB(this.props.currentClass!.storageUsed)}GB of 20GB
               </Text>
             </View>
           </>
@@ -442,10 +460,10 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state: StoreState) => {
   return {
-    currentClass: state.currentClass!,
+    currentClass: state.currentClass,
     token: state.token!,
-    isOwner: state.currentClass!.owner.username === state.profile.username,
-    premiumAllowed: state.currentClass!.planId !== 'free',
+    isOwner: state.currentClass?.owner.username === state.profile.username,
+    premiumAllowed: state.currentClass?.planId !== 'free',
   };
 };
 

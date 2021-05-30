@@ -72,15 +72,6 @@ interface State {
   loading: boolean;
 }
 
-interface RazorPayCheckOutSuccess {
-  checkout_logo: string;
-  org_logo: string;
-  org_name: string;
-  razorpay_order_id: string;
-  razorpay_payment_id: string;
-  razorpay_signature: string;
-}
-
 class ManageClass extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -272,15 +263,29 @@ class ManageClass extends React.Component<Props, State> {
     }
   };
 
-  render() {
-    const {name, about, subject, lockJoin, photo, loading} = this.state;
-    const {joinCode, payedOn} = this.props.currentClass!;
-    const {isOwner, premiumAllowed} = this.props;
+  renderNextPayDate = () => {
+    const {currentClass, premiumAllowed, isOwner} = this.props;
 
     const nextPay = new Date();
-    if (payedOn) {
-      nextPay.setDate(new Date(payedOn).getDate() + 1);
+    if (currentClass!.payedOn) {
+      nextPay.setDate(new Date(currentClass!.payedOn).getDate() + 30);
     }
+
+    const value = nextPay.toDateString();
+
+    if (isOwner && premiumAllowed) {
+      return <Input value={value} disabled label="Next Payment Date" />;
+    }
+
+    if (isOwner && !premiumAllowed && currentClass?.payedOn) {
+      return <Input value="Today" disabled label="Next Payment Date" />;
+    }
+  };
+
+  render() {
+    const {name, about, subject, lockJoin, photo, loading} = this.state;
+    const {joinCode} = this.props.currentClass!;
+    const {isOwner, premiumAllowed} = this.props;
 
     return (
       <View style={ContainerStyles.parent}>
@@ -341,13 +346,7 @@ class ManageClass extends React.Component<Props, State> {
               disabled={loading || !isOwner}
               onChangeText={(text) => this.setState({subject: text})}
             />
-            {isOwner && premiumAllowed && (
-              <Input
-                value={nextPay.toDateString()}
-                disabled
-                label="Next Payment Date"
-              />
-            )}
+            {this.renderNextPayDate()}
             {isOwner && (
               <>
                 <Input

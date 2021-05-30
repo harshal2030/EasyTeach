@@ -212,7 +212,7 @@ const People = (props: Props) => {
       {props.isOwner && !props.premiumAllowed && (
         <View style={styles.footerContainer}>
           <Text style={styles.footerText}>
-            You can only have 100 students in your class.{' '}
+            You can only have few seats in your class.{' '}
             <Text
               style={TextStyles.link}
               onPress={() => props.navigation.navigate('Checkout')}>
