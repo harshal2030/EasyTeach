@@ -109,7 +109,6 @@ class Module extends React.Component<Props, State> {
 
       this.setState({loading: false, modules: res.data});
     } catch (e) {
-      console.log(e);
       this.setState({loading: false, errored: true});
     }
   };

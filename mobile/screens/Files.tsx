@@ -13,7 +13,7 @@ import {
 import {Header, FAB, Button, Input, Icon} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
-import Picker from 'react-native-image-crop-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import Upload from 'react-native-background-upload';
 import FastImage from 'react-native-fast-image';
 import {VideoPlayer} from '../components/main/VideoPlayer';
@@ -30,9 +30,9 @@ import {
   commonBlue,
   commonGrey,
   greyWithAlpha,
+  flatRed,
 } from '../../shared/styles/colors';
-import {fileUrl, vidTrackerUrl} from '../../shared/utils/urls';
-import {flatRed} from '../../shared/styles/colors';
+import {fileUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
 
 type navigation = StackNavigationProp<RootStackParamList, 'Files'>;
@@ -102,25 +102,11 @@ class Files extends React.Component<Props, State> {
   };
 
   onVideoPress = () => {
-    Picker.openPicker({
+    ImagePicker.openPicker({
       mediaType: 'video',
     })
       .then((res) => this.setState({videoUri: res.path, videoModal: true}))
       .catch(() => null);
-  };
-
-  getInfo = () => {
-    axios
-      .get(
-        `${vidTrackerUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.state.fileId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      )
-      .then((res) => console.log(res.data))
-      .catch((e) => console.log(e));
   };
 
   confirmDelete = (fileId: string) => {

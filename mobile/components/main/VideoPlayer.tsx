@@ -1,17 +1,15 @@
 import React, {useState, useRef} from 'react';
-
 import {StyleSheet, View, ViewStyle} from 'react-native';
-
 import Video, {OnProgressData, OnLoadData} from 'react-native-video';
 
-import MediaControls, {PLAYER_STATES} from 'react-native-media-controls';
-import {commonBlue} from '../../../shared/styles/colors';
+import {PLAYER_STATES} from '../../../shared/utils/constants';
+import {MediaControls} from './MediaConrols';
 
 type Props = {
   source: {uri?: string; headers?: {[key: string]: string}} | number;
   onFullScreenPress?: () => void;
   style?: ViewStyle;
-  children?: JSX.Element | JSX.Element[];
+  children?: JSX.Element;
 };
 
 const VideoPlayer = (props: Props) => {
@@ -21,29 +19,32 @@ const VideoPlayer = (props: Props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [paused, setPaused] = useState(false);
   const [playerState, setPlayerState] = useState(PLAYER_STATES.PLAYING);
+  const [changeProgress, setChangeProgress] = useState(true);
 
   const onSeek = (seek: number) => {
     //Handler for change in seekbar
     videoPlayer.current!.seek(seek);
     setCurrentTime(seek);
+    setChangeProgress(true);
   };
 
-  const onPaused = (PlayerState: PLAYER_STATES) => {
+  const onPaused = () => {
     //Handler for Video Pause
     setPaused(!paused);
-    setPlayerState(PlayerState);
+    setPlayerState(paused ? PLAYER_STATES.PLAYING : PLAYER_STATES.PAUSED);
   };
 
   const onReplay = () => {
     //Handler for Replay
     videoPlayer.current!.seek(0);
+    setCurrentTime(0);
     setPaused(false);
-    setPlayerState(PLAYER_STATES.PLAYING);
+    setPlayerState(PLAYER_STATES.PAUSED);
   };
 
   const onProgress = (data: OnProgressData) => {
     // Video Player will progress continue even if it ends
-    if (!isLoading && playerState !== PLAYER_STATES.ENDED) {
+    if (!isLoading && playerState !== 2 && changeProgress) {
       setCurrentTime(data.currentTime);
     }
   };
@@ -57,7 +58,10 @@ const VideoPlayer = (props: Props) => {
 
   const onEnd = () => setPlayerState(PLAYER_STATES.ENDED);
 
-  const onSeeking = (CurrentTime: number) => setCurrentTime(CurrentTime);
+  const onSeeking = (CurrentTime: number) => {
+    setChangeProgress(false);
+    setCurrentTime(CurrentTime);
+  };
 
   return (
     <View style={props.style}>
@@ -73,21 +77,17 @@ const VideoPlayer = (props: Props) => {
         style={[styles.mediaPlayer, props.style]}
         useTextureView={false}
       />
-      {/* @ts-ignore */}
       <MediaControls
+        progress={currentTime}
         duration={duration}
-        mainColor={commonBlue}
-        isLoading={isLoading}
-        onFullScreen={props.onFullScreenPress}
-        onPaused={onPaused}
-        onReplay={onReplay}
-        onSeek={onSeek}
-        onSeeking={onSeeking}
         playerState={playerState}
-        progress={currentTime}>
-        {props.children && (
-          <MediaControls.Toolbar>{props.children}</MediaControls.Toolbar>
-        )}
+        onSeeking={onSeeking}
+        isLoading={isLoading}
+        onReplay={onReplay}
+        onPause={onPaused}
+        onSeekReleased={onSeek}
+        onFullScreen={props.onFullScreenPress}>
+        {props.children}
       </MediaControls>
     </View>
   );

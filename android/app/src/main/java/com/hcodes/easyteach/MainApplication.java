@@ -58,11 +58,6 @@ public class MainApplication extends Application implements ReactApplication {
       }
 
         @Override
-        protected JSIModulePackage getJSIModulePackage() {
-          return new EasyJSI();
-        }
-
-        @Override
         protected @Nullable String getJSBundleFile() {
           if (BuildConfig.DEBUG) {
             return super.getJSBundleFile();

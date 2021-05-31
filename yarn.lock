@@ -10624,6 +10624,11 @@ react-native-elements@^3.4.1:
     react-native-ratings "^7.3.0"
     react-native-size-matters "^0.3.1"
 
+react-native-exception-handler@^2.10.10:
+  version "2.10.10"
+  resolved "https://registry.yarnpkg.com/react-native-exception-handler/-/react-native-exception-handler-2.10.10.tgz#b6bfe2b7e6ea4a4deb1f518f48ce2ee1d4843497"
+  integrity sha512-otAXGoZDl1689OoUJWN/rXxVbdoZ3xcmyF1uq/CsizdLwwyZqVGd6d+p/vbYvnF996FfEyAEBnHrdFxulTn51w==
+
 react-native-fast-image@^8.3.4:
   version "8.3.4"
   resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.3.4.tgz#79edca177e30311b19d59ff335625bcbe22650d7"
@@ -10640,10 +10645,10 @@ react-native-gesture-handler@^1.10.3:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-image-crop-picker@0.33.2:
-  version "0.33.2"
-  resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.33.2.tgz#2ff761422118f9789ff823e8a3ba71a13525fd7c"
-  integrity sha512-RtOcPtshOAX2rXTFnfo2bXQVFkd0W8QifgUlzlDC8uCArt9P9++pygdXdhrLr1fk+mdiiYATQqIj1Xn3InPhfg==
+react-native-image-crop-picker@^0.36.2:
+  version "0.36.2"
+  resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.36.2.tgz#fcb35c1a12d805bedbb6d94a87078e86a6c9b49f"
+  integrity sha512-cTauoEHHzx14ZHA7Pt65e7RVnbn1WRYQz2ufTZp9/05EtNDrdsXwNhgtXdWVFbOhYB8qgUFQjy2NelkBOHIH3g==
 
 react-native-iphone-x-helper@^1.3.0:
   version "1.3.1"
@@ -10657,13 +10662,10 @@ react-native-lightbox-v2@^0.8.6:
   dependencies:
     prop-types "^15.7.2"
 
-"react-native-media-controls@git+https://github.com/harshal2030/react-native-media-controls.git":
-  version "2.3.0"
-  resolved "git+https://github.com/harshal2030/react-native-media-controls.git#dfd0d8e4079963535f9f8a172c4b4d1bba9774da"
-
-"react-native-mmkv-storage@git+https://github.com/ammarahm-ed/react-native-mmkv-storage.git":
-  version "0.5.8"
-  resolved "git+https://github.com/ammarahm-ed/react-native-mmkv-storage.git#c7e961198b1c585d475228150da0756a48a0ecb8"
+react-native-mmkv-storage@^0.5.9:
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/react-native-mmkv-storage/-/react-native-mmkv-storage-0.5.9.tgz#f4333c6fcae6475a786b1c0f907ae478bad2c91a"
+  integrity sha512-SfjUIpC0pkhdLx1zKYkEkzqfb+sOus1nr/RoXcesLhjz/qRYmnDIULsrebl6peHTNRAbgmhgumr6MoFj0m7EFA==
 
 react-native-modal@>=9.0.0:
   version "11.9.0"
@@ -10673,22 +10675,19 @@ react-native-modal@>=9.0.0:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
 
-react-native-modal@^11.5.6:
-  version "11.6.1"
-  resolved "https://registry.yarnpkg.com/react-native-modal/-/react-native-modal-11.6.1.tgz#6162a39731860fb3b6e8304059f72dc0a961f9fd"
-  integrity sha512-Xsd79nuBvbLOYwpRuur4btwJFQ3WkV9zp5LbAREidUtjl/Ajlp4QbNBx888FOPjo+EpOO3+U0riCRqs1dkdIzQ==
+react-native-modal@^11.10.0:
+  version "11.10.0"
+  resolved "https://registry.yarnpkg.com/react-native-modal/-/react-native-modal-11.10.0.tgz#94a6d3a2428ba5228cfb4dc174cacea79c871591"
+  integrity sha512-syRYDJYSh16bR37R5EKU9T/wC+5bEOfF17IUqf5URdhbEDd+hxyMInC++l45E8oI+MtdOaEp9yAws5xDqk8dnA==
   dependencies:
     prop-types "^15.6.2"
     react-native-animatable "1.3.3"
 
-<<<<<<< HEAD
 react-native-orientation-locker@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/react-native-orientation-locker/-/react-native-orientation-locker-1.2.0.tgz#9fa51b3aade9b847e63066b6fd60509371940a7e"
   integrity sha512-lnwp9Jbt1m/0Gfw9a5Mrwj/APNSuYkVdJEgBKRyQgOshDrKRv5dxpD0P786AgIEjnEbjyrNOS6GQvBdqPYSxsg==
 
-=======
->>>>>>> master
 "react-native-photo-view-ex@git+https://github.com/harshal2030/react-native-photo-view-ex.git":
   version "1.1.0"
   resolved "git+https://github.com/harshal2030/react-native-photo-view-ex.git#801c0bc18e253f685a001139453387ad04d53d25"
