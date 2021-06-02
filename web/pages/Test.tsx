@@ -10,7 +10,7 @@ import {
 import Modal from 'react-native-modal';
 import {withRouter, RouteComponentProps, Link} from 'react-router-dom';
 import {Header, Button} from 'react-native-elements';
-import Octicons from 'react-native-vector-icons/Octicons';
+import Plus from '../../shared/images/plus.svg';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
@@ -245,7 +245,7 @@ class Test extends React.Component<Props, State> {
         {this.props.isOwner && (
           <Link to={`/createtest/${this.props.currentClass!.id}`}>
             <Button
-              icon={<Octicons name="plus" size={26} color={commonBlue} />}
+              icon={<Plus />}
               containerStyle={styles.FABContainer}
               // eslint-disable-next-line react-native/no-inline-styles
               buttonStyle={{backgroundColor: '#ffff'}}

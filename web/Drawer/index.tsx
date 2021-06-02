@@ -11,15 +11,19 @@ import {
   ImageBackground,
 } from 'react-native';
 import {useRouteMatch, useHistory} from 'react-router-dom';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Feather from 'react-native-vector-icons/Feather';
 import {Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
-import Octicons from 'react-native-vector-icons/Octicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
+import LogOut from '../../shared/images/log-out.svg';
+import Plus from '../../shared/images/plus-36.svg';
+import Home from '../../shared/images/home.svg';
+import Sliders from '../../shared/images/sliders.svg';
+import InfoCircle from '../../shared/images/info-circle.svg';
+import Group from '../../shared/images/group.svg';
+import Checklist from '../../shared/images/checklist.svg';
+import Settings from '../../shared/images/settings.svg';
 
 import {StoreState} from '../../shared/global';
 import {removeToken} from '../../shared/global/actions/token';
@@ -107,7 +111,7 @@ const DrawerContent = (props: Props): JSX.Element => {
       <TouchableOpacity
         style={{alignSelf: 'center'}}
         onPress={() => history.push('/joinclass')}>
-        <Feather name="plus" size={36} color={commonGrey} />
+        <Plus />
       </TouchableOpacity>
     );
   };
@@ -152,14 +156,14 @@ const DrawerContent = (props: Props): JSX.Element => {
 
         <View style={actionButtonContainer}>
           <Button
-            icon={<Ionicons name="settings" size={36} color={commonGrey} />}
+            icon={<Settings />}
             type="clear"
             onPress={() => history.push('/settings')}
             TouchableComponent={TouchableOpacity}
           />
 
           <Button
-            icon={<Feather name="log-out" size={36} color={commonGrey} />}
+            icon={<LogOut />}
             type="clear"
             TouchableComponent={TouchableOpacity}
             onPress={logOut}
@@ -205,7 +209,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                     history.push(`${url}/home/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
-                  <Entypo name="home" color="#34495e" size={23} />
+                  <Home />
                   <Text style={optionText}> Home</Text>
                 </TouchableOpacity>
 
@@ -215,7 +219,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                     history.push(`${url}/people/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
-                  <FontAwesome name="group" color="#34495e" size={20} />
+                  <Group />
                   <Text style={optionText}> People</Text>
                 </TouchableOpacity>
 
@@ -225,7 +229,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                     history.push(`${url}/tests/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
-                  <Octicons name="checklist" color="#34495e" size={25} />
+                  <Checklist height={25} width={25} color="#34495e" />
                   <Text style={optionText}> Tests</Text>
                 </TouchableOpacity>
 
@@ -235,11 +239,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                     history.push(`${url}/about/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
-                  <FontAwesome
-                    name={props.isOwner ? 'sliders' : 'info-circle'}
-                    color="#34495e"
-                    size={23}
-                  />
+                  {props.isOwner ? <Sliders /> : <InfoCircle />}
                   <Text style={optionText}>
                     {' '}
                     {props.isOwner ? 'Manage' : 'Info'}

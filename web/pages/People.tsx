@@ -1,12 +1,19 @@
 import React from 'react';
 import axios from 'axios';
-import {View, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import {useHistory, useParams} from 'react-router-dom';
 import {Header, ListItem, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
 
+import Cross from '../../shared/images/cross.svg';
 import {Avatar} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
@@ -111,15 +118,13 @@ const People = (props: Props) => {
           <ListItem.Subtitle>{'@' + item.username}</ListItem.Subtitle>
         </ListItem.Content>
         {props.isOwner && (
-          <ListItem.Chevron
-            name="cross"
-            type="entypo"
-            size={24}
+          <TouchableOpacity
             onPress={() => {
-              setUser({name: item.name, username: item.username});
+              setUser(item);
               setAlert(true);
-            }}
-          />
+            }}>
+            <Cross />
+          </TouchableOpacity>
         )}
       </ListItem>
     );

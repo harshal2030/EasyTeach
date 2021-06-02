@@ -2,9 +2,9 @@ import React from 'react';
 import {View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem, Button, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 
+import AccountEdit from '../../shared/images/account-edit.svg';
 import {HeadCom} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
@@ -13,11 +13,8 @@ import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
 import {mediaUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
-import {
-  commonBlue,
-  commonGrey,
-  greyWithAlpha,
-} from '../../shared/styles/colors';
+import {commonBlue, greyWithAlpha} from '../../shared/styles/colors';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 type Props = RouteComponentProps & {
   token: string | null;
@@ -127,12 +124,10 @@ class Settings extends React.PureComponent<Props> {
           name={profile.name}
           username={profile.username}
           rightComponent={
-            <MaterialCommunityIcons
-              name="account-edit-outline"
-              size={28}
-              color={commonGrey}
-              onPress={() => this.props.history.push('/profile')}
-            />
+            <TouchableOpacity
+              onPress={() => this.props.history.push('/profile')}>
+              <AccountEdit />
+            </TouchableOpacity>
           }
         />
 
