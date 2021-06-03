@@ -12,7 +12,9 @@ import {Header, ListItem, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
+import MenuIcon from '@iconify-icons/ic/menu';
 
+import {TouchableIcon} from '../components';
 import Cross from '../../shared/images/cross.svg';
 import {Avatar} from '../../shared/components/common';
 
@@ -173,12 +175,14 @@ const People = (props: Props) => {
           text: 'People',
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
-        leftComponent={{
-          icon: 'menu',
-          color: '#ffff',
-          size: 26,
-          onPress: props.onLeftTopPress,
-        }}
+        leftComponent={
+          <TouchableIcon
+            icon={MenuIcon}
+            color="#fff"
+            size={26}
+            onPress={props.onLeftTopPress}
+          />
+        }
       />
       {props.currentClass ? (
         <FlatList

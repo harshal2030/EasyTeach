@@ -5,7 +5,9 @@ import {Header, Button} from 'react-native-elements';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
+import BackIcon from '@iconify-icons/ic/arrow-back';
 
+import {TouchableIcon} from '../components';
 import QuestionCard from '../components/QuestionCard';
 
 import {StoreState} from '../../shared/global';
@@ -170,12 +172,14 @@ class EditQuestion extends React.Component<Props, State> {
             text: 'Edit Questions',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.history.goBack(),
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={BackIcon}
+              color="#fff"
+              size={26}
+              onPress={this.props.history.goBack}
+            />
+          }
         />
 
         {this.renderContent()}

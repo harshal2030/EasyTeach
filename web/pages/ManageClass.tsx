@@ -10,10 +10,13 @@ import {
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {Header, Input, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
-import MI from 'react-native-vector-icons/MaterialIcons';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
+import CameraAlt from '@iconify-icons/ic/round-camera-alt';
+import MenuIcon from '@iconify-icons/ic/menu';
+import CopyIcon from '@iconify-icons/ic/content-copy';
 
+import {TouchableIcon} from '../components';
 import {CheckBox} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
@@ -221,12 +224,14 @@ class ManageClass extends React.Component<Props, State> {
             text: this.props.isOwner ? 'Manage' : 'Info',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: this.props.onTopLeftPress,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={MenuIcon}
+              size={26}
+              color="#fff"
+              onPress={this.props.onTopLeftPress}
+            />
+          }
         />
 
         <ScrollView keyboardShouldPersistTaps="handled">
@@ -245,7 +250,7 @@ class ManageClass extends React.Component<Props, State> {
                 <TouchableOpacity
                   style={ImageStyles.imageOverlay}
                   onPress={() => this.upload!.click()}>
-                  <MI name="camera-alt" color="#000" size={28} />
+                  <TouchableIcon icon={CameraAlt} color="#000" size={28} />
                 </TouchableOpacity>
               </ImageBackground>
             ) : (
@@ -280,10 +285,13 @@ class ManageClass extends React.Component<Props, State> {
                 <Input
                   value={joinCode}
                   label="Join Code"
-                  rightIcon={{
-                    name: 'content-copy',
-                    onPress: this.shareCode,
-                  }}
+                  rightIcon={
+                    <TouchableIcon
+                      icon={CopyIcon}
+                      onPress={this.shareCode}
+                      size={24}
+                    />
+                  }
                   disabled
                 />
                 <CheckBox

@@ -6,7 +6,9 @@ import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import AsyncStorage from '@react-native-community/async-storage';
+import BackIcon from '@iconify-icons/ic/arrow-back';
 
+import {TouchableIcon} from '../components';
 import {CommonSetting} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
@@ -119,12 +121,14 @@ class EditProfile extends React.Component<Props, State> {
             text: 'Edit Profile',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: this.props.history.goBack,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={BackIcon}
+              color="#fff"
+              size={26}
+              onPress={this.props.history.goBack}
+            />
+          }
         />
 
         <CommonSetting

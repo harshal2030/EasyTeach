@@ -13,7 +13,10 @@ import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
 import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
+import MenuIcon from '@iconify-icons/ic/baseline-menu';
+import SendIcon from '@iconify-icons/ic/baseline-send';
 
+import {TouchableIcon} from '../components';
 import {MsgCard} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
@@ -236,12 +239,14 @@ class Home extends React.Component<Props, State> {
               : 'Home',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: this.props.onLeftTopPress,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={MenuIcon}
+              size={26}
+              onPress={this.props.onLeftTopPress}
+              color="#fff"
+            />
+          }
         />
         <View
           style={{
@@ -256,11 +261,14 @@ class Home extends React.Component<Props, State> {
               multiline
               errorStyle={{height: 0}}
               onChangeText={(message) => this.setState({message})}
-              rightIcon={{
-                name: 'send',
-                color: commonBlue,
-                onPress: this.postMessage,
-              }}
+              rightIcon={
+                <TouchableIcon
+                  icon={SendIcon}
+                  onPress={this.postMessage}
+                  color={commonBlue}
+                  size={28}
+                />
+              }
             />
           ) : (
             <View

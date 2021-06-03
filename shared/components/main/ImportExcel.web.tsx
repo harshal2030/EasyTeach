@@ -1,8 +1,11 @@
 import React from 'react';
 import {Image as FastImage} from 'react-native';
 import LightBox from 'react-native-lightbox-v2';
-import {View, StyleSheet, Linking} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {Header, Button, Text} from 'react-native-elements';
+import {InlineIcon} from '@iconify/react';
+import ExcelIcon from '@iconify-icons/mdi/microsoft-excel';
+import FileIcon from '@iconify-icons/fa-solid/file-download';
 
 import {eucalyptusGreen} from '../../styles/colors';
 import {mediaUrl} from '../../utils/urls';
@@ -50,27 +53,22 @@ const ImportExcel = (props: Props) => {
 
         <Button
           title="Import Sheet"
-          icon={{
-            name: 'microsoft-excel',
-            type: 'material-community',
-            color: '#fff',
-          }}
+          icon={<InlineIcon icon={ExcelIcon} color="#fff" height={24} />}
           containerStyle={{marginTop: 20}}
           onPress={props.onImportPress}
         />
 
-        <Button
-          title="Download Sample"
-          containerStyle={{marginTop: 10}}
-          buttonStyle={{backgroundColor: eucalyptusGreen}}
-          icon={{
-            name: 'file-download',
-            type: 'font-awesome-5',
-            color: '#fff',
-            size: 24,
-          }}
-          onPress={() => Linking.openURL(`${mediaUrl}/sample`)}
-        />
+        <a
+          href={`${mediaUrl}/sample`}
+          target="_blank"
+          style={{textDecoration: 'none'}}>
+          <Button
+            title="Download Sample"
+            containerStyle={{marginTop: 10}}
+            buttonStyle={{backgroundColor: eucalyptusGreen}}
+            icon={<InlineIcon icon={FileIcon} color="#fff" height={24} />}
+          />
+        </a>
       </View>
     </View>
   );
@@ -98,3 +96,4 @@ const styles = StyleSheet.create({
 });
 
 export {ImportExcel};
+export default ImportExcel;

@@ -11,8 +11,9 @@ import axios from 'axios';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {toast} from 'react-toastify';
+import {TouchableIcon} from '../components';
+import arrowBack from '@iconify-icons/ic/round-arrow-back';
 
 import {CommonSetting} from '../../shared/components/main';
 import {classUrl} from '../../shared/utils/urls';
@@ -217,11 +218,11 @@ class JoinClass extends React.Component<Props, State> {
       <View style={mainContainer}>
         <Header
           leftComponent={
-            <MaterialIcons
-              name="arrow-back"
-              color="#fff"
+            <TouchableIcon
+              icon={arrowBack}
               size={28}
-              onPress={() => this.props.history.goBack()}
+              color="#fff"
+              onPress={this.props.history.goBack}
             />
           }
           centerComponent={{

@@ -11,6 +11,9 @@ import {
 import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
+import BackIcon from '@iconify-icons/ic/arrow-back';
+
+import {TouchableIcon} from '../components';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -150,12 +153,14 @@ class ShowScore extends React.Component<Props, State> {
             text: 'Test Score',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.history.goBack(),
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={BackIcon}
+              size={26}
+              onPress={this.props.history.goBack}
+              color="#fff"
+            />
+          }
         />
 
         <View style={ContainerStyles.centerElements}>

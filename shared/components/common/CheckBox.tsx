@@ -1,6 +1,9 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {CheckBox as CheckBoxCom, Text} from 'react-native-elements';
+import {InlineIcon} from '@iconify/react';
+import CheckedSquareO from '@iconify-icons/fa/check-square-o';
+import SqaureO from '@iconify-icons/fa/square-o';
 
 import {TextStyles} from '../../styles/styles';
 import {commonBackground, commonGrey} from '../../styles/colors';
@@ -9,7 +12,7 @@ const CheckBox = (props: {
   checked: boolean;
   title: string;
   desc?: string;
-  onPress?(): any;
+  onPress?(): void;
 }) => {
   return (
     <>
@@ -19,6 +22,8 @@ const CheckBox = (props: {
         textStyle={styles.checkBoxText}
         onPress={props.onPress}
         iconRight
+        uncheckedIcon={<InlineIcon icon={SqaureO} />}
+        checkedIcon={<InlineIcon icon={CheckedSquareO} />}
         containerStyle={styles.checkBoxContainer}
       />
       <Text style={styles.checkBoxDesc}>{props.desc}</Text>

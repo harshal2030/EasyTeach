@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {ButtonGroup} from 'react-native-elements';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import CameraAlt from '@iconify-icons/ic/round-camera-alt';
+
+import {TouchableIcon} from '../components';
 
 import {commonBackground, greyWithAlpha} from '../../shared/styles/colors';
 import {staticImageExtPattern} from '../../shared/utils/regexPatterns';
@@ -102,7 +104,7 @@ class QuestionCard extends React.Component<Props, State> {
           <TouchableOpacity
             style={styles.imageOverlay}
             onPress={() => this.upload!.click()}>
-            <MaterialIcons name="camera-alt" color="#000" size={28} />
+            <TouchableIcon icon={CameraAlt} size={28} color="#000" />
           </TouchableOpacity>
         </ImageBackground>
 

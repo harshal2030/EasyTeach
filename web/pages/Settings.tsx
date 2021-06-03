@@ -3,7 +3,9 @@ import {View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem, Button, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
+import ArrowBack from '@iconify-icons/ic/arrow-back';
 
+import {TouchableIcon} from '../components';
 import AccountEdit from '../../shared/images/account-edit.svg';
 import {HeadCom} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
@@ -112,12 +114,14 @@ class Settings extends React.PureComponent<Props> {
             text: 'Settings',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.history.goBack(),
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={ArrowBack}
+              size={26}
+              color="#fff"
+              onPress={this.props.history.goBack}
+            />
+          }
         />
         <HeadCom
           avatar={`${mediaUrl}/avatar/${profile.avatar}`}

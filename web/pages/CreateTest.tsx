@@ -5,18 +5,20 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  Linking,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {MuiPickersUtilsProvider, DateTimePicker} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import {Header, Input, Text, Button, Icon} from 'react-native-elements';
+import {Header, Input, Text, Button} from 'react-native-elements';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
+import BackIcon from '@iconify-icons/ic/arrow-back';
+import ExcelIcon from '@iconify-icons/mdi/microsoft-excel';
 
+import {TouchableIcon} from '../components/TouchableIcon';
 import {Chip, CheckBox} from '../../shared/components/common';
 import {ImportExcel} from '../../shared/components/main/ImportExcel.web';
 
@@ -31,7 +33,7 @@ import {
 
 import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
-import {mediaUrl, quizUrl} from '../../shared/utils/urls';
+import {quizUrl} from '../../shared/utils/urls';
 import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
 type Props = RouteComponentProps<{classId: string}> & {
@@ -368,13 +370,14 @@ class CreateTest extends React.Component<Props, State> {
             text: this.quizId ? 'Edit Test' : 'Create Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.history.goBack(),
-            disabled: APILoading,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={BackIcon}
+              color="#fff"
+              size={26}
+              onPress={() => this.props.history.goBack()}
+            />
+          }
         />
 
         <ScrollView
@@ -387,9 +390,7 @@ class CreateTest extends React.Component<Props, State> {
               </Text>
               <Chip
                 text={excelSheet ? excelSheet.name : ''}
-                rightIcon={
-                  <Icon name="microsoft-excel" type="material-community" />
-                }
+                rightIcon={<TouchableIcon icon={ExcelIcon} size={24} />}
               />
             </>
           )}
@@ -515,9 +516,6 @@ class CreateTest extends React.Component<Props, State> {
           <ImportExcel
             onBackPress={() => this.setState({excelModal: false})}
             onImportPress={() => this.upload!.click()}
-            onDownloadPress={() => {
-              window.open(`${mediaUrl}/sample`);
-            }}
           />
         </Modal>
 

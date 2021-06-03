@@ -13,7 +13,9 @@ import {Header, Button, ButtonGroup} from 'react-native-elements';
 import {connect} from 'react-redux';
 import LightBox from 'react-native-lightbox-v2';
 import Dialog from 'react-native-dialog';
+import BackIcon from '@iconify-icons/ic/arrow-back';
 
+import {TouchableIcon} from '../components';
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
@@ -325,12 +327,14 @@ class Quiz extends React.Component<Props, State> {
             text: 'Test',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.history.goBack(),
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={BackIcon}
+              size={26}
+              color="#fff"
+              onPress={this.props.history.goBack}
+            />
+          }
         />
 
         <View style={ContainerStyles.centerElements}>

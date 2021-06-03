@@ -65,12 +65,6 @@ const imageLoaderConfiguration = {
   },
 };
 
-const ttfLoaderConf = {
-  test: /\.ttf$/,
-  loader: 'url-loader', // or directly file-loader
-  include: path.resolve(__dirname, 'node_modules/react-native-vector-icons'),
-};
-
 const cssLoader = {
   test: /\.css$/,
   use: ['style-loader', 'css-loader'],
@@ -97,7 +91,6 @@ module.exports = {
       babelLoaderConfiguration,
       imageLoaderConfiguration,
       svgLoaderConfiguration,
-      ttfLoaderConf,
       cssLoader,
     ],
   },

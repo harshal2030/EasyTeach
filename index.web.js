@@ -11,28 +11,6 @@ import App from './web/App';
 import {name as appName} from './app.json';
 import {store} from './shared/global';
 
-// Generate required css
-import MaterialIcons from 'react-native-vector-icons/Fonts/MaterialIcons.ttf';
-
-const iconFontStyles = `
-@font-face {
-  src: url(${MaterialIcons});
-  font-family: 'MaterialIcons';
-}
-`;
-
-// Create stylesheet
-const style = document.createElement('style');
-style.type = 'text/css';
-if (style.styleSheet) {
-  style.styleSheet.cssText = iconFontStyles;
-} else {
-  style.appendChild(document.createTextNode(iconFontStyles));
-}
-
-// Inject stylesheet
-document.head.appendChild(style);
-
 const Wrapper = () => {
   return (
     <Provider store={store}>

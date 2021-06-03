@@ -14,7 +14,9 @@ import Plus from '../../shared/images/plus.svg';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
+import MenuIcon from '@iconify-icons/ic/menu';
 
+import {TouchableIcon} from '../components';
 import {Card} from '../../shared/components/common';
 import {QuizInfo} from '../../shared/components/main';
 
@@ -226,12 +228,14 @@ class Test extends React.Component<Props, State> {
             text: 'Tests',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: this.props.onLeftTopPress,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={MenuIcon}
+              size={26}
+              color="#fff"
+              onPress={this.props.onLeftTopPress}
+            />
+          }
         />
         {this.renderContent()}
         {this.props.isOwner && (
