@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
@@ -17,7 +18,7 @@ import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
 
 import {Chip, CheckBox} from '../../shared/components/common';
-import {ImportExcel} from '../../shared/components/main';
+import {ImportExcel} from '../../shared/components/main/ImportExcel.web';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -30,7 +31,7 @@ import {
 
 import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
-import {quizUrl} from '../../shared/utils/urls';
+import {mediaUrl, quizUrl} from '../../shared/utils/urls';
 import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
 type Props = RouteComponentProps<{classId: string}> & {
@@ -514,6 +515,9 @@ class CreateTest extends React.Component<Props, State> {
           <ImportExcel
             onBackPress={() => this.setState({excelModal: false})}
             onImportPress={() => this.upload!.click()}
+            onDownloadPress={() => {
+              window.open(`${mediaUrl}/sample`);
+            }}
           />
         </Modal>
 

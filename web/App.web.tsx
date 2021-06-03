@@ -5,16 +5,18 @@ import {Link, Route, Switch, RouteProps, Redirect} from 'react-router-dom';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
+// @ts-ignore
+import lazy from '@loadable/component';
 
-import AuthScreen from './pages/AuthScreen';
-import Main from './pages/Main';
-import JoinClass from './pages/JoinClass';
-import CreateTest from './pages/CreateTest';
-import Quiz from './pages/Quiz';
-import Settings from './pages/Settings';
-import EditProfile from './pages/EditProfile';
-import ShowScore from './pages/ShowScore';
-import EditQuestions from './pages/EditQuestions';
+// import AuthScreen from './pages/AuthScreen';
+// import Main from './pages/Main';
+// import JoinClass from './pages/JoinClass';
+// import CreateTest from './pages/CreateTest';
+// import Quiz from './pages/Quiz';
+// import Settings from './pages/Settings';
+// import EditProfile from './pages/EditProfile';
+// import ShowScore from './pages/ShowScore';
+// import EditQuestions from './pages/EditQuestions';
 
 import {StoreState} from '../shared/global';
 import {registerToken, removeToken} from '../shared/global/actions/token';
@@ -23,6 +25,15 @@ import {fetchClasses, Class} from '../shared/global/actions/classes';
 
 import {checkTokenUrl} from '../shared/utils/urls';
 
+const AuthScreen = lazy(() => import('./pages/AuthScreen'));
+const Main = lazy(() => import('./pages/Main'));
+const JoinClass = lazy(() => import('./pages/JoinClass'));
+const CreateTest = lazy(() => import('./pages/CreateTest'));
+const Quiz = lazy(() => import('./pages/Quiz'));
+const Settings = lazy(() => import('./pages/EditProfile'));
+const EditProfile = lazy(() => import('./pages/EditQuestions'));
+const ShowScore = lazy(() => import('./pages/ShowScore'));
+const EditQuestions = lazy(() => import('./pages/EditQuestions'));
 interface userChecker {
   user: {
     name: string;
