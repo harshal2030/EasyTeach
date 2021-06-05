@@ -15,6 +15,8 @@ import {Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
+import {InlineIcon} from '@iconify/react';
+import ModuleIcon from '@iconify-icons/ic/view-module';
 
 import LogOut from '../../shared/images/log-out.svg';
 import Plus from '../../shared/images/plus-36.svg';
@@ -231,6 +233,21 @@ const DrawerContent = (props: Props): JSX.Element => {
                   }}>
                   <Checklist height={25} width={25} color="#34495e" />
                   <Text style={optionText}> Tests</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => {
+                    history.push(`${url}/modules/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
+                  <InlineIcon
+                    icon={ModuleIcon}
+                    color="#34495e"
+                    height={25}
+                    width={25}
+                  />
+                  <Text style={optionText}> Modules</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity

@@ -2294,6 +2294,11 @@
   resolved "https://registry.yarnpkg.com/@iconify-icons/fa/-/fa-1.1.0.tgz#062b4f180ba9a4622bcd61434961fbe004b33118"
   integrity sha512-yywRO6E5p+G5hHq4S8HoWQ8Tfz42pYNreYx8+ZWwJBrICk1dcfn7b+Oo8lzG+vmmku+ye6J8MDSP/F0QLB6xbg==
 
+"@iconify-icons/feather@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@iconify-icons/feather/-/feather-1.1.0.tgz#49fd9afb5e67873eb2ac28b67754268d75595fbe"
+  integrity sha512-jBq1yuHJAdCN3CvEby6s++xy5rQFBUvRt/iIn1yFlSrFYdwwXbhsR2AGuior8Gu67x4b8X0wUQ0FSlIooOviBw==
+
 "@iconify-icons/ic@^1.1.5":
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/@iconify-icons/ic/-/ic-1.1.5.tgz#ceb30b9818e4c30f4ced75da3bbebbbe924bfb1d"
@@ -8896,6 +8901,11 @@ lottie-react-native@^4.0.2:
     prop-types "^15.5.10"
     react-native-safe-modules "^1.0.3"
 
+lottie-web@^5.7.1:
+  version "5.7.9"
+  resolved "https://registry.yarnpkg.com/lottie-web/-/lottie-web-5.7.9.tgz#d3327c069c1f209e110ae9388725f926a94774a5"
+  integrity sha512-wWqnah5YTCabVG5BzN2uI7vqOMCHaF6VlEdR99zoR8czg+YQQUtsmaKvaZo1nINshyjSDWQzVoXpMwbR5BdVZQ==
+
 lower-case@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/lower-case/-/lower-case-2.0.2.tgz#6fa237c63dbdc4a82ca0fd882e4722dc5e634e28"
@@ -10885,6 +10895,13 @@ react-native-video@^5.1.1:
     keymirror "^0.1.1"
     prop-types "^15.7.2"
     shaka-player "^2.5.9"
+
+react-native-web-lottie@^1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/react-native-web-lottie/-/react-native-web-lottie-1.4.4.tgz#b64d989cf3300bff5813f4ee3f2ee466092e6e4c"
+  integrity sha512-W0jZiOf2u3Us6yASdpgAuL1+3Gw1EU/Wi5QAf6brzhXmJnq6/FMGCTf5zvSaX0yIurr9qcYB40DwAb4HwA6frg==
+  dependencies:
+    lottie-web "^5.7.1"
 
 react-native-web@^0.16.3:
   version "0.16.3"

@@ -8,6 +8,7 @@ import Announce from './Announcement.web';
 import People from './People';
 import Test from './Test';
 import Manage from './ManageClass';
+import Modules from './Modules';
 
 const Main = () => {
   const [drawerVisible, setDrawer] = React.useState(false);
@@ -52,6 +53,9 @@ const Main = () => {
           </Route>
           <Route path={`${path}/about/:classId`}>
             <Manage onTopLeftPress={() => setDrawer(!drawerVisible)} />
+          </Route>
+          <Route path={`${path}/modules/:classId`}>
+            <Modules onLeftTopPress={() => setDrawer(!drawerVisible)} />
           </Route>
         </Switch>
       </View>

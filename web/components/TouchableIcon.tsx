@@ -8,6 +8,10 @@ interface Props extends IconifyIcon {
 }
 
 const TouchableIcon = ({icon, onPress, size, color}: Props) => {
+  if (!onPress) {
+    return <Icon icon={icon} height={size} width={size} color={color} />;
+  }
+
   return (
     <TouchableOpacity onPress={onPress}>
       <Icon icon={icon} height={size} width={size} color={color} />

@@ -4,10 +4,12 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   ViewStyle,
+  TouchableOpacity,
 } from 'react-native';
 import {Text} from 'react-native-elements';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Octicons from 'react-native-vector-icons/Octicons';
+import Gear from '../../images/gear.svg';
+import Assignment from '../../images/assignment.svg';
+
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {formatDate} from '../../utils/functions';
 
@@ -27,7 +29,7 @@ const Card = (props: Props) => {
         <View style={styles.contentContainer}>
           <View>
             <View style={styles.iconTextContainer}>
-              <MaterialIcons name="assignment" size={26} />
+              <Assignment />
               <Text style={styles.titleStyle} numberOfLines={1}>
                 {props.title}
               </Text>
@@ -39,7 +41,9 @@ const Card = (props: Props) => {
           </View>
 
           {props.isOwner && (
-            <Octicons name="gear" size={23} onPress={props.onGearPress} />
+            <TouchableOpacity onPress={props.onGearPress}>
+              <Gear height={23} width={23} color="#0000" />
+            </TouchableOpacity>
           )}
         </View>
       </TouchableWithoutFeedback>

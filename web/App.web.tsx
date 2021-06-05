@@ -23,6 +23,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
 const ShowScore = lazy(() => import('./pages/ShowScore'));
 const EditQuestions = lazy(() => import('./pages/EditQuestions'));
+const Files = lazy(() => import('./pages/Files'));
 
 interface userChecker {
   user: {
@@ -205,6 +206,11 @@ class App extends React.Component<Props, State> {
             Component={EditQuestions}
             token={this.props.token}
             path="/editque/:classId/:quizId"
+          />
+          <PrivateRoute
+            Component={Files}
+            token={this.props.token}
+            path="/files/:classId/:moduleId"
           />
           <Route path="*">
             <NotFound />
