@@ -7,11 +7,12 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  TouchableWithoutFeedback,
   ImageBackground as FastImage,
+  Dimensions,
+  ScaledSize,
 } from 'react-native';
-import {withRouter, RouteComponentProps} from 'react-router-dom';
-import {Header, FAB, Button, Input} from 'react-native-elements';
+import {withRouter, RouteComponentProps, Link} from 'react-router-dom';
+import {Header, Button, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
 import Modal from 'react-native-modal';
 import Dialog from 'react-native-dialog';
@@ -19,6 +20,8 @@ import {toast} from 'react-toastify';
 import playIcon from '@iconify-icons/ic/baseline-play-circle-outline';
 import deleteIcon from '@iconify-icons/ic/baseline-delete-outline';
 import infoIcon from '@iconify-icons/mdi/information-circle-outline';
+import backIcon from '@iconify-icons/ic/arrow-back';
+import refreshCw from '@iconify-icons/feather/refresh-ccw';
 
 import {TouchableIcon} from '../components/TouchableIcon';
 import {StoreState} from '../../shared/global';
@@ -44,7 +47,7 @@ type Props = RouteComponentProps<{classId: string; moduleId: string}> & {
 };
 
 type State = {
-  videoUri: File;
+  videoUri: File | null;
   videoModal: boolean;
   videoTitle: string;
   files: FileRes[];
@@ -53,11 +56,13 @@ type State = {
   fileId: string;
   videoPreview: string;
   alertVisible: boolean;
+  screenWidth: number;
   alertInfo: {
     title: string;
     description: string;
     buttons: {text: string; onPress(): void}[];
   };
+  videoToShow: string | null;
 };
 
 type FileRes = {
@@ -74,6 +79,7 @@ class Files extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+    const fileName = new URLSearchParams(this.props.location.search).get('v');
 
     this.state = {
       videoUri: null,
@@ -81,6 +87,7 @@ class Files extends React.Component<Props, State> {
       videoModal: false,
       videoTitle: '',
       files: [],
+      screenWidth: Dimensions.get('window').width,
       loading: true,
       errored: false,
       fileId: '',
@@ -90,6 +97,7 @@ class Files extends React.Component<Props, State> {
         buttons: [],
       },
       alertVisible: false,
+      videoToShow: fileName ? fileName : null,
     };
   }
 
@@ -98,7 +106,6 @@ class Files extends React.Component<Props, State> {
     const {classes} = this.props;
 
     const classFound = classes.find((cls) => cls.id === classId);
-    document.cookie = 'username=harshal; SameSite=none';
 
     if (classFound) {
       this.props.registerCurrentClass(classFound);
@@ -112,8 +119,28 @@ class Files extends React.Component<Props, State> {
       this.props.history.replace('/*');
     }
 
+    Dimensions.addEventListener('change', this.onWidthChange);
+
     this.getModules();
   }
+
+  componentDidUpdate(prevProps: Props) {
+    console.log(prevProps.location.search, this.props.location.search);
+    if (prevProps.location.search !== this.props.location.search) {
+      console.log('exec');
+      this.setState({
+        videoToShow: new URLSearchParams(this.props.location.search).get('v'),
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    Dimensions.removeEventListener('change', this.onWidthChange);
+  }
+
+  onWidthChange = ({window}: {window: ScaledSize}) => {
+    this.setState({screenWidth: window.width});
+  };
 
   getModules = async () => {
     try {
@@ -167,6 +194,7 @@ class Files extends React.Component<Props, State> {
 
   deleteVideo = async (fileId: string) => {
     try {
+      this.setState({alertVisible: false});
       await axios.delete(
         `${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${fileId}`,
         {
@@ -189,29 +217,23 @@ class Files extends React.Component<Props, State> {
       return;
     }
 
-    const path = this.state.videoUri!.replace('file://', '');
+    const data = new FormData();
+    data.append('title', this.state.videoTitle);
+    data.append('file', this.state.videoUri!, this.state.videoUri!.name);
 
-    Upload.startUpload({
-      url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,
-      path,
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.props.token}`,
-      },
-      notification: {
-        enabled: true,
-        onProgressTitle: 'Uploading ....',
-        onErrorTitle: 'Uploading errored. Please try again later',
-      },
-      type: 'multipart',
-      field: 'file',
-      parameters: {
-        title: this.state.videoTitle,
-      },
-    })
+    axios
+      .post(
+        `${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
       .then(() => {
         this.setState({videoModal: false, videoTitle: ''});
-        toast('Your upload has begun. please do not close this tab');
+        toast.info('Your upload has begun. please do not close this tab');
       })
       .catch(() => {
         this.setState({videoModal: false, videoTitle: ''});
@@ -237,15 +259,8 @@ class Files extends React.Component<Props, State> {
   renderItem = ({item}: {item: FileRes}) => {
     return (
       <View style={styles.itemContainer}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            this.props.navigation.navigate('Video', {
-              url: `${fileUrl}/${this.props.currentClass.id}/${item.moduleId}/${item.filename}`,
-              title: item.title,
-              id: item.id,
-              moduleId: item.moduleId,
-            });
-          }}>
+        <Link
+          to={`/files/${this.props.currentClass.id}/${this.props.match.params.moduleId}/?v=${item.filename}`}>
           <FastImage
             source={{
               uri: `${fileUrl}/preview/${this.props.currentClass.id}/${item.preview}`,
@@ -253,7 +268,7 @@ class Files extends React.Component<Props, State> {
             style={styles.image}>
             <TouchableIcon icon={playIcon} size={40} color="#fff" />
           </FastImage>
-        </TouchableWithoutFeedback>
+        </Link>
         <View style={styles.itemTextContainer}>
           <Text style={styles.itemTitle}>{item.title}</Text>
           {this.props.isOwner && (
@@ -305,39 +320,60 @@ class Files extends React.Component<Props, State> {
     }
 
     return (
-      <FlatList
-        data={files}
-        keyExtractor={(item) => item.id}
-        renderItem={this.renderItem}
-        removeClippedSubviews
-        ListFooterComponent={<View style={{height: 100}} />}
-      />
+      <View style={styles.contentContainer}>
+        <View>
+          {this.state.videoToShow && (
+            <video
+              width="100%"
+              controls
+              key={this.state.videoToShow}
+              onContextMenu={(e) => e.preventDefault()}
+              controlsList="nodownload">
+              <source
+                src={`${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoToShow}`}
+              />
+            </video>
+          )}
+        </View>
+        <FlatList
+          data={files}
+          keyExtractor={(item) => item.id}
+          renderItem={this.renderItem}
+          removeClippedSubviews
+          style={{maxWidth: 400, alignSelf: 'center'}}
+          ListFooterComponent={<View style={{height: 20}} />}
+        />
+      </View>
     );
   };
 
   render() {
     return (
-      <View style={[ContainerStyles.parent]}>
+      <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
         <Header
           centerComponent={{
             text: 'Videos',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'arrow-back',
-            color: '#ffff',
-            size: 26,
-            onPress: this.props.history.goBack,
-          }}
-          rightComponent={{
-            icon: 'refresh-ccw',
-            type: 'feather',
-            size: 20,
-            color: '#ffff',
-            onPress: this.getModules,
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={backIcon}
+              size={26}
+              color="#fff"
+              onPress={this.props.history.goBack}
+            />
+          }
+          rightComponent={
+            <TouchableIcon
+              icon={refreshCw}
+              size={20}
+              color="#fff"
+              onPress={this.getModules}
+            />
+          }
           rightContainerStyle={{justifyContent: 'center'}}
         />
+
         {this.renderContent()}
 
         <Modal
@@ -376,25 +412,13 @@ class Files extends React.Component<Props, State> {
           })}
         </Dialog.Container>
 
-        {this.props.isOwner && (
-          <>
-            <input
-              type="file"
-              accept="video/*"
-              style={{display: 'none'}}
-              ref={(ref) => (this.upload = ref)}
-              onChange={this.onFileChange}
-            />
-            <FAB
-              placement="right"
-              upperCase
-              title="Add Video"
-              icon={{name: 'plus', type: 'octicon', color: '#fff'}}
-              color={commonBlue}
-              onPress={() => this.upload!.click()}
-            />
-          </>
-        )}
+        <input
+          type="file"
+          accept="video/*"
+          style={{display: 'none'}}
+          ref={(ref) => (this.upload = ref)}
+          onChange={this.onFileChange}
+        />
       </View>
     );
   }
@@ -428,6 +452,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontSize: 20,
     marginTop: 10,
+  },
+  contentContainer: {
+    flexDirection: 'row',
   },
 });
 
