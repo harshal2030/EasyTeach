@@ -22,6 +22,7 @@ import deleteIcon from '@iconify-icons/ic/baseline-delete-outline';
 import infoIcon from '@iconify-icons/mdi/information-circle-outline';
 import backIcon from '@iconify-icons/ic/arrow-back';
 import refreshCw from '@iconify-icons/feather/refresh-ccw';
+import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
 
 import {TouchableIcon} from '../components/TouchableIcon';
 import {StoreState} from '../../shared/global';
@@ -102,7 +103,7 @@ class Files extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const {classId} = this.props.match.params;
+    const {classId, moduleId} = this.props.match.params;
     const {classes} = this.props;
 
     const classFound = classes.find((cls) => cls.id === classId);
@@ -110,14 +111,22 @@ class Files extends React.Component<Props, State> {
     if (classFound) {
       this.props.registerCurrentClass(classFound);
     } else {
-      if (classes.length !== 0) {
-        this.props.history.replace('/*');
-      }
+      this.props.history.replace('/*');
     }
 
     if (!this.props.premiumAllowed) {
       this.props.history.replace('/*');
     }
+
+    axios
+      .get(`${fileUrl}/cookie/${classId}/${moduleId}`, {
+        headers: {
+          Authorization: `Bearer ${this.props.token}`,
+        },
+        withCredentials: true,
+      })
+      .then((res) => console.log(res))
+      .catch((e) => console.log(e));
 
     Dimensions.addEventListener('change', this.onWidthChange);
 
@@ -125,9 +134,7 @@ class Files extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props) {
-    console.log(prevProps.location.search, this.props.location.search);
     if (prevProps.location.search !== this.props.location.search) {
-      console.log('exec');
       this.setState({
         videoToShow: new URLSearchParams(this.props.location.search).get('v'),
       });
@@ -320,11 +327,15 @@ class Files extends React.Component<Props, State> {
     }
 
     return (
-      <View style={styles.contentContainer}>
-        <View>
-          {this.state.videoToShow && (
+      <View
+        style={{
+          flexDirection: this.state.screenWidth < 970 ? 'column' : 'row',
+        }}>
+        <View style={{flex: 1}}>
+          {this.state.videoToShow ? (
             <video
               width="100%"
+              height="500"
               controls
               key={this.state.videoToShow}
               onContextMenu={(e) => e.preventDefault()}
@@ -333,14 +344,17 @@ class Files extends React.Component<Props, State> {
                 src={`${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoToShow}`}
               />
             </video>
+          ) : (
+            <Text>Select a video to watch</Text>
           )}
         </View>
         <FlatList
           data={files}
           keyExtractor={(item) => item.id}
           renderItem={this.renderItem}
+          style={{maxWidth: 400}}
+          contentContainerStyle={{width: 400}}
           removeClippedSubviews
-          style={{maxWidth: 400, alignSelf: 'center'}}
           ListFooterComponent={<View style={{height: 20}} />}
         />
       </View>
@@ -364,12 +378,26 @@ class Files extends React.Component<Props, State> {
             />
           }
           rightComponent={
-            <TouchableIcon
-              icon={refreshCw}
-              size={20}
-              color="#fff"
-              onPress={this.getModules}
-            />
+            <View
+              style={{
+                flexDirection: 'row-reverse',
+                width: 100,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <TouchableIcon
+                icon={refreshCw}
+                size={23}
+                color="#fff"
+                onPress={this.getModules}
+              />
+              <TouchableIcon
+                icon={uploadIcon}
+                size={34}
+                color="#fff"
+                onPress={() => this.upload!.click()}
+              />
+            </View>
           }
           rightContainerStyle={{justifyContent: 'center'}}
         />
@@ -452,9 +480,6 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontSize: 20,
     marginTop: 10,
-  },
-  contentContainer: {
-    flexDirection: 'row',
   },
 });
 

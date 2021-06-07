@@ -5,7 +5,7 @@ let root: string;
 if (Config.env === 'production') {
   root = 'https://easyteach.harshall.codes';
 } else {
-  root = 'http://192.168.43.21:3000';
+  root = 'http://localhost:3000';
 }
 const signUpUrl = `${root}/users/create`;
 const loginUrl = `${root}/users/login`;
