@@ -3,9 +3,9 @@ import Config from 'react-native-config';
 let root: string;
 
 if (Config.env === 'production') {
-  root = 'https://easyteach.harshall.codes';
+  root = 'http://192.168.43.21:3000';
 } else {
-  root = 'http://localhost:3000';
+  root = 'http://192.168.43.21:3000';
 }
 const signUpUrl = `${root}/users/create`;
 const loginUrl = `${root}/users/login`;

@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
 
+const CompressionPlugin = require('compression-webpack-plugin');
+
 const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
   .ReactWebConfig;
 
@@ -109,5 +111,6 @@ module.exports = {
     }),
     ReactWebConfig(envFilePath),
     new BundleAnalyzerPlugin(),
+    new CompressionPlugin(),
   ],
 };

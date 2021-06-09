@@ -101,6 +101,7 @@
     "babel-loader": "^8.2.2",
     "babel-plugin-react-native-web": "^0.15.0",
     "babel-plugin-transform-remove-console": "^6.9.4",
+    "compression-webpack-plugin": "^8.0.0",
     "css-loader": "^5.2.0",
     "eslint": "^7.9.0",
     "html-webpack-plugin": "^5.3.1",
