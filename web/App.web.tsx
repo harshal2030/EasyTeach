@@ -24,6 +24,8 @@ const EditProfile = lazy(() => import('./pages/EditProfile'));
 const ShowScore = lazy(() => import('./pages/ShowScore'));
 const EditQuestions = lazy(() => import('./pages/EditQuestions'));
 const Files = lazy(() => import('./pages/Files'));
+const Info = lazy(() => import('./pages/Info'));
+const Checkout = lazy(() => import('./pages/Checkout'));
 
 interface userChecker {
   user: {
@@ -211,6 +213,16 @@ class App extends React.Component<Props, State> {
             Component={Files}
             token={this.props.token}
             path="/files/:classId/:moduleId"
+          />
+          <PrivateRoute
+            Component={Info}
+            token={this.props.token}
+            path="/info/:classId/:moduleId/:videoId"
+          />
+          <PrivateRoute
+            Component={Checkout}
+            token={this.props.token}
+            path="/checkout/:classId"
           />
           <Route path="*">
             <NotFound />

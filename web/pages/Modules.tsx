@@ -317,7 +317,11 @@ class Module extends React.Component<Props, State> {
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
-              onPress={() => this.props.navigation.navigate('Checkout')} // TODO: add router
+              onPress={() =>
+                this.props.history.push(
+                  `/checkout/${this.props.currentClass?.id}`,
+                )
+              }
             />
           )}
         </View>

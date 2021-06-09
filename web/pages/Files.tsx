@@ -25,6 +25,8 @@ import refreshCw from '@iconify-icons/feather/refresh-ccw';
 import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
 
 import {TouchableIcon} from '../components/TouchableIcon';
+import {Video} from '../components/Video';
+
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
@@ -34,7 +36,7 @@ import {
   greyWithAlpha,
   flatRed,
 } from '../../shared/styles/colors';
-import {fileUrl} from '../../shared/utils/urls';
+import {fileUrl, vidTrackerUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
 import {videoExtPattern} from '../../shared/utils/regexPatterns';
 
@@ -135,15 +137,19 @@ class Files extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.location.search !== this.props.location.search) {
-      this.setState({
-        videoToShow: new URLSearchParams(this.props.location.search).get('v'),
-      });
+      this.changeVideo();
     }
   }
 
   componentWillUnmount() {
     Dimensions.removeEventListener('change', this.onWidthChange);
   }
+
+  changeVideo = () => {
+    this.setState({
+      videoToShow: new URLSearchParams(this.props.location.search).get('v'),
+    });
+  };
 
   onWidthChange = ({window}: {window: ScaledSize}) => {
     this.setState({screenWidth: window.width});
@@ -267,7 +273,7 @@ class Files extends React.Component<Props, State> {
     return (
       <View style={styles.itemContainer}>
         <Link
-          to={`/files/${this.props.currentClass.id}/${this.props.match.params.moduleId}/?v=${item.filename}`}>
+          to={`/files/${this.props.currentClass.id}/${this.props.match.params.moduleId}/?v=${item.filename}&i=${item.id}`}>
           <FastImage
             source={{
               uri: `${fileUrl}/preview/${this.props.currentClass.id}/${item.preview}`,
@@ -284,7 +290,11 @@ class Files extends React.Component<Props, State> {
                 icon={infoIcon}
                 color="#000"
                 size={25}
-                onPress={() => null} // TODO: add route
+                onPress={() =>
+                  this.props.history.push(
+                    `/info/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${item.id}`,
+                  )
+                }
               />
               <TouchableIcon
                 icon={deleteIcon}
@@ -333,17 +343,13 @@ class Files extends React.Component<Props, State> {
         }}>
         <View style={{flex: 1}}>
           {this.state.videoToShow ? (
-            <video
-              width="100%"
-              height="500"
-              controls
-              key={this.state.videoToShow}
-              onContextMenu={(e) => e.preventDefault()}
-              controlsList="nodownload">
-              <source
-                src={`${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoToShow}`}
-              />
-            </video>
+            <Video
+              url={`${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoToShow}`}
+              trackerUrl={`${vidTrackerUrl}/${this.props.currentClass.id}/${
+                this.props.match.params.moduleId
+              }/${new URLSearchParams(this.props.location.search).get('i')}`}
+              token={this.props.token}
+            />
           ) : (
             <Text>Select a video to watch</Text>
           )}

@@ -47,6 +47,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   };
   classes: Class[];
   onTopLeftPress: () => void;
+  premiumAllowed: boolean;
 };
 
 interface State {
@@ -213,10 +214,29 @@ class ManageClass extends React.Component<Props, State> {
     }
   };
 
+  renderNextPayDate = () => {
+    const {currentClass, premiumAllowed, isOwner} = this.props;
+
+    const nextPay = new Date();
+    if (currentClass!.payedOn) {
+      nextPay.setDate(new Date(currentClass!.payedOn).getDate() + 30);
+    }
+
+    const value = nextPay.toDateString();
+
+    if (isOwner && premiumAllowed) {
+      return <Input value={value} disabled label="Next Payment Date" />;
+    }
+
+    if (isOwner && !premiumAllowed && currentClass?.payedOn) {
+      return <Input value="Today" disabled label="Next Payment Date" />;
+    }
+  };
+
   render() {
     const {name, about, subject, lockJoin, loading, preview} = this.state;
     const {joinCode} = this.props.currentClass!;
-    const {isOwner} = this.props;
+    const {isOwner, premiumAllowed} = this.props;
     return (
       <View style={ContainerStyles.parent}>
         <Header
@@ -267,6 +287,11 @@ class ManageClass extends React.Component<Props, State> {
               onChangeText={(text) => this.setState({name: text})}
             />
             <Input
+              value={this.props.currentClass!.owner.name}
+              label="Class Owner"
+              disabled
+            />
+            <Input
               value={about}
               label="About"
               disabled={loading || !isOwner}
@@ -280,6 +305,7 @@ class ManageClass extends React.Component<Props, State> {
               disabled={loading || !isOwner}
               onChangeText={(text) => this.setState({subject: text})}
             />
+            {this.renderNextPayDate()}
             {isOwner && (
               <>
                 <Input
@@ -319,6 +345,18 @@ class ManageClass extends React.Component<Props, State> {
                 containerStyle={{marginTop: 20}}
               />
             )}
+
+            {isOwner && !premiumAllowed && (
+              <Button
+                title="Upgrade"
+                containerStyle={{marginTop: 20}}
+                onPress={() =>
+                  this.props.history.push(
+                    `/checkout/${this.props.match.params.classId}`,
+                  )
+                }
+              />
+            )}
           </View>
         </ScrollView>
 
@@ -349,6 +387,7 @@ const mapStateToProps = (state: StoreState) => {
     isOwner,
     profile: state.profile,
     classes: state.classes,
+    premiumAllowed: state.currentClass?.planId !== 'free',
   };
 };
 
