@@ -5,10 +5,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
 
+const CompressionPlugin = require('compression-webpack-plugin');
+
 const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
   .ReactWebConfig;
 
-const envFilePath = path.resolve(__dirname, './.env.development');
+const envFilePath = path.resolve(__dirname, './.env.production');
 const appDirectory = path.resolve(__dirname);
 const {presets} = require(`${appDirectory}/babel.config.js`);
 
@@ -101,7 +103,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),
-      favicon: path.join(__dirname, './shared/images/logo.png'),
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
@@ -110,5 +111,6 @@ module.exports = {
     }),
     ReactWebConfig(envFilePath),
     new BundleAnalyzerPlugin(),
+    new CompressionPlugin(),
   ],
 };

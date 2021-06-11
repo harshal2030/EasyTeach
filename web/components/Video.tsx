@@ -5,35 +5,23 @@ type Props = {
   url: string;
   trackerUrl: string;
   token: string;
+  start: Date;
 };
 
 const Video = (props: Props) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const startRef = useRef<Date>(props.start);
   const prevUrl = useRef(props.url);
-  const start = new Date();
-
-  useEffect(() => {
-    if (prevUrl.current === props.url) {
-      return;
-    }
-
-    if (videoRef.current) {
-      videoRef.current.load();
-    }
-
-    prevUrl.current = props.url;
-
-    return () => track();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.url]);
 
   const track = () => {
+    const stop = new Date();
+    console.log(startRef.current, stop);
     axios
       .post(
         props.trackerUrl,
         {
-          start: start,
-          stop: new Date(),
+          start: startRef.current,
+          stop,
         },
         {
           headers: {
@@ -43,6 +31,35 @@ const Video = (props: Props) => {
       )
       .catch(() => null);
   };
+
+  window.onbeforeunload = () => {
+    track();
+  };
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', (e) => {
+      track();
+      e.preventDefault();
+      const msg = null;
+      e.returnValue = msg;
+      return msg;
+    });
+
+    if (prevUrl.current === props.url) {
+      return;
+    }
+
+    if (videoRef.current) {
+      track();
+      videoRef.current.load();
+    }
+
+    startRef.current = props.start;
+    prevUrl.current = props.url;
+
+    return () => track();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.url]);
 
   return (
     <video

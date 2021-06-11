@@ -7,7 +7,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "build": "webpack --mode=production --config webpack.config.js",
+    "build": "webpack --mode=production --config webpack.config.prod.js",
     "web": "webpack serve --mode=development --config webpack.config.js --host 0.0.0.0",
     "lint": "eslint .",
     "stats": "webpack --json > stats.json"

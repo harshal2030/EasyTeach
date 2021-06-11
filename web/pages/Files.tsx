@@ -349,6 +349,7 @@ class Files extends React.Component<Props, State> {
                 this.props.match.params.moduleId
               }/${new URLSearchParams(this.props.location.search).get('i')}`}
               token={this.props.token}
+              start={new Date()}
             />
           ) : (
             <Text>Select a video to watch</Text>

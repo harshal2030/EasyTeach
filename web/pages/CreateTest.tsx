@@ -516,6 +516,7 @@ class CreateTest extends React.Component<Props, State> {
           <ImportExcel
             onBackPress={() => this.setState({excelModal: false})}
             onImportPress={() => this.upload!.click()}
+            classId={this.props.match.params.classId}
           />
         </Modal>
 

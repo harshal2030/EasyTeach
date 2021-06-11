@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  ViewStyle,
-  TouchableOpacity,
-} from 'react-native';
+import {View, StyleSheet, ViewStyle, TouchableOpacity} from 'react-native';
 import {Text} from 'react-native-elements';
 import Gear from '../../images/gear.svg';
 import Assignment from '../../images/assignment.svg';
@@ -25,7 +19,7 @@ type Props = {
 const Card = (props: Props) => {
   return (
     <View style={[styles.main, props.containerStyle]}>
-      <TouchableWithoutFeedback onPress={props.onPress}>
+      <TouchableOpacity onPress={props.onPress}>
         <View style={styles.contentContainer}>
           <View>
             <View style={styles.iconTextContainer}>
@@ -46,7 +40,7 @@ const Card = (props: Props) => {
             </TouchableOpacity>
           )}
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </View>
   );
 };

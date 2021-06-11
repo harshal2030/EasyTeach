@@ -6,6 +6,7 @@ import {Header, Button, Text} from 'react-native-elements';
 import {InlineIcon} from '@iconify/react';
 import ExcelIcon from '@iconify-icons/mdi/microsoft-excel';
 import FileIcon from '@iconify-icons/fa-solid/file-download';
+import createIcon from '@iconify-icons/ic/baseline-create';
 
 import {eucalyptusGreen} from '../../styles/colors';
 import {mediaUrl} from '../../utils/urls';
@@ -13,6 +14,7 @@ import {mediaUrl} from '../../utils/urls';
 interface Props {
   onBackPress: () => any;
   onImportPress: () => any;
+  classId: string;
 }
 
 const ImportExcel = (props: Props) => {
@@ -57,6 +59,17 @@ const ImportExcel = (props: Props) => {
           containerStyle={{marginTop: 20}}
           onPress={props.onImportPress}
         />
+
+        <a
+          href={`/createsheet/${props.classId}`}
+          style={{textDecoration: 'none'}}>
+          <Button
+            title="Manually create questions"
+            icon={<InlineIcon icon={createIcon} color="#fff" height={24} />}
+            containerStyle={{marginTop: 10}}
+            onPress={() => null}
+          />
+        </a>
 
         <a
           href={`${mediaUrl}/sample`}

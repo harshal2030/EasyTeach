@@ -73,6 +73,7 @@ export default class LoginForm extends Component<Props, State> {
             placeholder={'Password'}
             editable={!isLoading}
             returnKeyType={'done'}
+            onSubmitEditing={() => onLoginPress(email, password)}
             underlineColorAndroid="transparent"
             secureTextEntry={true}
             withRef={true}

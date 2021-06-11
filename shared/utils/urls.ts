@@ -3,7 +3,7 @@ import Config from 'react-native-config';
 let root: string;
 
 if (Config.env === 'production') {
-  root = 'http://192.168.43.21:3000';
+  root = 'https://easyteach.harshall.codes';
 } else {
   root = 'http://192.168.43.21:3000';
 }
