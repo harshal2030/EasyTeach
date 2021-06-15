@@ -14,6 +14,7 @@ import {mediaUrl} from '../../utils/urls';
 interface Props {
   onBackPress: () => any;
   onImportPress: () => any;
+  onManualPress: () => void;
   classId: string;
 }
 
@@ -60,16 +61,12 @@ const ImportExcel = (props: Props) => {
           onPress={props.onImportPress}
         />
 
-        <a
-          href={`/createsheet/${props.classId}`}
-          style={{textDecoration: 'none'}}>
-          <Button
-            title="Manually create questions"
-            icon={<InlineIcon icon={createIcon} color="#fff" height={24} />}
-            containerStyle={{marginTop: 10}}
-            onPress={() => null}
-          />
-        </a>
+        <Button
+          title="Manually create questions"
+          icon={<InlineIcon icon={createIcon} color="#fff" height={24} />}
+          containerStyle={{marginTop: 10}}
+          onPress={props.onManualPress}
+        />
 
         <a
           href={`${mediaUrl}/sample`}
