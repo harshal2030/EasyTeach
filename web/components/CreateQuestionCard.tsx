@@ -110,6 +110,7 @@ const CreateQuestionCard: React.FC<Props> = (props) => {
         numberOfLines={2}
         multiline
         onChangeText={setQuestion}
+        style={styles.inputStyles}
       />
       <input
         type="file"
@@ -129,11 +130,7 @@ const CreateQuestionCard: React.FC<Props> = (props) => {
               icon={dotIcon}
               size={28}
               color="#fff"
-              containerStyle={{
-                backgroundColor: greyWithAlpha(0.4),
-                padding: 2,
-                margin: 5,
-              }}
+              containerStyle={styles.imageOption}
               onPress={() => setDialogVisible(true)}
             />
           </View>
@@ -146,6 +143,7 @@ const CreateQuestionCard: React.FC<Props> = (props) => {
             <Input
               value={text}
               key={i}
+              style={styles.inputStyles}
               label={`Option ${i + 1}`}
               onChangeText={(str) => onChangeText(str, i)}
               rightIcon={
@@ -276,6 +274,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
     backgroundColor: greyWithAlpha(0.1),
+  },
+  imageOption: {
+    backgroundColor: greyWithAlpha(0.5),
+    padding: 2,
+    margin: 5,
+  },
+  inputStyles: {
+    padding: 5,
   },
 });
 

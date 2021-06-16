@@ -25,6 +25,8 @@ const compileNodeModules = [
   'react-native-dialog',
   'react-native-svg',
   'react-native-svg-transformer',
+  '@react-native-picker/picker',
+  'react-native-web',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const babelLoaderConfiguration = {

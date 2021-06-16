@@ -134,6 +134,7 @@ const DrawerContent = (props: Props): JSX.Element => {
         renderItem={renderSMClass}
         removeClippedSubviews
         ListFooterComponent={renderListFooter}
+        style={styles.leftContainer}
       />
     );
   };
@@ -152,9 +153,7 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center', height: '85%'}}>
-          {renderClasses()}
-        </View>
+        {renderClasses()}
 
         <View style={actionButtonContainer}>
           <Button
@@ -284,16 +283,15 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   avatarImageStyle: {
-    height: 60,
-    width: 60,
+    height: 70,
+    width: 70,
     marginTop: 10,
     backgroundColor: commonGrey,
   },
   leftContainer: {
-    width: 90,
+    width: 100,
     backgroundColor: commonBackground,
-    justifyContent: 'space-between',
-    padding: 10,
+    padding: 8,
   },
   rightContainer: {
     flex: 1,
