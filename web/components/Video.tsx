@@ -36,14 +36,16 @@ const Video = (props: Props) => {
     track();
   };
 
+  const beforeUnload = (e: BeforeUnloadEvent) => {
+    track();
+    e.preventDefault();
+    const msg = null;
+    e.returnValue = msg;
+    return msg;
+  };
+
   useEffect(() => {
-    window.addEventListener('beforeunload', (e) => {
-      track();
-      e.preventDefault();
-      const msg = null;
-      e.returnValue = msg;
-      return msg;
-    });
+    window.addEventListener('beforeunload', beforeUnload);
 
     if (prevUrl.current === props.url) {
       return;
@@ -57,7 +59,10 @@ const Video = (props: Props) => {
     startRef.current = props.start;
     prevUrl.current = props.url;
 
-    return () => track();
+    return () => {
+      track();
+      window.removeEventListener('beforeunload', beforeUnload);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.url]);
 

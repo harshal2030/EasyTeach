@@ -6,6 +6,7 @@ import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-community/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 
 import {StoreState} from '../../shared/global';
 import {registerToken} from '../../shared/global/actions/token';
@@ -17,7 +18,7 @@ import Auth from '../../shared/screens/AuthScreen';
 import {signUpUrl, loginUrl} from '../../shared/utils/urls';
 import {usernamePattern} from '../../shared/utils/regexPatterns';
 
-interface Props {
+interface Props extends RouteComponentProps {
   token: string;
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
@@ -193,7 +194,7 @@ class AuthScreen extends React.Component<Props, State> {
           login={this.onLogin}
           signup={this.onSignUp}
           onLoginAnimationCompleted={() => null}
-          onForgotClick={() => alert('You have to complete this')}
+          onForgotClick={() => this.props.history.push('/forgot')}
         />
 
         <Dialog.Container visible={this.state.alertVisible}>
@@ -212,8 +213,10 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {
-  registerProfile,
-  registerToken,
-  fetchClasses,
-})(AuthScreen);
+export default withRouter(
+  connect(mapStateToProps, {
+    registerProfile,
+    registerToken,
+    fetchClasses,
+  })(AuthScreen),
+);

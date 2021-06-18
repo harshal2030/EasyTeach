@@ -66,6 +66,7 @@ type State = {
     buttons: {text: string; onPress(): void}[];
   };
   videoToShow: string | null;
+  uploaded: number;
 };
 
 type FileRes = {
@@ -101,6 +102,7 @@ class Files extends React.Component<Props, State> {
       },
       alertVisible: false,
       videoToShow: fileName ? fileName : null,
+      uploaded: 0,
     };
   }
 
@@ -242,11 +244,16 @@ class Files extends React.Component<Props, State> {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
           },
+          onUploadProgress: (e) => {
+            const temp = (e.loaded / e.total) * 100;
+            const uploaded = Math.round((temp + Number.EPSILON) * 100) / 100;
+            this.setState({uploaded});
+          },
         },
       )
       .then(() => {
         this.setState({videoModal: false, videoTitle: ''});
-        toast.info('Your upload has begun. please do not close this tab');
+        toast.success('Video uploaded successfully');
       })
       .catch(() => {
         this.setState({videoModal: false, videoTitle: ''});
@@ -428,6 +435,11 @@ class Files extends React.Component<Props, State> {
               onChangeText={(videoTitle) => this.setState({videoTitle})}
             />
             <Button title="Upload Video" onPress={this.uploadVideo} />
+            {this.state.uploaded ? (
+              <Text>
+                {this.state.uploaded}% uploaded. Do not close this tab
+              </Text>
+            ) : null}
           </ScrollView>
         </Modal>
 

@@ -28,12 +28,10 @@ const Card = (props: Props) => {
           <View>
             <View style={styles.iconTextContainer}>
               <MaterialIcons name="assignment" size={26} />
-              <Text style={styles.titleStyle} numberOfLines={1}>
-                {props.title}
-              </Text>
+              <Text style={styles.titleStyle}>{props.title}</Text>
             </View>
 
-            <Text style={styles.timeText} numberOfLines={1}>
+            <Text style={styles.timeText}>
               Expires On: {formatDate(props.expiresOn)}
             </Text>
           </View>

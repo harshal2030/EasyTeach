@@ -53,6 +53,9 @@ const Checkout = lazy(() => import('./pages/Checkout'), {
 const CreateSheet = lazy(() => import('./pages/CreateSheet'), {
   fallback: <div>loading...</div>,
 });
+const Forgot = lazy(() => import('./pages/Forgot'), {
+  fallback: <div>loading...</div>,
+});
 
 interface userChecker {
   user: {
@@ -195,6 +198,9 @@ class App extends React.Component<Props, State> {
           />
           <Route path="/auth">
             {this.props.token ? this.handleRedirect() : <AuthScreen />}
+          </Route>
+          <Route path="/forgot">
+            {this.props.token ? this.handleRedirect() : <Forgot />}
           </Route>
           <PrivateRoute
             Component={Main}

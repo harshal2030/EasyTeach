@@ -101,9 +101,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           }}
           style={avatarImageStyle}
         />
-        <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
-          {item.name}
-        </Text>
+        <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
       </TouchableOpacity>
     );
   };
