@@ -105,6 +105,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, 'index.html'),
+      favicon: path.join(__dirname, './favicon.ico'),
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({

@@ -66,6 +66,7 @@ type State = {
     buttons: {text: string; onPress(): void}[];
   };
   videoToShow: string | null;
+  videoId: string | null;
   uploaded: number;
 };
 
@@ -84,6 +85,7 @@ class Files extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const fileName = new URLSearchParams(this.props.location.search).get('v');
+    const videoId = new URLSearchParams(this.props.location.search).get('i');
 
     this.state = {
       videoUri: null,
@@ -102,6 +104,7 @@ class Files extends React.Component<Props, State> {
       },
       alertVisible: false,
       videoToShow: fileName ? fileName : null,
+      videoId,
       uploaded: 0,
     };
   }
@@ -150,6 +153,7 @@ class Files extends React.Component<Props, State> {
   changeVideo = () => {
     this.setState({
       videoToShow: new URLSearchParams(this.props.location.search).get('v'),
+      videoId: new URLSearchParams(this.props.location.search).get('i'),
     });
   };
 
@@ -352,9 +356,7 @@ class Files extends React.Component<Props, State> {
           {this.state.videoToShow ? (
             <Video
               url={`${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoToShow}`}
-              trackerUrl={`${vidTrackerUrl}/${this.props.currentClass.id}/${
-                this.props.match.params.moduleId
-              }/${new URLSearchParams(this.props.location.search).get('i')}`}
+              trackerUrl={`${vidTrackerUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}/${this.state.videoId}`}
               token={this.props.token}
               start={new Date()}
             />
@@ -388,7 +390,11 @@ class Files extends React.Component<Props, State> {
               icon={backIcon}
               size={26}
               color="#fff"
-              onPress={this.props.history.goBack}
+              onPress={() =>
+                this.props.history.push(
+                  `/classes/modules/${this.props.match.params.classId}`,
+                )
+              }
             />
           }
           rightComponent={

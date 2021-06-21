@@ -80,6 +80,7 @@ export default class LoginForm extends Component<Props, State> {
             returnKeyType={'done'}
             underlineColorAndroid="transparent"
             secureTextEntry={true}
+            onSubmitEditing={() => onLoginPress(email, password)}
             withRef={true}
             onChangeText={(value) => this.setState({password: value})}
             isEnabled={!isLoading}
