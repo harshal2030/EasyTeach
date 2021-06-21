@@ -292,6 +292,7 @@ class Quiz extends React.Component<Props, State> {
                   uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`,
                 }}
                 style={styles.imageStyle}
+                resizeMode="contain"
               />
             </LightBox>
           </>

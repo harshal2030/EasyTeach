@@ -15,6 +15,8 @@ import {Button} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
+import {InlineIcon} from '@iconify/react';
+import ModuleIcon from '@iconify-icons/ic/view-module';
 
 import LogOut from '../../shared/images/log-out.svg';
 import Plus from '../../shared/images/plus-36.svg';
@@ -99,9 +101,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           }}
           style={avatarImageStyle}
         />
-        <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
-          {item.name}
-        </Text>
+        <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
       </TouchableOpacity>
     );
   };
@@ -132,6 +132,7 @@ const DrawerContent = (props: Props): JSX.Element => {
         renderItem={renderSMClass}
         removeClippedSubviews
         ListFooterComponent={renderListFooter}
+        style={styles.leftContainer}
       />
     );
   };
@@ -150,9 +151,7 @@ const DrawerContent = (props: Props): JSX.Element => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.leftContainer}>
-        <View style={{alignItems: 'center', height: '85%'}}>
-          {renderClasses()}
-        </View>
+        {renderClasses()}
 
         <View style={actionButtonContainer}>
           <Button
@@ -236,6 +235,21 @@ const DrawerContent = (props: Props): JSX.Element => {
                 <TouchableOpacity
                   style={optionContainer}
                   onPress={() => {
+                    history.push(`${url}/modules/${currentClass?.id}`);
+                    props.onOptionPress();
+                  }}>
+                  <InlineIcon
+                    icon={ModuleIcon}
+                    color="#34495e"
+                    height={25}
+                    width={25}
+                  />
+                  <Text style={optionText}> Modules</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => {
                     history.push(`${url}/about/${currentClass?.id}`);
                     props.onOptionPress();
                   }}>
@@ -267,16 +281,15 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   avatarImageStyle: {
-    height: 60,
-    width: 60,
+    height: 70,
+    width: 70,
     marginTop: 10,
     backgroundColor: commonGrey,
   },
   leftContainer: {
-    width: 90,
+    width: 100,
     backgroundColor: commonBackground,
-    justifyContent: 'space-between',
-    padding: 10,
+    padding: 8,
   },
   rightContainer: {
     flex: 1,

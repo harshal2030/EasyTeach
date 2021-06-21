@@ -5,10 +5,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin;
 
+const CompressionPlugin = require('compression-webpack-plugin');
+
 const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
   .ReactWebConfig;
 
-const envFilePath = path.resolve(__dirname, './.env.development');
+const envFilePath = path.resolve(__dirname, './.env.production');
 const appDirectory = path.resolve(__dirname);
 const {presets} = require(`${appDirectory}/babel.config.js`);
 
@@ -57,7 +59,7 @@ const svgLoaderConfiguration = {
 };
 
 const imageLoaderConfiguration = {
-  test: /\.(gif|jpe?g|png|ico)$/,
+  test: /\.(gif|jpe?g|png)$/,
   use: {
     loader: 'url-loader',
     options: {
@@ -112,5 +114,6 @@ module.exports = {
     }),
     ReactWebConfig(envFilePath),
     new BundleAnalyzerPlugin(),
+    new CompressionPlugin(),
   ],
 };

@@ -7,21 +7,23 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
-  Alert,
 } from 'react-native';
 import Dialog from 'react-native-dialog';
-import {Header, Icon, Button} from 'react-native-elements';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {DrawerNavigationProp} from '@react-navigation/drawer';
-import SnackBar from 'react-native-snackbar';
+import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 import LottieView from 'lottie-react-native';
+import {toast} from 'react-toastify';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
+import pencilIcon from '@iconify-icons/mdi/pencil';
+import deleteIcon from '@iconify-icons/mdi/delete-outline';
+import menuIcon from '@iconify-icons/ic/menu';
+import refreshCw from '@iconify-icons/feather/refresh-ccw';
+import plusIcon from '@iconify-icons/ic/baseline-plus';
 
+import {TouchableIcon} from '../components';
 import {StoreState} from '../../shared/global';
-import {Class} from '../../shared/global/actions/classes';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
-import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {moduleUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
 import {
@@ -33,17 +35,14 @@ import {
 } from '../../shared/styles/colors';
 import {bytesToGB} from '../../shared/utils/functions';
 
-type navigation = CompositeNavigationProp<
-  DrawerNavigationProp<DrawerParamList, 'Modules'>,
-  StackNavigationProp<RootStackParamList>
->;
-
-interface Props {
-  navigation: navigation;
+interface Props extends RouteComponentProps<{classId: string}> {
   currentClass: Class | null;
   token: string;
   isOwner: boolean;
   premiumAllowed: boolean;
+  classes: Class[];
+  registerCurrentClass: typeof registerCurrentClass;
+  onLeftTopPress: () => void;
 }
 
 interface ModuleRes {
@@ -59,6 +58,12 @@ interface State {
   dialogVisible: boolean;
   moduleName: string;
   moduleId: string | null;
+  alertInfo: {
+    title: string;
+    description: string;
+    buttons: {text: string; onPress(): void}[];
+  };
+  alertVisible: boolean;
 }
 
 class Module extends React.Component<Props, State> {
@@ -72,10 +77,28 @@ class Module extends React.Component<Props, State> {
       dialogVisible: false,
       moduleName: '',
       moduleId: null,
+      alertInfo: {
+        title: '',
+        description: '',
+        buttons: [],
+      },
+      alertVisible: false,
     };
   }
 
   componentDidMount() {
+    const {classId} = this.props.match.params;
+    const {classes} = this.props;
+
+    const classFound = classes.find((cls) => cls.id === classId);
+
+    if (classFound) {
+      this.props.registerCurrentClass(classFound);
+    } else {
+      if (classes.length !== 0) {
+        this.props.history.replace('/*');
+      }
+    }
     if (this.props.premiumAllowed) {
       this.fetchModules();
     }
@@ -94,6 +117,25 @@ class Module extends React.Component<Props, State> {
       this.fetchModules();
     }
   }
+
+  Alert = (
+    title: string,
+    description: string,
+    buttons?: {text: string; onPress(): void}[],
+  ) => {
+    const buttonToSet = buttons
+      ? buttons
+      : [{text: 'Ok', onPress: () => this.setState({alertVisible: false})}];
+
+    this.setState({
+      alertInfo: {
+        title,
+        description,
+        buttons: buttonToSet,
+      },
+      alertVisible: true,
+    });
+  };
 
   fetchModules = async () => {
     try {
@@ -115,6 +157,7 @@ class Module extends React.Component<Props, State> {
 
   confirmDelete = (id: string) => {
     const deleteModule = () => {
+      this.setState({alertVisible: false});
       axios
         .delete(`${moduleUrl}/${this.props.currentClass?.id}/${id}`, {
           headers: {
@@ -126,21 +169,17 @@ class Module extends React.Component<Props, State> {
           this.setState({modules: temp, moduleId: null});
         })
         .catch(() => {
-          SnackBar.show({
-            text: 'Unable to delete module. Please try again later',
-            backgroundColor: flatRed,
-            textColor: '#fff',
-            duration: SnackBar.LENGTH_LONG,
-          });
+          toast.error('Unable to delete module. Please try again later');
         });
     };
 
-    Alert.alert(
+    this.Alert(
       'Confirm',
       'Are you sure to delete? You will lose all related information.',
       [
         {
           text: 'Cancel',
+          onPress: () => this.setState({alertVisible: false}),
         },
         {
           text: 'Yes',
@@ -151,11 +190,12 @@ class Module extends React.Component<Props, State> {
   };
 
   closeDialog = () => {
-    this.setState({dialogVisible: false, moduleId: null, moduleName: ''});
+    this.setState({dialogVisible: false, moduleId: null});
   };
 
   createModule = async () => {
     try {
+      this.closeDialog();
       const res = await axios.post<ModuleRes>(
         `${moduleUrl}/${this.props.currentClass!.id}`,
         {title: this.state.moduleName},
@@ -166,18 +206,19 @@ class Module extends React.Component<Props, State> {
         },
       );
 
-      this.closeDialog();
       this.setState({
         modules: [...this.state.modules, res.data],
         moduleName: '',
       });
     } catch (e) {
-      Alert.alert('Oops!', 'Something went wrong. Please try again later');
+      toast.error('Something went wrong. Please try again later');
     }
   };
 
   updateModule = async () => {
     try {
+      this.closeDialog();
+
       const res = await axios.put<ModuleRes>(
         `${moduleUrl}/${this.props.currentClass?.id}/${this.state.moduleId}`,
         {
@@ -190,7 +231,6 @@ class Module extends React.Component<Props, State> {
         },
       );
 
-      this.closeDialog();
       const moduleIndex = this.state.modules.findIndex(
         (val) => val.id === res.data.id,
       );
@@ -199,12 +239,7 @@ class Module extends React.Component<Props, State> {
       this.setState({moduleId: null, modules: temp, moduleName: ''});
     } catch (e) {
       this.setState({moduleId: null, moduleName: ''});
-      SnackBar.show({
-        text: 'Unable to update. Please try again later',
-        backgroundColor: flatRed,
-        duration: SnackBar.LENGTH_LONG,
-        textColor: '#ffff',
-      });
+      toast.error('Unable to update. Please try again later');
     }
   };
 
@@ -221,16 +256,18 @@ class Module extends React.Component<Props, State> {
       <TouchableHighlight
         underlayColor={greyWithAlpha(0.4)}
         onPress={() =>
-          this.props.navigation.navigate('Files', {moduleId: item.id})
+          this.props.history.push(
+            `/files/${this.props.currentClass?.id}/${item.id}`,
+          )
         }>
         <View style={styles.moduleContainer}>
           <Text style={styles.moduleText}>{item.title}</Text>
           {this.props.isOwner && (
             <View style={styles.iconContainer}>
-              <Icon
-                name="pencil"
-                type="material-community"
+              <TouchableIcon
+                icon={pencilIcon}
                 color="#000"
+                size={26}
                 onPress={() =>
                   this.setState({
                     moduleId: item.id,
@@ -239,9 +276,9 @@ class Module extends React.Component<Props, State> {
                   })
                 }
               />
-              <Icon
-                name="delete-outline"
-                type="material-community"
+              <TouchableIcon
+                icon={deleteIcon}
+                size={26}
                 color={flatRed}
                 onPress={() => this.confirmDelete(item.id)}
               />
@@ -280,7 +317,11 @@ class Module extends React.Component<Props, State> {
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
-              onPress={() => this.props.navigation.navigate('Checkout')}
+              onPress={() =>
+                this.props.history.push(
+                  `/checkout/${this.props.currentClass?.id}`,
+                )
+              }
             />
           )}
         </View>
@@ -332,19 +373,22 @@ class Module extends React.Component<Props, State> {
             text: 'Modules',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
-          }}
-          rightComponent={{
-            icon: 'refresh-ccw',
-            type: 'feather',
-            size: 20,
-            onPress: this.fetchModules,
-            color: '#ffff',
-          }}
+          leftComponent={
+            <TouchableIcon
+              icon={menuIcon}
+              size={26}
+              color="#fff"
+              onPress={this.props.onLeftTopPress}
+            />
+          }
+          rightComponent={
+            <TouchableIcon
+              icon={refreshCw}
+              size={20}
+              color="#fff"
+              onPress={this.fetchModules}
+            />
+          }
           rightContainerStyle={{justifyContent: 'center'}}
         />
         {this.renderContent()}
@@ -357,6 +401,7 @@ class Module extends React.Component<Props, State> {
           <Dialog.Input
             placeholder="Module Name"
             value={this.state.moduleName}
+            style={{borderBottomColor: 'gray', borderBottomWidth: 1}}
             onChangeText={(text) => this.setState({moduleName: text})}
             underlineColorAndroid="grey"
           />
@@ -367,14 +412,27 @@ class Module extends React.Component<Props, State> {
           />
         </Dialog.Container>
 
+        <Dialog.Container visible={this.state.alertVisible}>
+          <Dialog.Title>{this.state.alertInfo.title}</Dialog.Title>
+          <Dialog.Description>
+            {this.state.alertInfo.description}
+          </Dialog.Description>
+          {this.state.alertInfo.buttons.map((button, i) => {
+            return (
+              <Dialog.Button
+                key={i}
+                label={button.text}
+                onPress={button.onPress}
+              />
+            );
+          })}
+        </Dialog.Container>
         {this.props.isOwner && this.props.premiumAllowed && (
           <>
             <Button
-              icon={{
-                name: 'plus',
-                type: 'octicon',
-                color: commonBlue,
-              }}
+              icon={
+                <TouchableIcon icon={plusIcon} color={commonBlue} size={36} />
+              }
               containerStyle={styles.FABContainer}
               onPress={() => this.setState({dialogVisible: true})}
               // eslint-disable-next-line react-native/no-inline-styles
@@ -437,20 +495,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: 60,
     width: 60,
-    bottom: 30,
+    bottom: 50,
     right: 30,
     backgroundColor: '#ffff',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: greyWithAlpha(0.3),
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: commonGrey,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.23,
+    shadowOpacity: 0.5,
     shadowRadius: 2.62,
     elevation: 4,
   },
@@ -462,7 +520,10 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token!,
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
+    classes: state.classes,
   };
 };
 
-export default connect(mapStateToProps)(Module);
+export default withRouter(
+  connect(mapStateToProps, {registerCurrentClass})(Module),
+);

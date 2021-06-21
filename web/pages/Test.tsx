@@ -8,7 +8,7 @@ import {
   Linking,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {withRouter, RouteComponentProps, Link} from 'react-router-dom';
+import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {Header, Button} from 'react-native-elements';
 import Plus from '../../shared/images/plus.svg';
 import {connect} from 'react-redux';
@@ -247,14 +247,17 @@ class Test extends React.Component<Props, State> {
         )}
 
         {this.props.isOwner && (
-          <Link to={`/createtest/${this.props.currentClass!.id}`}>
-            <Button
-              icon={<Plus />}
-              containerStyle={styles.FABContainer}
-              // eslint-disable-next-line react-native/no-inline-styles
-              buttonStyle={{backgroundColor: '#ffff'}}
-            />
-          </Link>
+          <Button
+            icon={<Plus />}
+            containerStyle={styles.FABContainer}
+            // eslint-disable-next-line react-native/no-inline-styles
+            buttonStyle={{backgroundColor: '#ffff'}}
+            onPress={() =>
+              this.props.history.push(
+                `/createtest/${this.props.currentClass!.id}`,
+              )
+            }
+          />
         )}
 
         {this.props.isOwner && (

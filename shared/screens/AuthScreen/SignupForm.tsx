@@ -99,6 +99,9 @@ export default class SignupForm extends Component<Props, State> {
             editable={!isLoading}
             returnKeyType={'done'}
             secureTextEntry={true}
+            onSubmitEditing={() =>
+              onSignupPress(name, username, email, password)
+            }
             underlineColorAndroid="transparent"
             withRef={true}
             onChangeText={(value) => this.setState({password: value})}

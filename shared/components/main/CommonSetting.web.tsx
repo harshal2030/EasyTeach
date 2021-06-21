@@ -6,8 +6,8 @@ import {
   StyleSheet,
   ImageSourcePropType,
 } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Button, ButtonProps} from 'react-native-elements';
+import Camera from '../../../shared/images/camera.svg';
 
 import {greyWithAlpha} from '../../styles/colors';
 
@@ -28,7 +28,7 @@ const CommonSetting = (props: Props) => {
       <View>
         <ImageBackground style={classImage} source={props.imageSource}>
           <TouchableOpacity style={imageOverlay} onPress={props.onImagePress}>
-            <MaterialIcons name="camera-alt" color="#000" size={28} />
+            <Camera />
           </TouchableOpacity>
         </ImageBackground>
       </View>

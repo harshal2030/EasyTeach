@@ -23,7 +23,7 @@ const TouchableView = ({
   ...props
 }: Props) => {
   if (IS_RIPPLE_EFFECT_SUPPORTED && !isRippleDisabled) {
-    const background = TouchableNativeFeedback.Ripple('#FFF');
+    const background = TouchableNativeFeedback.Ripple('#FFF', false);
     return (
       <TouchableNativeFeedback {...props} background={background}>
         <View style={style}>{children}</View>

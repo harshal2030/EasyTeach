@@ -258,8 +258,9 @@ class Home extends React.Component<Props, State> {
             <Input
               placeholder="Type here..."
               value={this.state.message}
-              multiline
               errorStyle={{height: 0}}
+              returnKeyType="send"
+              onSubmitEditing={this.postMessage}
               onChangeText={(message) => this.setState({message})}
               rightIcon={
                 <TouchableIcon

@@ -14,15 +14,48 @@ import {fetchClasses, Class} from '../shared/global/actions/classes';
 
 import {checkTokenUrl} from '../shared/utils/urls';
 
-const AuthScreen = lazy(() => import('./pages/AuthScreen'));
-const Main = lazy(() => import('./pages/Main'));
-const JoinClass = lazy(() => import('./pages/JoinClass'));
-const CreateTest = lazy(() => import('./pages/CreateTest'));
-const Quiz = lazy(() => import('./pages/Quiz'));
-const Settings = lazy(() => import('./pages/Settings'));
-const EditProfile = lazy(() => import('./pages/EditProfile'));
-const ShowScore = lazy(() => import('./pages/ShowScore'));
-const EditQuestions = lazy(() => import('./pages/EditQuestions'));
+const AuthScreen = lazy(() => import('./pages/AuthScreen'), {
+  fallback: <div>loading...</div>,
+});
+const Main = lazy(() => import('./pages/Main'), {
+  fallback: <div>loading...</div>,
+});
+const JoinClass = lazy(() => import('./pages/JoinClass'), {
+  fallback: <div>loading...</div>,
+});
+const CreateTest = lazy(() => import('./pages/CreateTest'), {
+  fallback: <div>loading...</div>,
+});
+const Quiz = lazy(() => import('./pages/Quiz'), {
+  fallback: <div>loading...</div>,
+});
+const Settings = lazy(() => import('./pages/Settings'), {
+  fallback: <div>loading...</div>,
+});
+const EditProfile = lazy(() => import('./pages/EditProfile'), {
+  fallback: <div>loading...</div>,
+});
+const ShowScore = lazy(() => import('./pages/ShowScore'), {
+  fallback: <div>loading...</div>,
+});
+const EditQuestions = lazy(() => import('./pages/EditQuestions'), {
+  fallback: <div>loading...</div>,
+});
+const Files = lazy(() => import('./pages/Files'), {
+  fallback: <div>loading...</div>,
+});
+const Info = lazy(() => import('./pages/Info'), {
+  fallback: <div>loading...</div>,
+});
+const Checkout = lazy(() => import('./pages/Checkout'), {
+  fallback: <div>loading...</div>,
+});
+const CreateSheet = lazy(() => import('./pages/CreateSheet'), {
+  fallback: <div>loading...</div>,
+});
+const Forgot = lazy(() => import('./pages/Forgot'), {
+  fallback: <div>loading...</div>,
+});
 
 interface userChecker {
   user: {
@@ -166,6 +199,9 @@ class App extends React.Component<Props, State> {
           <Route path="/auth">
             {this.props.token ? this.handleRedirect() : <AuthScreen />}
           </Route>
+          <Route path="/forgot">
+            {this.props.token ? this.handleRedirect() : <Forgot />}
+          </Route>
           <PrivateRoute
             Component={Main}
             token={this.props.token}
@@ -205,6 +241,26 @@ class App extends React.Component<Props, State> {
             Component={EditQuestions}
             token={this.props.token}
             path="/editque/:classId/:quizId"
+          />
+          <PrivateRoute
+            Component={Files}
+            token={this.props.token}
+            path="/files/:classId/:moduleId"
+          />
+          <PrivateRoute
+            Component={Info}
+            token={this.props.token}
+            path="/info/:classId/:moduleId/:videoId"
+          />
+          <PrivateRoute
+            Component={Checkout}
+            token={this.props.token}
+            path="/checkout/:classId"
+          />
+          <PrivateRoute
+            Component={CreateSheet}
+            token={this.props.token}
+            path="/createsheet/:classId"
           />
           <Route path="*">
             <NotFound />

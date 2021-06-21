@@ -1,13 +1,9 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  ViewStyle,
-} from 'react-native';
+import {View, StyleSheet, ViewStyle, TouchableOpacity} from 'react-native';
 import {Text} from 'react-native-elements';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Octicons from 'react-native-vector-icons/Octicons';
+import Gear from '../../images/gear.svg';
+import Assignment from '../../images/assignment.svg';
+
 import {commonBackground, commonGrey, greyWithAlpha} from '../../styles/colors';
 import {formatDate} from '../../utils/functions';
 
@@ -23,11 +19,11 @@ type Props = {
 const Card = (props: Props) => {
   return (
     <View style={[styles.main, props.containerStyle]}>
-      <TouchableWithoutFeedback onPress={props.onPress}>
+      <TouchableOpacity onPress={props.onPress}>
         <View style={styles.contentContainer}>
           <View>
             <View style={styles.iconTextContainer}>
-              <MaterialIcons name="assignment" size={26} />
+              <Assignment />
               <Text style={styles.titleStyle}>{props.title}</Text>
             </View>
 
@@ -37,10 +33,12 @@ const Card = (props: Props) => {
           </View>
 
           {props.isOwner && (
-            <Octicons name="gear" size={23} onPress={props.onGearPress} />
+            <TouchableOpacity onPress={props.onGearPress}>
+              <Gear height={23} width={23} color="#0000" />
+            </TouchableOpacity>
           )}
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </View>
   );
 };

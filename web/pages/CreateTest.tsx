@@ -11,7 +11,7 @@ import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {MuiPickersUtilsProvider, DateTimePicker} from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import {Header, Input, Text, Button} from 'react-native-elements';
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
@@ -22,7 +22,7 @@ import {TouchableIcon} from '../components/TouchableIcon';
 import {Chip, CheckBox} from '../../shared/components/common';
 import {ImportExcel} from '../../shared/components/main/ImportExcel.web';
 
-import {StoreState} from '../../shared/global';
+import {StoreState} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {
   QuizRes,
@@ -30,10 +30,11 @@ import {
   fetchQuiz,
   removeQuiz,
 } from '../../shared/global/actions/quiz';
+import {Question, emptyQuestions} from '../../shared/global/actions/questions';
 
 import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
-import {quizUrl} from '../../shared/utils/urls';
+import {questionUrl, quizUrl} from '../../shared/utils/urls';
 import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
 type Props = RouteComponentProps<{classId: string}> & {
@@ -44,6 +45,8 @@ type Props = RouteComponentProps<{classId: string}> & {
   removeQuiz: typeof removeQuiz;
   classes: Class[];
   registerCurrentClass: typeof registerCurrentClass;
+  questions: Question[];
+  emptyQuestions: typeof emptyQuestions;
 };
 
 interface State {
@@ -90,7 +93,8 @@ class CreateTest extends React.Component<Props, State> {
       errored: false,
       APILoading: false,
       excelSheet: null,
-      excelModal: this.quizId ? false : true,
+      excelModal:
+        this.quizId || this.props.questions.length !== 0 ? false : true,
       type: 0,
       deleteModal: false,
     };
@@ -258,7 +262,11 @@ class CreateTest extends React.Component<Props, State> {
       }),
     );
 
-    data.append('sheet', excelSheet!, excelSheet!.name);
+    if (excelSheet) {
+      data.append('sheet', excelSheet!, excelSheet!.name);
+    }
+
+    const questionRequest: Promise<AxiosResponse<any>>[] = [];
 
     this.setState({APILoading: true});
     axios
@@ -267,15 +275,46 @@ class CreateTest extends React.Component<Props, State> {
           Authorization: `Bearer ${this.props.token!}`,
         },
       })
-      .then((res) => {
+      .then(async (res) => {
         this.setState({APILoading: false});
         if (res.status === 201) {
           this.props.addQuiz(res.data);
+          this.props.questions.forEach((que) => {
+            const form = new FormData();
+
+            form.append(
+              'info',
+              JSON.stringify({
+                question: que.question,
+                options: que.options,
+                correct: que.correct,
+              }),
+            );
+
+            if (que.image) {
+              form.append('media', que.image, que.image.name);
+            }
+
+            const request = axios.post(
+              `${questionUrl}/${this.props.match.params.classId}/${res.data.quizId}`,
+              form,
+              {
+                headers: {
+                  Authorization: `Bearer ${this.props.token}`,
+                },
+              },
+            );
+            questionRequest.push(request);
+          });
+
+          await Promise.all(questionRequest);
+          this.props.emptyQuestions();
           return this.props.history.goBack();
         }
         throw new Error();
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         this.setState({APILoading: false});
         toast.error('Unable to create Test. Please try again later.');
       });
@@ -389,7 +428,7 @@ class CreateTest extends React.Component<Props, State> {
                 Question Sheet
               </Text>
               <Chip
-                text={excelSheet ? excelSheet.name : ''}
+                text={excelSheet ? excelSheet.name : 'Manual'}
                 rightIcon={<TouchableIcon icon={ExcelIcon} size={24} />}
               />
             </>
@@ -516,6 +555,12 @@ class CreateTest extends React.Component<Props, State> {
           <ImportExcel
             onBackPress={() => this.setState({excelModal: false})}
             onImportPress={() => this.upload!.click()}
+            onManualPress={() =>
+              this.props.history.replace(
+                `/createsheet/${this.props.match.params.classId}`,
+              )
+            }
+            classId={this.props.match.params.classId}
           />
         </Modal>
 
@@ -563,6 +608,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     currentClass: state.currentClass,
     classes: state.classes,
+    questions: state.questions,
   };
 };
 
@@ -572,5 +618,6 @@ export default withRouter(
     removeQuiz,
     fetchQuiz,
     registerCurrentClass,
+    emptyQuestions,
   })(CreateTest),
 );
