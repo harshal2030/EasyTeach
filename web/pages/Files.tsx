@@ -132,8 +132,8 @@ class Files extends React.Component<Props, State> {
         },
         withCredentials: true,
       })
-      .then((res) => console.log(res))
-      .catch((e) => console.log(e));
+      .then(() => null)
+      .catch(() => null);
 
     Dimensions.addEventListener('change', this.onWidthChange);
 

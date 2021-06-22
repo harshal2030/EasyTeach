@@ -45,12 +45,8 @@ export default class LoginForm extends Component<Props, State> {
 
   render() {
     const {email, password} = this.state;
-    const {
-      isLoading,
-      onSignupLinkPress,
-      onLoginPress,
-      onForgotClick,
-    } = this.props;
+    const {isLoading, onSignupLinkPress, onLoginPress, onForgotClick} =
+      this.props;
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         <View
