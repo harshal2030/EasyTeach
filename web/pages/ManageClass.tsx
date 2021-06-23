@@ -217,19 +217,24 @@ class ManageClass extends React.Component<Props, State> {
   renderNextPayDate = () => {
     const {currentClass, premiumAllowed, isOwner} = this.props;
 
-    const nextPay = new Date();
-    if (currentClass!.payedOn) {
-      nextPay.setDate(new Date(currentClass!.payedOn).getDate() + 30);
-    }
+    if (isOwner) {
+      const nextPay = currentClass!.payedOn
+        ? new Date(currentClass!.payedOn)
+        : new Date();
 
-    const value = nextPay.toDateString();
+      if (currentClass!.payedOn) {
+        nextPay.setDate(nextPay.getDate() + 30);
+      }
 
-    if (isOwner && premiumAllowed) {
-      return <Input value={value} disabled label="Next Payment Date" />;
-    }
+      const value = nextPay.toDateString();
 
-    if (isOwner && !premiumAllowed && currentClass?.payedOn) {
-      return <Input value="Today" disabled label="Next Payment Date" />;
+      if (premiumAllowed) {
+        return <Input value={value} disabled label="Next Payment Date" />;
+      }
+
+      if (!premiumAllowed && currentClass?.payedOn) {
+        return <Input value="Today" disabled label="Next Payment Date" />;
+      }
     }
   };
 
