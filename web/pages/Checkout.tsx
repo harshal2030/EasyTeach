@@ -48,6 +48,12 @@ interface OrderApiRes {
   error: string | null;
 }
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: any;
+  }
+}
+
 const loadScript = (src: string) => {
   return new Promise((resolve) => {
     const script = document.createElement('script');
@@ -87,6 +93,13 @@ class Checkout extends React.Component<Props, State> {
   }
 
   updateAndGreet = (data: Class) => {
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({success: true, data}),
+      );
+      return;
+    }
+
     this.props.updateClasses(data);
     this.props.registerCurrentClass(data);
     this.props.history.push(`/classes/home/${this.props.match.params.classId}`);
@@ -119,7 +132,6 @@ class Checkout extends React.Component<Props, State> {
 
       this.updateAndGreet(res.data);
     } catch (err) {
-      console.log(err);
       this.setState({loading: false});
       toast.error('Payment failed');
     }
@@ -179,7 +191,6 @@ class Checkout extends React.Component<Props, State> {
             color: commonBlue,
           },
           handler: (data: any) => {
-            console.log(data);
             this.postPayment(
               res.data.order!.amount,
               data.razorpay_payment_id,
@@ -231,20 +242,22 @@ class Checkout extends React.Component<Props, State> {
   render() {
     return (
       <View style={{flex: 1}}>
-        <Header
-          centerComponent={{
-            text: 'Checkout',
-            style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
-          }}
-          leftComponent={
-            <TouchableIcon
-              icon={backIcon}
-              size={26}
-              color="#fff"
-              onPress={this.props.history.goBack}
-            />
-          }
-        />
+        {!window.ReactNativeWebView && (
+          <Header
+            centerComponent={{
+              text: 'Checkout',
+              style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
+            }}
+            leftComponent={
+              <TouchableIcon
+                icon={backIcon}
+                size={26}
+                color="#fff"
+                onPress={this.props.history.goBack}
+              />
+            }
+          />
+        )}
         <ScrollView style={{maxWidth: 1000, alignSelf: 'center'}}>
           <Text h3 style={styles.titleStyle}>
             Upgrading {this.props.currentClass.name} Class

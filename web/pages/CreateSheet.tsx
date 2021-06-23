@@ -121,7 +121,6 @@ const CreateSheet: React.FC<Props> = (props) => {
 
                 <View style={styles.opContainer}>
                   {que.options.map((op, j) => {
-                    console.log(op, que.correct);
                     const color = op === que.correct ? eucalyptusGreen : '#000';
                     return (
                       <Text key={j} style={{color}}>

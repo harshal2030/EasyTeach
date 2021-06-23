@@ -1,12 +1,15 @@
 import Config from 'react-native-config';
 
-let root: string;
+const root =
+  Config.env === 'production'
+    ? 'https://api.easyteach.inddex.co'
+    : 'http://192.168.43.21:3000';
 
-if (Config.env === 'production') {
-  root = 'https://easyteach.harshall.codes';
-} else {
-  root = 'http://192.168.43.21:3000';
-}
+const websiteRoot =
+  Config.env === 'production'
+    ? 'https://easyteach.inddex.co'
+    : 'http://192.168.43.21:8080';
+
 const signUpUrl = `${root}/users/create`;
 const loginUrl = `${root}/users/login`;
 const logOutUrl = `${root}/users/logout`;
@@ -42,4 +45,5 @@ export {
   fileUrl,
   vidTrackerUrl,
   paymentUrl,
+  websiteRoot,
 };

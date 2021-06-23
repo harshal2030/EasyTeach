@@ -313,8 +313,7 @@ class CreateTest extends React.Component<Props, State> {
         }
         throw new Error();
       })
-      .catch((e) => {
-        console.log(e);
+      .catch(() => {
         this.setState({APILoading: false});
         toast.error('Unable to create Test. Please try again later.');
       });

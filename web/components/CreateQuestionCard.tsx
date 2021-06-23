@@ -69,7 +69,6 @@ const CreateQuestionCard: React.FC<Props> = (props) => {
       correctAns = data[0];
     }
 
-    console.log({question, options, image, correct: correctAns});
     props.onAddQuestionPress({question, options, image, correct: correctAns});
 
     setQuestion('');
