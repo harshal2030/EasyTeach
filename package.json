@@ -8,6 +8,7 @@
     "start": "react-native start",
     "test": "jest",
     "build": "webpack --mode=production --config webpack.config.prod.js",
+    "local": "webpack --mode=production --config webpack.config.js",
     "web": "webpack serve --mode=development --config webpack.config.js --host 0.0.0.0",
     "lint": "eslint .",
     "stats": "webpack --json > stats.json"
@@ -32,6 +33,7 @@
     "expo-asset": "^8.2.2",
     "expo-screen-capture": "^3.0.0",
     "expo-updates": "^0.4.2",
+    "firebase": "^8.6.8",
     "js-base64": "^3.6.0",
     "lottie-ios": "3.1.8",
     "lottie-react-native": "^4.0.2",

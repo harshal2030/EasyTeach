@@ -1,4 +1,3 @@
-/* eslint-disable no-alert */
 import React from 'react';
 import axios from 'axios';
 import {connect} from 'react-redux';
@@ -23,6 +22,10 @@ interface Props extends RouteComponentProps {
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
   fetchClasses: Function;
+  fcm: {
+    os: string;
+    fcmToken: string;
+  } | null;
 }
 
 interface State {
@@ -63,6 +66,7 @@ class AuthScreen extends React.Component<Props, State> {
       return this.openDialog('Invalid credentials');
     }
 
+    const {fcm} = this.props;
     this.setState({loading: true}, () => {
       axios
         .post<{
@@ -76,8 +80,8 @@ class AuthScreen extends React.Component<Props, State> {
               password,
             },
             device: {
-              os: 'web',
-              fcmToken: '',
+              os: fcm ? fcm.os : 'web',
+              fcmToken: fcm ? fcm.fcmToken : '',
             },
           },
           {
@@ -137,6 +141,8 @@ class AuthScreen extends React.Component<Props, State> {
     }
 
     this.setState({loading: true});
+
+    const {fcm} = this.props;
     axios
       .post<{
         token: string;
@@ -151,8 +157,8 @@ class AuthScreen extends React.Component<Props, State> {
             password,
           },
           device: {
-            os: 'web',
-            fcmToken: '',
+            os: fcm ? fcm.os : 'web',
+            fcmToken: fcm ? fcm.fcmToken : '',
           },
         },
         {
@@ -210,6 +216,7 @@ class AuthScreen extends React.Component<Props, State> {
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token!,
+    fcm: state.fcm,
   };
 };
 

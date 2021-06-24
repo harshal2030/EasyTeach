@@ -29,14 +29,8 @@ PushNotification.configure({
 
     if (currentClass && !notification.userInteraction) {
       if (currentClass.id === notification.data.classId) {
-        const {
-          username,
-          name,
-          avatar,
-          id,
-          message,
-          createdAt,
-        } = notification.data;
+        const {username, name, avatar, id, message, createdAt} =
+          notification.data;
 
         store.dispatch(
           addMsg({

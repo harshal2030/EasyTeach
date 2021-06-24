@@ -2,11 +2,11 @@ const path = require('path');
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
-  .BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const ReactWebConfig = require('react-web-config/lib/ReactWebConfig')
-  .ReactWebConfig;
+const ReactWebConfig =
+  require('react-web-config/lib/ReactWebConfig').ReactWebConfig;
 
 const envFilePath = path.resolve(__dirname, './.env.development');
 const appDirectory = path.resolve(__dirname);
@@ -79,7 +79,7 @@ module.exports = {
   output: {
     path: path.resolve(appDirectory, 'dist'),
     publicPath: '/',
-    filename: 'easyteach.bundle.js',
+    filename: '[name].js',
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js'],
