@@ -14,6 +14,7 @@ import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
 import {toast} from 'react-toastify';
 import {TouchableIcon} from '../components';
 import arrowBack from '@iconify-icons/ic/round-arrow-back';
+import {socket} from '../socket';
 
 import {CommonSetting} from '../../shared/components/main';
 import {classUrl} from '../../shared/utils/urls';
@@ -61,6 +62,10 @@ class JoinClass extends React.Component<Props, State> {
     };
   }
 
+  private joinSocketRoom = (classId: string) => {
+    socket.emit('class:join_create', classId);
+  };
+
   private joinClassRequest = () => {
     this.setState({loading: true});
     axios
@@ -77,6 +82,7 @@ class JoinClass extends React.Component<Props, State> {
       )
       .then((res) => {
         this.props.addClass(res.data);
+        this.joinSocketRoom(res.data.id);
         this.props.registerCurrentClass(res.data);
         this.props.history.push(`/classes/home/${res.data.id}`);
       })
@@ -117,6 +123,7 @@ class JoinClass extends React.Component<Props, State> {
       })
       .then((res) => {
         this.props.addClass(res.data);
+        this.joinSocketRoom(res.data.id);
         this.props.registerCurrentClass(res.data);
         this.props.history.push(`/classes/home/${res.data.id}`);
       })

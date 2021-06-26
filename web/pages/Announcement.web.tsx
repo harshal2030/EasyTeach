@@ -30,6 +30,11 @@ import {
   commonGrey,
 } from '../../shared/styles/colors';
 import {mediaUrl, msgUrl} from '../../shared/utils/urls';
+import {socket} from '../socket';
+
+type WSMsg = Msg & {
+  classId: string;
+};
 
 type Props = RouteComponentProps<{classId: string}> & {
   profile: {
@@ -65,6 +70,14 @@ class Home extends React.Component<Props, State> {
     };
   }
 
+  openSocket = () => {
+    socket.on('message', (data: {type: string; payload: WSMsg}) => {
+      if (data.payload.classId === this.props.currentClass?.id) {
+        this.props.addMsg(data.payload);
+      }
+    });
+  };
+
   componentDidMount() {
     const {classId} = this.props.match.params;
     const {classes} = this.props;
@@ -80,6 +93,7 @@ class Home extends React.Component<Props, State> {
     }
 
     if (this.props.currentClass) {
+      this.openSocket();
       this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
     }
   }
@@ -131,7 +145,7 @@ class Home extends React.Component<Props, State> {
           },
         },
       )
-      .then((res) => this.props.addMsg(res.data))
+      .then(() => null)
       .catch(() =>
         toast.error('Unable to message at the moment. Please try again later'),
       );

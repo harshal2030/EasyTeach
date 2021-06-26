@@ -6,9 +6,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
 import lazy from '@loadable/component';
-import {toast} from 'react-toastify';
 
-import {StoreState, store} from '../shared/global';
+import {StoreState} from '../shared/global';
 import {
   registerToken,
   removeToken,
@@ -16,59 +15,9 @@ import {
 } from '../shared/global/actions/token';
 import {registerProfile} from '../shared/global/actions/profile';
 import {fetchClasses, Class} from '../shared/global/actions/classes';
-import {addMsg} from '../shared/global/actions/msgs';
+import {addMsg, Msg} from '../shared/global/actions/msgs';
 
-import {getToken, messaging} from './firebase';
 import {checkTokenUrl} from '../shared/utils/urls';
-
-messaging.onMessage((payload) => {
-  console.log(payload);
-  const {currentClass} = store.getState();
-  const {username, name, avatar, id, message, createdAt} = payload.data;
-
-  if (!currentClass) {
-    return;
-  }
-
-  if (payload.data.classId === currentClass.id) {
-    store.dispatch(
-      addMsg({
-        user: {
-          username,
-          name,
-          avatar,
-        },
-        createdAt,
-        id,
-        message,
-      }),
-    );
-  }
-});
-navigator.serviceWorker.addEventListener('message', (data) => {
-  const {currentClass} = store.getState();
-  const {username, name, avatar, id, message, createdAt, classId} =
-    data.data.data;
-
-  if (!currentClass) {
-    return;
-  }
-
-  if (classId === currentClass.id) {
-    store.dispatch(
-      addMsg({
-        user: {
-          username,
-          name,
-          avatar,
-        },
-        createdAt,
-        id,
-        message,
-      }),
-    );
-  }
-});
 
 const AuthScreen = lazy(() => import('./pages/AuthScreen'), {
   fallback: <div>loading...</div>,
@@ -121,6 +70,10 @@ interface userChecker {
   };
   message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
 }
+
+type WSMsg = Msg & {
+  classId: string;
+};
 
 type Props = {
   token: string | null;
@@ -175,13 +128,6 @@ class App extends React.Component<Props, State> {
 
   componentDidMount() {
     this.checkToken();
-    getToken()
-      .then((token) => this.props.registerFCM({os: 'web', fcmToken: token}))
-      .catch(() => {
-        toast.error(
-          'Please enable permission for notification and reload the page.',
-        );
-      });
 
     document.title = 'EasyTeach - Delightful teaching for everyone';
   }

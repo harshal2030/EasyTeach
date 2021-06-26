@@ -65,7 +65,6 @@ const msgFetched = (msgs: Msg[]): msgFetchedAction => {
 };
 
 const addMsg = (msg: Msg): addMsgAction => {
-  console.log(msg);
   return {
     type: ActionTypes.addMsgs,
     payload: msg,

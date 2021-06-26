@@ -33,7 +33,6 @@
     "expo-asset": "^8.2.2",
     "expo-screen-capture": "^3.0.0",
     "expo-updates": "^0.4.2",
-    "firebase": "^8.6.8",
     "js-base64": "^3.6.0",
     "lottie-ios": "3.1.8",
     "lottie-react-native": "^4.0.2",
@@ -74,6 +73,7 @@
     "react-toastify": "^7.0.3",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "socket.io-client": "^4.1.2",
     "validator": "^13.1.17"
   },
   "devDependencies": {
