@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
-import {Link, Route, Switch, RouteProps, Redirect} from 'react-router-dom';
+import {Route, Switch, RouteProps, Redirect} from 'react-router-dom';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
@@ -15,7 +15,6 @@ import {
 } from '../shared/global/actions/token';
 import {registerProfile} from '../shared/global/actions/profile';
 import {fetchClasses, Class} from '../shared/global/actions/classes';
-import {addMsg, Msg} from '../shared/global/actions/msgs';
 
 import {checkTokenUrl} from '../shared/utils/urls';
 
@@ -71,17 +70,12 @@ interface userChecker {
   message: 'CONTINUE' | 'UPDATE_REQUIRED' | 'SERVER_MAINTENANCE';
 }
 
-type WSMsg = Msg & {
-  classId: string;
-};
-
 type Props = {
   token: string | null;
   registerProfile: typeof registerProfile;
   registerToken: typeof registerToken;
   removeToken: typeof removeToken;
   registerFCM: typeof registerFCM;
-  addMsg: typeof addMsg;
   fetchClasses: Function;
   classIsLoading: boolean;
   currentClass: Class | null;
@@ -200,13 +194,9 @@ class App extends React.Component<Props, State> {
     return (
       <>
         <Switch>
-          <Route
-            exact
-            path="/"
-            render={() => {
-              return this.props.token ? this.handleRedirect() : <Home />;
-            }}
-          />
+          <Route exact path="/">
+            {this.props.token ? this.handleRedirect() : <Redirect to="/auth" />}
+          </Route>
           <Route path="/auth">
             {this.props.token ? this.handleRedirect() : <AuthScreen />}
           </Route>
@@ -292,16 +282,6 @@ const NotFound = () => {
   return <h1>404 NOT FOUND!!</h1>;
 };
 
-const Home = () => {
-  return (
-    <View>
-      <Link to="/auth">
-        <p>Auth</p>
-      </Link>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   loaderContainer: {
     flex: 1,
@@ -324,5 +304,4 @@ export default connect(mapStateToProps, {
   removeToken,
   fetchClasses,
   registerFCM,
-  addMsg,
 })(App);

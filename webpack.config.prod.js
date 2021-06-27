@@ -77,7 +77,6 @@ const cssLoader = {
 module.exports = {
   entry: {
     app: path.join(__dirname, 'index.web.js'),
-    'firebase-messaging-sw': path.join(__dirname, './firebase-messaging-sw.js'),
   },
   output: {
     path: path.resolve(appDirectory, 'dist'),
