@@ -5,6 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const ImageMin = require('image-minimizer-webpack-plugin');
+const {extendDefaultPlugins} = require('svgo');
+
 const CompressionPlugin = require('compression-webpack-plugin');
 
 const ReactWebConfig =
@@ -115,5 +118,32 @@ module.exports = {
     ReactWebConfig(envFilePath),
     new BundleAnalyzerPlugin(),
     new CompressionPlugin(),
+    new ImageMin({
+      minimizerOptions: {
+        plugins: [
+          ['gifsicle', {interlaced: true}],
+          ['jpegtran', {progressive: true}],
+          ['optipng', {optimizationLevel: 5}],
+          // Svgo configuration here https://github.com/svg/svgo#configuration
+          [
+            'svgo',
+            {
+              plugins: extendDefaultPlugins([
+                {
+                  name: 'removeViewBox',
+                  active: false,
+                },
+                {
+                  name: 'addAttributesToSVGElement',
+                  params: {
+                    attributes: [{xmlns: 'http://www.w3.org/2000/svg'}],
+                  },
+                },
+              ]),
+            },
+          ],
+        ],
+      },
+    }),
   ],
 };

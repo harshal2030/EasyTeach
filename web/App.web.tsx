@@ -18,6 +18,7 @@ import {fetchClasses, Class} from '../shared/global/actions/classes';
 
 import {checkTokenUrl} from '../shared/utils/urls';
 
+const Home = lazy(() => import('./pages/Home'));
 const AuthScreen = lazy(() => import('./pages/AuthScreen'), {
   fallback: <div>loading...</div>,
 });
@@ -174,29 +175,16 @@ class App extends React.Component<Props, State> {
     );
   };
 
-  render() {
-    if (this.state.loading) {
+  handleLoading = () => {
+    if (this.state.loading || (this.props.classIsLoading && this.props.token)) {
       return (
         <View style={styles.loaderContainer}>
           <ActivityIndicator animating color="blue" size="large" />
         </View>
       );
-    }
-
-    if (this.props.classIsLoading && this.props.token) {
+    } else {
       return (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator animating color="blue" size="large" />
-        </View>
-      );
-    }
-
-    return (
-      <>
-        <Switch>
-          <Route exact path="/">
-            {this.props.token ? this.handleRedirect() : <Redirect to="/auth" />}
-          </Route>
+        <>
           <Route path="/auth">
             {this.props.token ? this.handleRedirect() : <AuthScreen />}
           </Route>
@@ -263,9 +251,19 @@ class App extends React.Component<Props, State> {
             token={this.props.token}
             path="/createsheet/:classId"
           />
-          <Route path="*">
-            <NotFound />
+        </>
+      );
+    }
+  };
+
+  render() {
+    return (
+      <>
+        <Switch>
+          <Route exact path="/">
+            <Home />
           </Route>
+          {this.handleLoading()}
         </Switch>
 
         <Dialog.Container visible={this.state.alertVisible}>
@@ -277,10 +275,6 @@ class App extends React.Component<Props, State> {
     );
   }
 }
-
-const NotFound = () => {
-  return <h1>404 NOT FOUND!!</h1>;
-};
 
 const styles = StyleSheet.create({
   loaderContainer: {
