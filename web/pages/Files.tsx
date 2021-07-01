@@ -147,6 +147,7 @@ class Files extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
+    this.setState({videoToShow: null});
     Dimensions.removeEventListener('change', this.onWidthChange);
   }
 
@@ -390,11 +391,12 @@ class Files extends React.Component<Props, State> {
               icon={backIcon}
               size={26}
               color="#fff"
-              onPress={() =>
+              onPress={() => {
                 this.props.history.push(
                   `/classes/modules/${this.props.match.params.classId}`,
-                )
-              }
+                );
+                this.setState({videoToShow: null});
+              }}
             />
           }
           rightComponent={

@@ -12,12 +12,13 @@ const Video = (props: Props) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const startRef = useRef<Date>(props.start);
   const prevUrl = useRef(props.url);
+  const trackerUrl = useRef(props.trackerUrl);
 
   const track = () => {
     const stop = new Date();
     axios
       .post(
-        props.trackerUrl,
+        trackerUrl.current,
         {
           start: startRef.current,
           stop,
@@ -57,8 +58,10 @@ const Video = (props: Props) => {
 
     startRef.current = props.start;
     prevUrl.current = props.url;
+    trackerUrl.current = props.trackerUrl;
 
     return () => {
+      console.log('unmounted');
       track();
       window.removeEventListener('beforeunload', beforeUnload);
     };
