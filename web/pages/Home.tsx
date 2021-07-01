@@ -181,10 +181,12 @@ const Home = () => {
         </View>
 
         <View style={{width: 200, marginVertical: 10}}>
-          <Image
-            source={require('../../shared/images/google-play-badge.png')}
-            style={{height: 80, width: 200}}
-          />
+          <a href="" style={{textDecoration: 'none'}}>
+            <Image
+              source={require('../../shared/images/google-play-badge.png')}
+              style={{height: 80, width: 200}}
+            />
+          </a>
           <Text>
             Google Play and the Google Play logo are trademarks of Google LLC.
           </Text>

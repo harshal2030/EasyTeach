@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {useHistory, useParams} from 'react-router-dom';
+import {useHistory, useParams, Link} from 'react-router-dom';
 import {Header, ListItem, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
@@ -21,7 +21,8 @@ import {Avatar} from '../../shared/components/common';
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
-import {commonBlue} from '../../shared/styles/colors';
+import {commonBlue, greyWithAlpha} from '../../shared/styles/colors';
+import {TextStyles} from '../../shared/styles/styles';
 
 interface Props {
   profile: {
@@ -35,6 +36,7 @@ interface Props {
   classes: Class[];
   onLeftTopPress: () => void;
   registerCurrentClass: typeof registerCurrentClass;
+  premiumAllowed: boolean;
 }
 
 interface peopleProp {
@@ -198,6 +200,18 @@ const People = (props: Props) => {
         <Text>Enroll in a class to see people</Text>
       )}
 
+      {props.isOwner && !props.premiumAllowed && (
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>
+            You can only have few seats in your class.{' '}
+            <Link to={`/checkout/${props.currentClass?.id}`}>
+              <Text style={TextStyles.link}>Click here</Text>
+            </Link>{' '}
+            to upgrade now
+          </Text>
+        </View>
+      )}
+
       <Dialog.Container visible={alertVisible}>
         <Dialog.Title>Confirm</Dialog.Title>
         <Dialog.Description>
@@ -215,12 +229,24 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
+  footerContainer: {
+    padding: 8,
+    borderTopColor: greyWithAlpha(0.5),
+    borderTopWidth: 1,
+  },
+  footerText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 const mapStateToProps = (state: StoreState) => {
   let isOwner: boolean = false;
+  let premiumAllowed = false;
+
   if (state.currentClass) {
     isOwner = state.currentClass.owner.username === state.profile.username;
+    premiumAllowed = state.currentClass.planId !== 'free';
   }
   return {
     token: state.token,
@@ -228,6 +254,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     classes: state.classes,
     isOwner,
+    premiumAllowed,
   };
 };
 
