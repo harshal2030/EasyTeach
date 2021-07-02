@@ -121,7 +121,9 @@ class Files extends React.Component<Props, State> {
       this.props.history.replace('/*');
     }
 
-    if (!this.props.premiumAllowed) {
+    const premiumAllowed = classFound?.planId !== 'free';
+
+    if (!premiumAllowed) {
       this.props.history.replace('/*');
     }
 
@@ -166,7 +168,7 @@ class Files extends React.Component<Props, State> {
     try {
       this.setState({loading: true});
       const res = await axios.get<FileRes[]>(
-        `${fileUrl}/${this.props.currentClass.id}/${this.props.match.params.moduleId}`,
+        `${fileUrl}/${this.props.match.params.classId}/${this.props.match.params.moduleId}`,
         {
           headers: {
             Authorization: `Bearer ${this.props.token}`,
@@ -511,6 +513,7 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: StoreState) => {
+  console.log(state.currentClass);
   return {
     currentClass: state.currentClass!,
     token: state.token!,
