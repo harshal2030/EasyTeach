@@ -35,6 +35,7 @@ interface Class {
   planId: string;
   payedOn: string;
   storageUsed: number;
+  lockMsg: boolean;
 }
 
 // return action types of each action

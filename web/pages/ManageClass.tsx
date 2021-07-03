@@ -59,6 +59,7 @@ interface State {
   preview: string;
   loading: boolean;
   deleteModal: boolean;
+  lockMsg: boolean;
 }
 
 class ManageClass extends React.Component<Props, State> {
@@ -66,12 +67,14 @@ class ManageClass extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const {name, photo, about, subject, lockJoin} = this.props.currentClass!;
+    const {name, photo, about, subject, lockJoin, lockMsg} =
+      this.props.currentClass!;
 
     this.state = {
       name,
       about,
       subject,
+      lockMsg,
       lockJoin,
       preview: `${mediaUrl}/class/avatar/${photo}`,
       photo: null,
@@ -140,7 +143,7 @@ class ManageClass extends React.Component<Props, State> {
 
   updateClass = () => {
     this.setState({loading: true});
-    const {name, subject, about, photo, lockJoin} = this.state;
+    const {name, subject, about, photo, lockJoin, lockMsg} = this.state;
     const reqBody = new FormData();
 
     reqBody.append(
@@ -150,6 +153,7 @@ class ManageClass extends React.Component<Props, State> {
         subject,
         about,
         lockJoin,
+        lockMsg,
       }),
     );
 
@@ -239,7 +243,8 @@ class ManageClass extends React.Component<Props, State> {
   };
 
   render() {
-    const {name, about, subject, lockJoin, loading, preview} = this.state;
+    const {name, about, subject, lockJoin, loading, preview, lockMsg} =
+      this.state;
     const {joinCode} = this.props.currentClass!;
     const {isOwner, premiumAllowed} = this.props;
     return (
@@ -324,6 +329,12 @@ class ManageClass extends React.Component<Props, State> {
                     />
                   }
                   disabled
+                />
+                <CheckBox
+                  checked={lockMsg}
+                  title="Lock Messages"
+                  desc="Enabling this will not allow students to send messages."
+                  onPress={() => this.setState({lockMsg: !lockMsg})}
                 />
                 <CheckBox
                   checked={lockJoin}

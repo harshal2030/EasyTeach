@@ -70,19 +70,22 @@ interface State {
     type: string;
   };
   loading: boolean;
+  lockMsg: boolean;
 }
 
 class ManageClass extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const {name, photo, about, subject, lockJoin} = this.props.currentClass!;
+    const {name, photo, about, subject, lockJoin, lockMsg} =
+      this.props.currentClass!;
 
     this.state = {
       name,
       about,
       subject,
       lockJoin,
+      lockMsg,
       photo: {
         uri: `${mediaUrl}/class/avatar/${photo}`,
         type: 'image/png',
@@ -183,7 +186,7 @@ class ManageClass extends React.Component<Props, State> {
 
   updateClass = () => {
     this.setState({loading: true});
-    const {name, subject, about, photo, lockJoin} = this.state;
+    const {name, subject, about, photo, lockJoin, lockMsg} = this.state;
     const reqBody = new FormData();
 
     reqBody.append(
@@ -193,6 +196,7 @@ class ManageClass extends React.Component<Props, State> {
         subject,
         about,
         lockJoin,
+        lockMsg,
       }),
     );
 
@@ -288,7 +292,8 @@ class ManageClass extends React.Component<Props, State> {
   };
 
   render() {
-    const {name, about, subject, lockJoin, photo, loading} = this.state;
+    const {name, about, subject, lockJoin, photo, loading, lockMsg} =
+      this.state;
     const {joinCode} = this.props.currentClass!;
     const {isOwner, premiumAllowed} = this.props;
 
@@ -363,6 +368,12 @@ class ManageClass extends React.Component<Props, State> {
                     onPress: this.shareCode,
                   }}
                   disabled
+                />
+                <CheckBox
+                  checked={lockMsg}
+                  title="Lock Messages"
+                  desc="Enabling this will not allow students to send messages."
+                  onPress={() => this.setState({lockMsg: !lockMsg})}
                 />
                 <CheckBox
                   checked={lockJoin}

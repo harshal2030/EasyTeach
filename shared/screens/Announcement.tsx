@@ -244,7 +244,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.props.isOwner ? (
+          {this.props.isOwner || !this.props.currentClass?.lockMsg ? (
             <Input
               placeholder="Type here..."
               value={this.state.message}
