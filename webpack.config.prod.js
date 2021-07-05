@@ -84,7 +84,7 @@ module.exports = {
   output: {
     path: path.resolve(appDirectory, 'dist'),
     publicPath: '/',
-    filename: '[name].js',
+    filename: `[contenthash]-${Date.now()}.js`,
   },
   resolve: {
     extensions: ['.web.tsx', '.web.ts', '.tsx', '.ts', '.web.js', '.js'],

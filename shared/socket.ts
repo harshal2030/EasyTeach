@@ -1,6 +1,6 @@
 import {io} from 'socket.io-client';
-import {store} from '../shared/global';
-import {root} from '../shared/utils/urls';
+import {store} from './global';
+import {root} from './utils/urls';
 
 export const socket = io(root, {
   auth: {

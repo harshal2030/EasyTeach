@@ -14,7 +14,7 @@ import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
 import {toast} from 'react-toastify';
 import {TouchableIcon} from '../components';
 import arrowBack from '@iconify-icons/ic/round-arrow-back';
-import {socket} from '../socket';
+import {socket} from '../../shared/socket';
 
 import {CommonSetting} from '../../shared/components/main';
 import {classUrl} from '../../shared/utils/urls';

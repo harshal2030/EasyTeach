@@ -19,7 +19,7 @@ import SendIcon from '@iconify-icons/ic/baseline-send';
 import {TouchableIcon} from '../components';
 import {MsgCard} from '../../shared/components/common';
 
-import {StoreState} from '../../shared/global';
+import {StoreState, store} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
 
@@ -30,7 +30,15 @@ import {
   commonGrey,
 } from '../../shared/styles/colors';
 import {mediaUrl, msgUrl} from '../../shared/utils/urls';
-import {socket} from '../socket';
+import {socket} from '../../shared/socket';
+
+socket.on('message', (data: {type: string; payload: WSMsg}) => {
+  const {currentClass} = store.getState();
+
+  if (data.payload.classId === currentClass?.id) {
+    store.dispatch(addMsg(data.payload));
+  }
+});
 
 type WSMsg = Msg & {
   classId: string;
@@ -70,14 +78,6 @@ class Home extends React.Component<Props, State> {
     };
   }
 
-  openSocket = () => {
-    socket.on('message', (data: {type: string; payload: WSMsg}) => {
-      if (data.payload.classId === this.props.currentClass?.id) {
-        this.props.addMsg(data.payload);
-      }
-    });
-  };
-
   componentDidMount() {
     const {classId} = this.props.match.params;
     const {classes} = this.props;
@@ -93,7 +93,6 @@ class Home extends React.Component<Props, State> {
     }
 
     if (this.props.currentClass) {
-      this.openSocket();
       this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
     }
   }

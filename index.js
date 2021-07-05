@@ -15,37 +15,12 @@ import {store} from './shared/global';
 import PushNotification from 'react-native-push-notification';
 
 import {registerFCM} from './shared/global/actions/token';
-import {addMsg} from './shared/global/actions/msgs';
 
 enableScreens(true);
 
 PushNotification.configure({
   onRegister: (token) => {
     store.dispatch(registerFCM({os: token.os, fcmToken: token.token}));
-  },
-
-  onNotification: (notification) => {
-    const {currentClass} = store.getState();
-
-    if (currentClass && !notification.userInteraction) {
-      if (currentClass.id === notification.data.classId) {
-        const {username, name, avatar, id, message, createdAt} =
-          notification.data;
-
-        store.dispatch(
-          addMsg({
-            user: {
-              name,
-              username,
-              avatar,
-            },
-            id,
-            message,
-            createdAt,
-          }),
-        );
-      }
-    }
   },
 
   requestPermissions: true,

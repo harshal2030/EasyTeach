@@ -138,7 +138,7 @@ class Test extends React.Component<Props, State> {
       AndroidPicker.show(
         {
           title: 'Choose Option',
-          items: ['Edit Quiz', 'Add Image to questions', 'Download Result'],
+          items: ['Edit Quiz', 'Download Result'],
           cancelText: 'Cancel',
         },
         (index) => {
@@ -147,10 +147,6 @@ class Test extends React.Component<Props, State> {
           }
 
           if (index === 1) {
-            return navigation.navigate('EditQuestion', {quizId});
-          }
-
-          if (index === 2) {
             Linking.openURL(
               `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
             );
@@ -161,13 +157,8 @@ class Test extends React.Component<Props, State> {
       ActionSheetIOS.showActionSheetWithOptions(
         {
           title: 'Choose Option',
-          options: [
-            'Edit Quiz',
-            'Add Image to questions',
-            'Download Result',
-            'Cancel',
-          ],
-          cancelButtonIndex: 3,
+          options: ['Edit Quiz', 'Download Result', 'Cancel'],
+          cancelButtonIndex: 2,
         },
         (index) => {
           if (index === 0) {
@@ -175,10 +166,6 @@ class Test extends React.Component<Props, State> {
           }
 
           if (index === 1) {
-            return navigation.navigate('EditQuestion', {quizId});
-          }
-
-          if (index === 2) {
             return Linking.openURL(
               `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
             );

@@ -101,7 +101,7 @@ class Home extends React.Component<Props, State> {
           },
         },
       )
-      .then((res) => this.props.addMsg(res.data))
+      .then(() => null)
       .catch(this.props.onSendError);
   };
 

@@ -194,9 +194,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                 : 'https://easyteach.harshall.codes/noimage',
             }}
             style={mainImage}>
-            <Text
-              style={classText}
-              onPress={() => props.navigation.navigate('EditQuestions')}>
+            <Text style={classText}>
               {currentClass ? currentClass.name : 'Current Class appears here'}
             </Text>
           </FastImage>

@@ -1,18 +1,13 @@
 import React from 'react';
-import {
-  View,
-  ImageBackground,
-  TouchableOpacity,
-  StyleSheet,
-  ImageSourcePropType,
-} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FastImage, {Source} from 'react-native-fast-image';
 import {Button, ButtonProps} from 'react-native-elements';
 
 import {greyWithAlpha} from '../../styles/colors';
 
 interface Props {
-  imageSource: ImageSourcePropType;
+  imageSource: Source;
   onImagePress(): any;
   onButtonPress(): any;
   buttonLoading?: boolean;
@@ -26,11 +21,11 @@ const CommonSetting = (props: Props) => {
   return (
     <View style={createClassContainer}>
       <View>
-        <ImageBackground style={classImage} source={props.imageSource}>
+        <FastImage style={classImage} source={props.imageSource}>
           <TouchableOpacity style={imageOverlay} onPress={props.onImagePress}>
             <MaterialIcons name="camera-alt" color="#000" size={28} />
           </TouchableOpacity>
-        </ImageBackground>
+        </FastImage>
       </View>
 
       <View>

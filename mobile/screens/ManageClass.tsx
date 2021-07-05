@@ -5,7 +5,6 @@ import {
   ScrollView,
   Platform,
   Alert,
-  ImageBackground,
   TouchableOpacity,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -212,6 +211,8 @@ class ManageClass extends React.Component<Props, State> {
       });
     }
 
+    console.log(`${classUrl}/${this.props.currentClass!.id}`);
+
     axios
       .put<Class>(`${classUrl}/${this.props.currentClass!.id}`, reqBody, {
         headers: {
@@ -229,6 +230,7 @@ class ManageClass extends React.Component<Props, State> {
         this.props.navigation.goBack();
       })
       .catch((e) => {
+        console.log(JSON.stringify(e));
         this.setState({loading: false});
         if (e.response) {
           if (e.response.status === 400) {
@@ -315,7 +317,7 @@ class ManageClass extends React.Component<Props, State> {
         <ScrollView keyboardShouldPersistTaps="handled">
           <View style={{padding: 20}}>
             {isOwner ? (
-              <ImageBackground
+              <FastImage
                 style={ImageStyles.classImage}
                 source={{uri: photo.uri}}>
                 <TouchableOpacity
@@ -323,7 +325,7 @@ class ManageClass extends React.Component<Props, State> {
                   onPress={() => this.sheet!.open()}>
                   <MI name="camera-alt" color="#000" size={28} />
                 </TouchableOpacity>
-              </ImageBackground>
+              </FastImage>
             ) : (
               <FastImage
                 style={ImageStyles.classImage}

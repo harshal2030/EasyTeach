@@ -24,9 +24,6 @@ type RootStackParamList = {
   EditProfile: {
     username: string;
   };
-  EditQuestion: {
-    quizId: string;
-  };
   Files: {
     moduleId: string;
   };
