@@ -8,6 +8,8 @@ public class BasePackageList {
   public List<Package> getPackageList() {
     return Arrays.<Package>asList(
         new expo.modules.constants.ConstantsPackage(),
+        new expo.modules.firebase.analytics.FirebaseAnalyticsPackage(),
+        new expo.modules.firebase.core.FirebaseCorePackage(),
         new expo.modules.screencapture.ScreenCapturePackage(),
         new expo.modules.updates.UpdatesPackage()
     );

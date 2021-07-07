@@ -1,9 +1,10 @@
 /**
  * @format
  */
-import React from 'react';
+import React, {useRef} from 'react';
 import 'react-native-gesture-handler';
 import 'expo-asset';
+import * as Analytics from 'expo-firebase-analytics';
 import {AppRegistry} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import App from './mobile/App';
@@ -27,10 +28,29 @@ PushNotification.configure({
 });
 
 const Wrapper = () => {
+  const navigationRef = useRef();
+  const routeNameRef = useRef();
+
   return (
     <Provider store={store}>
       <SafeAreaProvider>
-        <NavigationContainer>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={() =>
+            (routeNameRef.current =
+              navigationRef.current.getCurrentRoute().name)
+          }
+          onStateChange={async () => {
+            const previousRouteName = routeNameRef.current;
+            const currentRouteName =
+              navigationRef.current.getCurrentRoute().name;
+
+            if (previousRouteName !== currentRouteName) {
+              await Analytics.setCurrentScreen(currentRouteName);
+            }
+
+            routeNameRef.current = currentRouteName;
+          }}>
           <App />
         </NavigationContainer>
       </SafeAreaProvider>

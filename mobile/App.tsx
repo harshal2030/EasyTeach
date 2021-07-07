@@ -1,6 +1,7 @@
 import React from 'react';
 import Axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
+import * as Analytics from 'expo-firebase-analytics';
 import AsyncStorage from '@react-native-community/async-storage';
 import {createStackNavigator} from '@react-navigation/stack';
 import {connect} from 'react-redux';
@@ -105,6 +106,7 @@ const App = (props: Props): JSX.Element => {
               ],
             );
           }
+          Analytics.setUserId(res.data.user.username);
           props.registerProfile(res.data.user);
         })
         .catch((e) => {
