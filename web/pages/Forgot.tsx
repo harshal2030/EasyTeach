@@ -40,7 +40,7 @@ class Forgot extends React.Component<Props, State> {
       code: '',
       password: '',
       password2: '',
-      page: 1,
+      page: 0,
     };
   }
 

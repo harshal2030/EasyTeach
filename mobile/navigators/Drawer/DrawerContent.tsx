@@ -191,7 +191,7 @@ const DrawerContent = (props: Props): JSX.Element => {
             source={{
               uri: currentClass
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
-                : 'https://easyteach.harshall.codes/noimage',
+                : 'https://api.easyetach.inddex.co/noimage',
             }}
             style={mainImage}>
             <Text style={classText}>

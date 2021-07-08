@@ -21,7 +21,7 @@ import SnackBar from 'react-native-snackbar';
 import {PhotoPicker} from '../components/common';
 
 import {CommonSetting} from '../../shared/components/main';
-import {classUrl} from '../../shared/utils/urls';
+import {classUrl, mediaUrl} from '../../shared/utils/urls';
 
 import {
   Class,
@@ -58,7 +58,7 @@ class JoinClass extends React.Component<Props, State> {
     this.state = {
       selected: 0,
       photo: {
-        uri: 'none',
+        uri: `${mediaUrl}/class/avatar`,
         type: '',
       },
       joinCode: '',
