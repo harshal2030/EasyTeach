@@ -2,11 +2,16 @@
 type RootStackParamList = {
   Auth: undefined;
   Drawer: undefined;
-  JoinClass: undefined;
+  JoinClass:
+    | {
+        c?: string;
+      }
+    | undefined;
   Forgot: undefined;
   Quiz: {
     quizId: string;
-    title: string;
+    title?: string;
+    classId?: string;
   };
   CreateTest: {
     file?: {

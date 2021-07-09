@@ -15,6 +15,7 @@ import {Header, Input, Button, ButtonGroup} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigators/types';
 import SnackBar from 'react-native-snackbar';
 
@@ -22,6 +23,7 @@ import {PhotoPicker} from '../components/common';
 
 import {CommonSetting} from '../../shared/components/main';
 import {classUrl, mediaUrl} from '../../shared/utils/urls';
+import {socket} from '../../shared/socket';
 
 import {
   Class,
@@ -29,10 +31,12 @@ import {
   registerCurrentClass,
 } from '../../shared/global/actions/classes';
 import {StoreState} from '../../shared/global';
+import {eucalyptusGreen} from '../../shared/styles/colors';
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, 'JoinClass'>;
   token: string;
+  route: RouteProp<RootStackParamList, 'JoinClass'>;
   classes: Class[];
   addClass: typeof addClass;
   registerCurrentClass: typeof registerCurrentClass;
@@ -61,12 +65,22 @@ class JoinClass extends React.Component<Props, State> {
         uri: `${mediaUrl}/class/avatar`,
         type: '',
       },
-      joinCode: '',
+      joinCode: props.route.params?.c || '',
       className: '',
       about: '',
       subject: '',
       loading: false,
     };
+  }
+
+  private joinSocketRoom = (classId: string) => {
+    socket.emit('class:join_create', classId);
+  };
+
+  componentDidMount() {
+    if (this.props.route.params?.c) {
+      this.joinClassRequest();
+    }
   }
 
   private sheet: RBSheet | null = null;
@@ -86,9 +100,17 @@ class JoinClass extends React.Component<Props, State> {
         },
       )
       .then((res) => {
-        this.props.addClass(res.data);
         this.props.registerCurrentClass(res.data);
+        this.props.addClass(res.data);
         this.props.navigation.navigate('Drawer');
+        this.joinSocketRoom(res.data.id);
+
+        SnackBar.show({
+          text: `Successfully joined ${res.data.name} class, open drawer to navigate to new class`,
+          backgroundColor: eucalyptusGreen,
+          duration: SnackBar.LENGTH_LONG,
+          textColor: '#fff',
+        });
       })
       .catch((e) => {
         this.setState({loading: false});
@@ -139,6 +161,7 @@ class JoinClass extends React.Component<Props, State> {
       .then((res) => {
         this.props.addClass(res.data);
         this.props.registerCurrentClass(res.data);
+        this.joinSocketRoom(res.data.id);
         this.props.navigation.navigate('Drawer');
       })
       .catch((e) => {
@@ -228,6 +251,14 @@ class JoinClass extends React.Component<Props, State> {
     this.sheet!.close();
   };
 
+  private goBack = () => {
+    if (this.props.navigation.canGoBack()) {
+      this.props.navigation.goBack();
+    } else {
+      this.props.navigation.navigate('Drawer');
+    }
+  };
+
   render() {
     const {mainContainer, RBContainer} = styles;
     const {loading} = this.state;
@@ -240,7 +271,7 @@ class JoinClass extends React.Component<Props, State> {
               name="arrow-back"
               color="#fff"
               size={28}
-              onPress={() => this.props.navigation.goBack()}
+              onPress={this.goBack}
             />
           }
           centerComponent={{

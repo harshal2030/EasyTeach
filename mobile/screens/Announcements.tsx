@@ -13,6 +13,7 @@ import SnackBar from 'react-native-snackbar';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
+import Share from 'react-native-share';
 
 import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
@@ -135,6 +136,17 @@ class Home extends React.Component<Props, State> {
       });
   };
 
+  shareCode = () => {
+    Share.open({
+      title: 'Join my class on EasyTeach',
+      message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+        this.props.currentClass!.joinCode
+      }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
+  };
+
   renderListItem = ({item}: {item: Msg}) => {
     return (
       <MsgCard
@@ -213,6 +225,18 @@ class Home extends React.Component<Props, State> {
           }}>
           <Megaphone height={200} width={200} />
           <MegaText height={50} width={200} />
+          <Text style={{padding: 5}}>
+            Open drawer by swiping or click on menu icon in header to navigate.
+          </Text>
+          {this.props.isOwner && (
+            <Button
+              title="Share Join Code"
+              type="clear"
+              icon={{name: 'share', color: commonBlue}}
+              titleStyle={{color: commonBlue}}
+              onPress={this.shareCode}
+            />
+          )}
         </ScrollView>
       );
     }
