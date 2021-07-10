@@ -120,7 +120,7 @@ class Quiz extends React.Component<Props, State> {
     if (this.props.navigation.canGoBack()) {
       this.props.navigation.goBack();
     } else {
-      this.props.navigation.navigate('Drawer');
+      this.props.navigation.replace('Drawer');
     }
   };
 

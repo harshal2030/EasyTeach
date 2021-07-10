@@ -19,6 +19,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import AndroidPicker from 'react-native-android-dialog-picker';
+import Share from 'react-native-share';
 
 import {Card} from '../../shared/components/common';
 import {QuizInfo, ImportExcel} from '../../shared/components/main';
@@ -132,24 +133,40 @@ class Test extends React.Component<Props, State> {
     }
   };
 
+  shareTest = (quizId: string) => {
+    Share.open({
+      title: 'Open Test on EasyTeach',
+      message: `Open test on EasyTeach through this link https://easyteach.inddex.co/quiz/${this.props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
+  };
+
   onGearPress = (quizId: string) => {
     const {navigation} = this.props;
     if (Platform.OS === 'android') {
       AndroidPicker.show(
         {
           title: 'Choose Option',
-          items: ['Edit Quiz', 'Download Result'],
+          items: ['Edit Quiz', 'Download Result', 'Share test link'],
           cancelText: 'Cancel',
         },
         (index) => {
           if (index === 0) {
-            return navigation.navigate('CreateTest', {quizId});
+            navigation.navigate('CreateTest', {quizId});
+            return;
           }
 
           if (index === 1) {
             Linking.openURL(
               `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
             );
+            return;
+          }
+
+          if (index === 2) {
+            this.shareTest(quizId);
+            return;
           }
         },
       );
@@ -157,8 +174,13 @@ class Test extends React.Component<Props, State> {
       ActionSheetIOS.showActionSheetWithOptions(
         {
           title: 'Choose Option',
-          options: ['Edit Quiz', 'Download Result', 'Cancel'],
-          cancelButtonIndex: 2,
+          options: [
+            'Edit Quiz',
+            'Download Result',
+            'Share Test Link',
+            'Cancel',
+          ],
+          cancelButtonIndex: 3,
         },
         (index) => {
           if (index === 0) {
@@ -169,6 +191,11 @@ class Test extends React.Component<Props, State> {
             return Linking.openURL(
               `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
             );
+          }
+
+          if (index === 2) {
+            this.shareTest(quizId);
+            return;
           }
         },
       );
