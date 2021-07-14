@@ -86,3 +86,5 @@
   public void onPayment*(...);
 }
 -keep class com.facebook.react.turbomodule.** { *; }
+-keep class net.gotev.uploadservice.** { *; }
+-keep class com.shockwave.**

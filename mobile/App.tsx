@@ -223,6 +223,10 @@ const App: React.FC<Props> = (props) => {
               name="Video"
               component={require('./screens/Video').default}
             />
+            <Stack.Screen
+              name="PDFViewer"
+              component={require('./screens/PdfViewer').default}
+            />
             {props.isOwner && (
               <Stack.Screen
                 name="CreateTest"

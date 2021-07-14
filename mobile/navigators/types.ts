@@ -44,6 +44,9 @@ type RootStackParamList = {
     title: string;
   };
   Checkout: undefined;
+  PDFViewer: {
+    url: string;
+  };
 };
 
 type DrawerParamList = {
