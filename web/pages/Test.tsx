@@ -119,6 +119,15 @@ class Test extends React.Component<Props, State> {
     }
   };
 
+  shareTest = (quizId: string) => {
+    navigator.clipboard
+      .writeText(
+        `Open test on EasyTeach through this link https://easyteach.inddex.co/quiz/${this.props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+      )
+      .then(() => toast.info('Test link copied to clipboard'))
+      .catch(() => toast.error('Unable to copy link to clipboard'));
+  };
+
   ImportSheet = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const sheet = e.target.files[0];
@@ -298,6 +307,10 @@ class Test extends React.Component<Props, State> {
                     }`,
                   )
                 }
+              />
+              <Dialog.Button
+                label="Share test link"
+                onPress={() => this.shareTest(this.state.quiz!.quizId)}
               />
             </View>
           </Dialog.Container>

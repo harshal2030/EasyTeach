@@ -53,13 +53,21 @@ class JoinClass extends React.Component<Props, State> {
     this.state = {
       selected: 0,
       photo: null,
-      joinCode: '',
+      joinCode: new URLSearchParams(this.props.location.search).get('c') || '',
       className: '',
       about: '',
       subject: '',
       loading: false,
       previewPhoto: '',
     };
+  }
+
+  componentDidMount() {
+    const c = new URLSearchParams(this.props.location.search).get('c');
+
+    if (c) {
+      this.joinClassRequest();
+    }
   }
 
   private joinSocketRoom = (classId: string) => {
@@ -84,12 +92,16 @@ class JoinClass extends React.Component<Props, State> {
         this.props.addClass(res.data);
         this.joinSocketRoom(res.data.id);
         this.props.registerCurrentClass(res.data);
+        toast.success('You have successfully joined the class');
         this.props.history.push(`/classes/home/${res.data.id}`);
       })
       .catch((e) => {
         this.setState({loading: false});
         if (e.response && e.response.status === 400) {
-          return Alert.alert('Oops!', e.response.data.error);
+          return Alert.alert(
+            'Oops!',
+            e.response.data.error || 'Something went wrong.',
+          );
         }
 
         toast('Unable to join class at the moment');

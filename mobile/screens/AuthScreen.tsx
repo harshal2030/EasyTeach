@@ -10,6 +10,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {StoreState} from '../../shared/global';
 import {registerToken} from '../../shared/global/actions/token';
 import {registerProfile} from '../../shared/global/actions/profile';
+import {fetchClasses} from '../../shared/global/actions/classes';
 
 import Auth from '../../shared/screens/AuthScreen';
 
@@ -25,6 +26,7 @@ interface Props {
   };
   registerToken: typeof registerToken;
   registerProfile: typeof registerProfile;
+  fetchClasses: Function;
   navigation: StackNavigationProp<RootStackParamList, 'Auth'>;
 }
 
@@ -75,6 +77,7 @@ class AuthScreen extends React.Component<Props, State> {
         .then((res) => {
           if (res.status === 200) {
             this.storeToken(res.data.token);
+            this.props.fetchClasses(res.data.token);
             this.props.registerToken(res.data.token);
             this.props.registerProfile(res.data.user);
           }
@@ -147,6 +150,7 @@ class AuthScreen extends React.Component<Props, State> {
       .then((res) => {
         if (res.status === 201) {
           this.storeToken(res.data.token);
+          this.props.fetchClasses(res.data.token);
           this.setState({loading: false});
           this.props.registerToken(res.data.token);
           this.props.registerProfile(res.data.user);
@@ -186,6 +190,8 @@ const mapStateToProps = (state: StoreState) => {
   };
 };
 
-export default connect(mapStateToProps, {registerProfile, registerToken})(
-  AuthScreen,
-);
+export default connect(mapStateToProps, {
+  registerProfile,
+  registerToken,
+  fetchClasses,
+})(AuthScreen);

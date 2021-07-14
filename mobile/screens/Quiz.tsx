@@ -20,7 +20,7 @@ import LightBox from 'react-native-lightbox-v2';
 import PhotoView from 'react-native-photo-view-ex';
 
 import {StoreState} from '../../shared/global';
-import {Class} from '../../shared/global/actions/classes';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -36,6 +36,9 @@ interface Props {
   route: RouteProp<RootStackParamList, 'Quiz'>;
   token: string | null;
   currentClass: Class | null;
+  classIsLoading: boolean;
+  classes: Class[];
+  registerCurrentClass: typeof registerCurrentClass;
 }
 
 type Questions = {
@@ -52,6 +55,7 @@ interface State {
   questions: Questions[];
   loading: boolean;
   errored: boolean;
+  quizTitle: string;
 }
 
 class Quiz extends React.Component<Props, State> {
@@ -64,6 +68,7 @@ class Quiz extends React.Component<Props, State> {
       questions: [],
       loading: true,
       errored: false,
+      quizTitle: '',
     };
   }
 
@@ -76,6 +81,26 @@ class Quiz extends React.Component<Props, State> {
       ScreenCapture.allowScreenCaptureAsync('quiz');
       AppState.removeEventListener('change', this.appStateHandler);
     });
+  }
+
+  handleCurrentClass = () => {
+    if (
+      this.props.route.params.classId &&
+      !this.props.classIsLoading &&
+      this.props.route.params.classId !== this.props.currentClass?.id &&
+      this.props.navigation.isFocused()
+    ) {
+      const {classId} = this.props.route.params;
+      const classFound = this.props.classes.find((cls) => cls.id === classId);
+
+      if (classFound) {
+        this.props.registerCurrentClass(classFound);
+      }
+    }
+  };
+
+  componentDidUpdate() {
+    this.handleCurrentClass();
   }
 
   appStateHandler = (state: AppStateStatus) => {
@@ -91,21 +116,35 @@ class Quiz extends React.Component<Props, State> {
     AppState.removeEventListener('change', this.appStateHandler);
   }
 
+  goBack = () => {
+    if (this.props.navigation.canGoBack()) {
+      this.props.navigation.goBack();
+    } else {
+      this.props.navigation.replace('Drawer');
+    }
+  };
+
   fetchQues = () => {
     const {quizId} = this.props.route.params;
-    const {id} = this.props.currentClass!;
+    const id = this.props.currentClass?.id || this.props.route.params.classId;
 
     axios
-      .get<{questions: Questions[]; totalScore: number; quizId: string}>(
-        `${quizUrl}/que/${id}/${quizId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token!}`,
-          },
+      .get<{
+        questions: Questions[];
+        totalScore: number;
+        quizId: string;
+        quizTitle: string;
+      }>(`${quizUrl}/que/${id}/${quizId}`, {
+        headers: {
+          Authorization: `Bearer ${this.props.token!}`,
         },
-      )
+      })
       .then((res) => {
-        this.setState({loading: false, questions: res.data.questions});
+        this.setState({
+          loading: false,
+          questions: res.data.questions,
+          quizTitle: res.data.quizTitle,
+        });
         const images = res.data.questions
           .filter((que) => (que.attachments ? true : false))
           .map((q) => ({
@@ -121,7 +160,7 @@ class Quiz extends React.Component<Props, State> {
             Alert.alert('Oops!', e.response.data.error, [
               {
                 text: 'Ok',
-                onPress: () => this.props.navigation.goBack(),
+                onPress: this.goBack,
               },
             ]);
           }
@@ -166,7 +205,7 @@ class Quiz extends React.Component<Props, State> {
         if (res.data.releaseScore) {
           return this.props.navigation.replace('ShowScore', {
             quizId: route.params.quizId,
-            title: route.params.title,
+            title: this.state.quizTitle,
             questions: this.state.questions.length,
           });
         }
@@ -174,7 +213,7 @@ class Quiz extends React.Component<Props, State> {
         Alert.alert('Success', 'Your response has been recorded', [
           {
             text: 'Ok',
-            onPress: () => this.props.navigation.goBack(),
+            onPress: this.goBack,
           },
         ]);
       })
@@ -291,14 +330,14 @@ class Quiz extends React.Component<Props, State> {
       <View style={ContainerStyles.parent}>
         <Header
           centerComponent={{
-            text: this.props.route.params.title,
+            text: this.state.quizTitle,
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={{
             icon: 'arrow-back',
             color: '#ffff',
             size: 26,
-            onPress: () => this.props.navigation.goBack(),
+            onPress: this.goBack,
           }}
         />
 
@@ -368,7 +407,9 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
+    classIsLoading: state.classIsLoading,
+    classes: state.classes,
   };
 };
 
-export default connect(mapStateToProps)(Quiz);
+export default connect(mapStateToProps, {registerCurrentClass})(Quiz);

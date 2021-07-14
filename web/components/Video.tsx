@@ -15,6 +15,7 @@ const Video = (props: Props) => {
   const trackerUrl = useRef(props.trackerUrl);
 
   const track = () => {
+    console.log('sent');
     const stop = new Date();
     axios
       .post(
@@ -58,11 +59,11 @@ const Video = (props: Props) => {
 
     startRef.current = props.start;
     prevUrl.current = props.url;
-    trackerUrl.current = props.trackerUrl;
+    if (!props.trackerUrl.endsWith('null')) {
+      trackerUrl.current = props.trackerUrl;
+    }
 
     return () => {
-      console.log('unmounted');
-      track();
       window.removeEventListener('beforeunload', beforeUnload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

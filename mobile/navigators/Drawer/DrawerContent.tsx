@@ -24,7 +24,6 @@ import {StoreState} from '../../../shared/global';
 import {removeToken} from '../../../shared/global/actions/token';
 import {
   Class,
-  fetchClasses,
   registerCurrentClass,
   removeCurrentClass,
 } from '../../../shared/global/actions/classes';
@@ -52,7 +51,6 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
 type Props = DrawerContentComponentProps & {
   token: string | null;
   removeToken: typeof removeToken;
-  fetchClasses: Function;
   classes: Class[];
   classIsLoading: boolean;
   classErrored: boolean;
@@ -69,11 +67,6 @@ type Props = DrawerContentComponentProps & {
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
-  React.useEffect(() => {
-    props.fetchClasses(props.token!);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const {currentClass} = props;
 
   const logOut = async () => {
@@ -356,7 +349,6 @@ const mapStateToProps = (state: StoreState) => {
 
 export default connect(mapStateToProps, {
   removeToken,
-  fetchClasses,
   registerCurrentClass,
   removeCurrentClass,
 })(DrawerContent);

@@ -194,9 +194,9 @@ class ManageClass extends React.Component<Props, State> {
   shareCode = () => {
     navigator.clipboard
       .writeText(
-        `Join my class on EasyTeach, through this code: ${
+        `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
           this.props.currentClass!.joinCode
-        }, Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+        }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
       )
       .then(() => toast.info('Joining Info has been copied to clipboard'))
       .catch(() =>
