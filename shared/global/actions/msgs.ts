@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import {Dispatch} from 'redux';
 import axios from 'axios';
+import {StoreState} from '../index.web';
 
 import {msgUrl} from '../../utils/urls';
 
@@ -9,7 +10,19 @@ enum ActionTypes {
   msgsLoading = 'msgs_loading',
   msgsFetched = 'msgs_fetched',
   addMsgs = 'msgs_add',
+  msgsEnd = 'msgs_end',
 }
+
+type MsgPayload = {
+  loading: boolean;
+  errored: boolean;
+  end: boolean;
+  msgs: Msg[];
+};
+
+type MsgState = {
+  [classId: string]: MsgPayload | undefined;
+};
 
 interface Msg {
   id: string;
@@ -25,78 +38,138 @@ interface Msg {
 // action interfaces
 interface msgErroredAction {
   type: ActionTypes.msgsErrored;
-  payload: boolean;
+  payload: {
+    classId: string;
+    errored: boolean;
+  };
 }
 
 interface msgLoadingAction {
   type: ActionTypes.msgsLoading;
-  payload: boolean;
+  payload: {
+    classId: string;
+    loading: boolean;
+  };
 }
 
 interface msgFetchedAction {
   type: ActionTypes.msgsFetched;
-  payload: Msg[];
+  payload: {
+    msgs: Msg[];
+    classId: string;
+  };
 }
 
 interface addMsgAction {
   type: ActionTypes.addMsgs;
-  payload: Msg;
+  payload: {
+    msg: Msg;
+    classId: string;
+  };
 }
 
-const msgHasErrored = (errored: boolean): msgErroredAction => {
+interface endMsgAction {
+  type: ActionTypes.msgsEnd;
+  payload: {
+    end: boolean;
+    classId: string;
+  };
+}
+
+const msgHasEnd = (end: boolean, classId: string): endMsgAction => {
+  return {
+    type: ActionTypes.msgsEnd,
+    payload: {
+      end,
+      classId,
+    },
+  };
+};
+
+const msgHasErrored = (errored: boolean, classId: string): msgErroredAction => {
   return {
     type: ActionTypes.msgsErrored,
-    payload: errored,
+    payload: {
+      errored,
+      classId,
+    },
   };
 };
 
-const msgIsLoading = (loading: boolean): msgLoadingAction => {
+const msgIsLoading = (loading: boolean, classId: string): msgLoadingAction => {
   return {
     type: ActionTypes.msgsLoading,
-    payload: loading,
+    payload: {
+      loading,
+      classId,
+    },
   };
 };
 
-const msgFetched = (msgs: Msg[]): msgFetchedAction => {
+const msgFetched = (msgs: Msg[], classId: string): msgFetchedAction => {
   return {
     type: ActionTypes.msgsFetched,
-    payload: msgs,
+    payload: {
+      msgs,
+      classId,
+    },
   };
 };
 
-const addMsg = (msg: Msg): addMsgAction => {
+const addMsg = (msg: Msg, classId: string): addMsgAction => {
   return {
     type: ActionTypes.addMsgs,
-    payload: msg,
+    payload: {
+      msg,
+      classId,
+    },
   };
 };
 
 const fetchMsgs = (token: string, classId: string) => {
-  return async (dispatch: Dispatch) => {
+  return async (dispatch: Dispatch, getState: () => StoreState) => {
     try {
-      dispatch(msgIsLoading(true));
+      const state = getState();
+      const msg = state.msgs[classId];
+
+      if (msg && msg.end) {
+        return;
+      }
+
+      dispatch(msgIsLoading(true, classId));
+      const lastMessage = msg?.msgs[msg.msgs.length - 1];
+
+      const params = lastMessage ? {after: lastMessage.id} : null;
+
       const res = await axios.get<Msg[]>(`${msgUrl}/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params,
       });
 
-      dispatch(msgIsLoading(false));
-      dispatch(msgFetched(res.data));
+      if (res.data.length === 0) {
+        dispatch(msgHasEnd(true, classId));
+      }
+
+      dispatch(msgIsLoading(false, classId));
+      dispatch(msgFetched(res.data, classId));
     } catch (e) {
-      dispatch(msgIsLoading(false));
-      dispatch(msgHasErrored(true));
+      dispatch(msgIsLoading(false, classId));
+      dispatch(msgHasErrored(true, classId));
     }
   };
 };
 
-export {
-  ActionTypes,
+export {ActionTypes, fetchMsgs, addMsg};
+
+export type {
   msgErroredAction,
   msgLoadingAction,
   msgFetchedAction,
   addMsgAction,
+  endMsgAction,
   Msg,
-  fetchMsgs,
-  addMsg,
+  MsgState,
+  MsgPayload,
 };
