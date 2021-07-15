@@ -19,7 +19,7 @@ import SendIcon from '@iconify-icons/ic/baseline-send';
 import {TouchableIcon} from '../components';
 import {MsgCard} from '../../shared/components/common';
 
-import {StoreState, store} from '../../shared/global';
+import {StoreState, store} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
 
@@ -33,11 +33,7 @@ import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
-  const {currentClass} = store.getState();
-
-  if (data.payload.classId === currentClass?.id) {
-    store.dispatch(addMsg(data.payload));
-  }
+  store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
 type WSMsg = Msg & {
@@ -57,9 +53,12 @@ type Props = RouteComponentProps<{classId: string}> & {
   token: string | null;
   fetchMsgs(token: string, classId: string): void;
   addMsg: typeof addMsg;
-  msgs: Msg[];
-  msgErrored: boolean;
-  msgLoading: boolean;
+  msgs: {
+    loading: boolean;
+    errored: boolean;
+    end: boolean;
+    msgs: Msg[];
+  };
   registerCurrentClass: typeof registerCurrentClass;
   isOwner: boolean;
   onLeftTopPress: () => void;
@@ -162,6 +161,28 @@ class Home extends React.Component<Props, State> {
     );
   };
 
+  renderListFooter = () => {
+    if (this.props.msgs.loading) {
+      return (
+        <View
+          style={{
+            height: 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+          }}>
+          <ActivityIndicator color={commonBlue} size="large" animating />
+        </View>
+      );
+    }
+  };
+
+  fetchMsg = () => {
+    if (!this.props.msgs.end) {
+      this.props.fetchMsgs(this.props.token!, this.props.match.params.classId);
+    }
+  };
+
   renderContent = () => {
     const {props} = this;
 
@@ -199,7 +220,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.msgErrored) {
+    if (props.msgs.errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text>
@@ -210,15 +231,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.msgLoading) {
-      return (
-        <View style={ContainerStyles.centerElements}>
-          <ActivityIndicator color={commonBlue} animating size="large" />
-        </View>
-      );
-    }
-
-    if (props.msgs.length === 0) {
+    if (props.msgs.msgs.length === 0 && !props.msgs.loading) {
       return (
         <ScrollView
           contentContainerStyle={{
@@ -234,10 +247,13 @@ class Home extends React.Component<Props, State> {
 
     return (
       <FlatList
-        data={this.props.msgs}
+        data={this.props.msgs.msgs}
         keyExtractor={(_item, i) => i.toString()}
         inverted
         renderItem={this.renderListItem}
+        ListEmptyComponent={this.renderListFooter()}
+        onEndReached={this.fetchMsg}
+        onEndReachedThreshold={0.3}
       />
     );
   };
@@ -313,9 +329,12 @@ const mapStateToProps = (state: StoreState) => {
     classIsLoading: state.classIsLoading,
     classes: state.classes,
     token: state.token,
-    msgs: state.msgs,
-    msgErrored: state.msgErrored,
-    msgLoading: state.msgLoading,
+    msgs: state.msgs[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      end: false,
+      msgs: [],
+    },
     isOwner,
   };
 };

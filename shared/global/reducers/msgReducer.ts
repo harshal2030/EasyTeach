@@ -4,36 +4,90 @@ import {
   msgLoadingAction,
   msgFetchedAction,
   addMsgAction,
-  Msg,
+  MsgState,
+  endMsgAction,
 } from '../actions/msgs';
 
-const msgErrored = (state: boolean = false, action: msgErroredAction) => {
+type Action =
+  | msgErroredAction
+  | addMsgAction
+  | msgFetchedAction
+  | endMsgAction
+  | msgLoadingAction;
+
+const initialState: MsgState = {};
+
+const msgsReducer = (
+  state: MsgState = initialState,
+  action: Action,
+): MsgState => {
+  const classMsgs = state[action.payload?.classId] || {
+    loading: true,
+    errored: false,
+    end: false,
+    msgs: [],
+  };
+  const {loading, errored, msgs, end} = classMsgs;
+  const tempState = {...state};
+
   switch (action.type) {
     case ActionTypes.msgsErrored:
-      return action.payload;
-    default:
-      return state;
-  }
-};
+      const tempErrored = {
+        loading,
+        errored: action.payload.errored,
+        msgs,
+        end,
+      };
+      tempState[action.payload.classId] = tempErrored;
 
-const msgLoading = (state: boolean = true, action: msgLoadingAction) => {
-  switch (action.type) {
+      return tempState;
+    case ActionTypes.msgsEnd:
+      const tempEnd = {
+        loading,
+        errored,
+        msgs,
+        end: action.payload.end,
+      };
+
+      tempState[action.payload.classId] = tempEnd;
+
+      return tempState;
     case ActionTypes.msgsLoading:
-      return action.payload;
-    default:
-      return state;
-  }
-};
+      const tempLoad = {
+        loading: action.payload.loading,
+        errored,
+        end,
+        msgs,
+      };
 
-const msgs = (state: Msg[] = [], action: msgFetchedAction | addMsgAction) => {
-  switch (action.type) {
+      tempState[action.payload.classId] = tempLoad;
+
+      return tempState;
     case ActionTypes.msgsFetched:
-      return action.payload;
+      const tempMsg = {
+        loading,
+        errored,
+        end,
+        msgs: [...msgs, ...action.payload.msgs],
+      };
+
+      tempState[action.payload.classId] = tempMsg;
+
+      return tempState;
     case ActionTypes.addMsgs:
-      return [action.payload, ...state];
+      const tempAddMsg = {
+        loading,
+        errored,
+        end,
+        msgs: [action.payload.msg, ...msgs],
+      };
+
+      tempState[action.payload.classId] = tempAddMsg;
+
+      return tempState;
     default:
       return state;
   }
 };
 
-export {msgErrored, msgLoading, msgs};
+export {msgsReducer};
