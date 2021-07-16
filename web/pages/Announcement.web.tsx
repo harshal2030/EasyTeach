@@ -51,7 +51,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   classes: Class[];
   classIsLoading: boolean;
   token: string | null;
-  fetchMsgs(token: string, classId: string): void;
+  fetchMsgs(token: string, classId: string, endReached?: boolean): void;
   addMsg: typeof addMsg;
   msgs: {
     loading: boolean;
@@ -179,7 +179,11 @@ class Home extends React.Component<Props, State> {
 
   fetchMsg = () => {
     if (!this.props.msgs.end) {
-      this.props.fetchMsgs(this.props.token!, this.props.match.params.classId);
+      this.props.fetchMsgs(
+        this.props.token!,
+        this.props.match.params.classId,
+        true,
+      );
     }
   };
 

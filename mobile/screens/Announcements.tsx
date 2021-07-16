@@ -64,7 +64,7 @@ type Props = {
   classes: Class[];
   classIsLoading: boolean;
   token: string | null;
-  fetchMsgs(token: string, classId: string): void;
+  fetchMsgs(token: string, classId: string, endReached?: boolean): void;
   addMsg: typeof addMsg;
   msgs: MsgPayload;
   registerCurrentClass: typeof registerCurrentClass;
@@ -148,7 +148,11 @@ class Home extends React.Component<Props, State> {
 
   fetchMsg = () => {
     if (!this.props.msgs.end) {
-      this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+      this.props.fetchMsgs(
+        this.props.token!,
+        this.props.currentClass!.id,
+        true,
+      );
     }
   };
 

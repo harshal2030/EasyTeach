@@ -126,11 +126,15 @@ const addMsg = (msg: Msg, classId: string): addMsgAction => {
   };
 };
 
-const fetchMsgs = (token: string, classId: string) => {
+const fetchMsgs = (token: string, classId: string, endReached = false) => {
   return async (dispatch: Dispatch, getState: () => StoreState) => {
     try {
       const state = getState();
       const msg = state.msgs[classId];
+
+      if (msg && !endReached) {
+        return;
+      }
 
       if (msg && msg.end) {
         return;

@@ -8,7 +8,7 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import {Header, ListItem, Text} from 'react-native-elements';
+import {Header, ListItem, Text, Button} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -51,34 +51,54 @@ interface peopleProp {
 const People = (props: Props) => {
   const [people, setPeople] = React.useState<peopleProp[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [offset, setOffset] = React.useState(0);
+
+  const fetchPeople = () => {
+    setPeople([]);
+    setLoading(true);
+    axios
+      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
+        headers: {
+          Authorization: `Bearer ${props.token!}`,
+        },
+        params: {
+          offset,
+        },
+        timeout: 20000,
+      })
+      .then((res) => {
+        setLoading(false);
+        setPeople(res.data);
+      })
+      .catch(() => {
+        setLoading(false);
+        SnackBar.show({
+          text: 'Unable to show people. Please try again later',
+          backgroundColor: flatRed,
+          duration: SnackBar.LENGTH_SHORT,
+          textColor: '#ffff',
+        });
+      });
+  };
+
+  const onNextPress = () => {
+    if (people.length >= 10) {
+      setOffset((prevValue) => prevValue + 10);
+    }
+  };
+
+  const onPrevPress = () => {
+    if (offset !== 0) {
+      setOffset((prevValue) => prevValue - 10);
+    }
+  };
 
   React.useEffect(() => {
     if (props.currentClass) {
-      setPeople([]);
-      setLoading(true);
-      axios
-        .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
-          headers: {
-            Authorization: `Bearer ${props.token!}`,
-          },
-          timeout: 20000,
-        })
-        .then((res) => {
-          setLoading(false);
-          setPeople(res.data);
-        })
-        .catch(() => {
-          setLoading(false);
-          SnackBar.show({
-            text: 'Unable to show people. Please try again later',
-            backgroundColor: flatRed,
-            duration: SnackBar.LENGTH_SHORT,
-            textColor: '#ffff',
-          });
-        });
+      fetchPeople();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass]);
+  }, [props.currentClass, offset]);
 
   const removeStudent = (name: string, username: string) => {
     const removeReq = () => {
@@ -165,9 +185,15 @@ const People = (props: Props) => {
         </ListItem>
 
         {people.length !== 0 && (
-          <Text h4 style={styles.titleStyle}>
-            Students
-          </Text>
+          <View style={styles.studentTextContainer}>
+            <Text h4 style={styles.titleStyle}>
+              Students
+            </Text>
+
+            <Text>
+              Showing {offset} - {offset + 10}
+            </Text>
+          </View>
         )}
       </>
     );
@@ -178,7 +204,22 @@ const People = (props: Props) => {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
     }
 
-    return <View style={{height: 50}} />;
+    return (
+      <View style={styles.listFooterContainer}>
+        <Button
+          title="PREV"
+          type="clear"
+          disabled={offset === 0}
+          onPress={onPrevPress}
+        />
+        <Button
+          title="NEXT"
+          type="clear"
+          disabled={people.length < 10}
+          onPress={onNextPress}
+        />
+      </View>
+    );
   };
 
   return (
@@ -230,6 +271,18 @@ const styles = StyleSheet.create({
   titleStyle: {
     marginTop: 5,
     marginBottom: 5,
+  },
+  studentTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  listFooterContainer: {
+    height: 50,
+    justifyContent: 'space-between',
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   footerContainer: {
     padding: 8,
