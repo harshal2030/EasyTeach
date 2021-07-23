@@ -22,6 +22,7 @@ import {MsgCard} from '../../shared/components/common';
 import {StoreState, store} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
+import {addUnread} from '../../shared/global/actions/unreads';
 
 import {ContainerStyles} from '../../shared/styles/styles';
 import {
@@ -33,6 +34,8 @@ import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
+  // @ts-ignore
+  store.dispatch(addUnread(data.payload.classId));
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
@@ -92,7 +95,7 @@ class Home extends React.Component<Props, State> {
     }
 
     if (this.props.currentClass) {
-      this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+      this.props.fetchMsgs(this.props.token!, this.props.match.params.classId);
     }
   }
 
@@ -344,5 +347,9 @@ const mapStateToProps = (state: StoreState) => {
 };
 
 export default withRouter(
-  connect(mapStateToProps, {fetchMsgs, addMsg, registerCurrentClass})(Home),
+  connect(mapStateToProps, {
+    fetchMsgs,
+    addMsg,
+    registerCurrentClass,
+  })(Home),
 );

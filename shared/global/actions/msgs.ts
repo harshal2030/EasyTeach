@@ -4,6 +4,7 @@ import axios from 'axios';
 import {StoreState} from '../index.web';
 
 import {msgUrl} from '../../utils/urls';
+import {setUnread, UnreadPayload, setUnreadZero} from './unreads';
 
 enum ActionTypes {
   msgsErrored = 'msgs_errored',
@@ -128,20 +129,58 @@ const addMsg = (msg: Msg, classId: string): addMsgAction => {
 
 const fetchMsgs = (token: string, classId: string, endReached = false) => {
   return async (dispatch: Dispatch, getState: () => StoreState) => {
+    const state = getState();
+    const msg = state.msgs[classId];
+    if (!state.unreads.fetched) {
+      try {
+        const res = await axios.get<UnreadPayload>(`${msgUrl}/unread`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        dispatch(setUnread(res.data, true));
+      } catch (e) {
+        null;
+      }
+    }
+
+    const unreads = state.unreads.data[classId]?.unread;
+
+    console.log(unreads, state.currentClass);
+
+    if (unreads && unreads !== 0) {
+      dispatch(setUnreadZero(classId));
+
+      try {
+        await axios.post(
+          `${msgUrl}/unread/${classId}`,
+          {
+            lastMessageDate: new Date(),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+      } catch (e) {
+        null;
+      }
+    }
+
+    if (msg && !endReached) {
+      return;
+    }
+
+    if (msg && msg.end) {
+      return;
+    }
+
+    const lastMessage = msg?.msgs[msg.msgs.length - 1];
+
     try {
-      const state = getState();
-      const msg = state.msgs[classId];
-
-      if (msg && !endReached) {
-        return;
-      }
-
-      if (msg && msg.end) {
-        return;
-      }
-
       dispatch(msgIsLoading(true, classId));
-      const lastMessage = msg?.msgs[msg.msgs.length - 1];
 
       const params = lastMessage ? {after: lastMessage.id} : null;
 

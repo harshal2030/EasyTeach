@@ -5,6 +5,7 @@ import {Class} from './actions/classes';
 import {MsgState} from './actions/msgs';
 import {QuizRes} from './actions/quiz';
 import {Question} from './actions/questions';
+import {UnreadState} from './actions/unreads';
 
 import {tokenReducer, fcmReducer} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
@@ -17,6 +18,7 @@ import {
 import {msgsReducer} from './reducers/msgReducer';
 import {quizErrored, quizLoading, quizzes} from './reducers/quizReducer';
 import {questions} from './reducers/questionReducer';
+import {unreadReducer} from './reducers/unreadReducer';
 
 export interface StoreState {
   token: string | null;
@@ -38,6 +40,7 @@ export interface StoreState {
   } | null;
   msgs: MsgState;
   questions: Question[];
+  unreads: UnreadState;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -53,6 +56,7 @@ export const reducers = combineReducers<StoreState>({
   fcm: fcmReducer,
   msgs: msgsReducer,
   questions,
+  unreads: unreadReducer,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));
