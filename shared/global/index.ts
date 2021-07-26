@@ -4,6 +4,7 @@ import thunk from 'redux-thunk';
 import {Class} from './actions/classes';
 import {MsgState} from './actions/msgs';
 import {QuizRes} from './actions/quiz';
+import {UnreadState} from './actions/unreads';
 
 import {tokenReducer, fcmReducer} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
@@ -15,6 +16,7 @@ import {
 } from './reducers/classReducer';
 import {msgsReducer} from './reducers/msgReducer';
 import {quizErrored, quizLoading, quizzes} from './reducers/quizReducer';
+import {unreadReducer} from './reducers/unreadReducer';
 
 export interface StoreState {
   token: string | null;
@@ -35,6 +37,7 @@ export interface StoreState {
     fcmToken: string;
   } | null;
   msgs: MsgState;
+  unreads: UnreadState;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -49,6 +52,7 @@ export const reducers = combineReducers<StoreState>({
   quizzes,
   fcm: fcmReducer,
   msgs: msgsReducer,
+  unreads: unreadReducer,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));

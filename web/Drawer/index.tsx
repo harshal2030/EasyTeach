@@ -109,8 +109,8 @@ const DrawerContent = (props: Props): JSX.Element => {
             value={props.unread.data[item.id]?.unread}
             badgeStyle={{
               position: 'absolute',
-              top: -10,
-              right: -8,
+              right: -1,
+              top: -4,
             }}
           />
         ) : null}

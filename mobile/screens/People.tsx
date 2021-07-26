@@ -8,13 +8,14 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import {Header, ListItem, Text, Button} from 'react-native-elements';
+import {Header, ListItem, Text, Button, Icon} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
+import {HeaderBadge} from '../components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {DrawerParamList, RootStackParamList} from '../navigators/types';
@@ -40,6 +41,7 @@ interface Props {
   token: string | null;
   isOwner: boolean;
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface peopleProp {
@@ -229,12 +231,17 @@ const People = (props: Props) => {
           text: 'People',
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
-        leftComponent={{
-          icon: 'menu',
-          color: '#ffff',
-          size: 26,
-          onPress: () => props.navigation.openDrawer(),
-        }}
+        leftComponent={
+          <>
+            <Icon
+              name="menu"
+              size={26}
+              onPress={props.navigation.openDrawer}
+              color="#ffff"
+            />
+            {props.unread !== 0 ? <HeaderBadge /> : null}
+          </>
+        }
       />
       {props.currentClass ? (
         <FlatList
@@ -309,6 +316,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     isOwner,
     premiumAllowed,
+    unread: state.unreads.totalUnread,
   };
 };
 

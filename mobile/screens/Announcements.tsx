@@ -7,7 +7,7 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import {Header, Button, Input} from 'react-native-elements';
+import {Header, Button, Input, Icon} from 'react-native-elements';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -19,6 +19,7 @@ import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
 
 import {MsgCard} from '../../shared/components/common';
+import {HeaderBadge} from '../components/common';
 
 import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {StoreState, store} from '../../shared/global';
@@ -29,6 +30,7 @@ import {
   addMsg,
   Msg,
 } from '../../shared/global/actions/msgs';
+import {addUnread} from '../../shared/global/actions/unreads';
 
 import {ContainerStyles} from '../../shared/styles/styles';
 import {
@@ -41,6 +43,8 @@ import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
+  // @ts-ignore
+  store.dispatch(addUnread(data.payload.classId));
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
@@ -70,6 +74,7 @@ type Props = {
   registerCurrentClass: typeof registerCurrentClass;
   isOwner: boolean;
   navigation: NavigationProp;
+  unread: number;
 };
 
 interface State {
@@ -272,6 +277,7 @@ class Home extends React.Component<Props, State> {
   };
 
   render() {
+    const {unread} = this.props;
     return (
       <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
         <Header
@@ -281,12 +287,17 @@ class Home extends React.Component<Props, State> {
               : 'Home',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
-          }}
+          leftComponent={
+            <>
+              <Icon
+                name="menu"
+                size={26}
+                onPress={this.props.navigation.openDrawer}
+                color="#ffff"
+              />
+              {unread !== 0 ? <HeaderBadge /> : null}
+            </>
+          }
         />
         <View
           style={{
@@ -344,6 +355,7 @@ const mapStateToProps = (state: StoreState) => {
       msgs: [],
     },
     isOwner,
+    unread: state.unreads.totalUnread,
   };
 };
 

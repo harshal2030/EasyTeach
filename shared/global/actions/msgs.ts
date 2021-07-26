@@ -131,6 +131,9 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
   return async (dispatch: Dispatch, getState: () => StoreState) => {
     const state = getState();
     const msg = state.msgs[classId];
+
+    let unreads = state.unreads.data[classId]?.unread;
+
     if (!state.unreads.fetched) {
       try {
         const res = await axios.get<UnreadPayload>(`${msgUrl}/unread`, {
@@ -139,15 +142,12 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
           },
         });
 
+        unreads = res.data[classId]?.unread;
         dispatch(setUnread(res.data, true));
       } catch (e) {
-        null;
+        // do nothing
       }
     }
-
-    const unreads = state.unreads.data[classId]?.unread;
-
-    console.log(unreads, state.currentClass);
 
     if (unreads && unreads !== 0) {
       dispatch(setUnreadZero(classId));
@@ -165,7 +165,7 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
           },
         );
       } catch (e) {
-        null;
+        // do nothing
       }
     }
 

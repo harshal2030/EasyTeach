@@ -13,6 +13,7 @@ type UnreadPayload = {
 
 type UnreadState = {
   data: UnreadPayload;
+  totalUnread: number;
   fetched: boolean;
 };
 
@@ -62,11 +63,22 @@ const addUnread = (classId: string) => {
 };
 
 const setUnread = (data: UnreadPayload, fetched: boolean): setUnreadAction => {
+  let totalUnread = 0;
+
+  Object.keys(data).forEach((unr) => {
+    const unread = data[unr];
+
+    if (unread) {
+      totalUnread += unread.unread;
+    }
+  });
+
   return {
     type: ActionTypes.setUnread,
     payload: {
       data,
       fetched,
+      totalUnread,
     },
   };
 };
