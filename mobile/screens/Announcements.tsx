@@ -19,7 +19,7 @@ import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
 
 import {MsgCard} from '../../shared/components/common';
-import {HeaderBadge} from '../components/common';
+import {HeaderBadge} from '../../shared/components/common';
 
 import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {StoreState, store} from '../../shared/global';

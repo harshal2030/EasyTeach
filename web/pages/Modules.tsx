@@ -21,6 +21,8 @@ import refreshCw from '@iconify-icons/feather/refresh-ccw';
 import plusIcon from '@iconify-icons/ic/baseline-plus';
 
 import {TouchableIcon} from '../components';
+import {HeaderBadge} from '../../shared/components/common';
+
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
@@ -43,6 +45,7 @@ interface Props extends RouteComponentProps<{classId: string}> {
   classes: Class[];
   registerCurrentClass: typeof registerCurrentClass;
   onLeftTopPress: () => void;
+  unread: number;
 }
 
 interface ModuleRes {
@@ -374,12 +377,15 @@ class Module extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={menuIcon}
-              size={26}
-              color="#fff"
-              onPress={this.props.onLeftTopPress}
-            />
+            <>
+              <TouchableIcon
+                icon={menuIcon}
+                size={26}
+                color="#fff"
+                onPress={this.props.onLeftTopPress}
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
           rightComponent={
             <TouchableIcon
@@ -521,6 +527,7 @@ const mapStateToProps = (state: StoreState) => {
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
     classes: state.classes,
+    unread: state.unreads.totalUnread,
   };
 };
 

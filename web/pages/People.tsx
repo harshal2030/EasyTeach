@@ -16,7 +16,7 @@ import MenuIcon from '@iconify-icons/ic/menu';
 
 import {TouchableIcon} from '../components';
 import Cross from '../../shared/images/cross.svg';
-import {Avatar} from '../../shared/components/common';
+import {Avatar, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -37,6 +37,7 @@ interface Props {
   onLeftTopPress: () => void;
   registerCurrentClass: typeof registerCurrentClass;
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface peopleProp {
@@ -223,12 +224,15 @@ const People = (props: Props) => {
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
         leftComponent={
-          <TouchableIcon
-            icon={MenuIcon}
-            color="#fff"
-            size={26}
-            onPress={props.onLeftTopPress}
-          />
+          <>
+            <TouchableIcon
+              icon={MenuIcon}
+              color="#fff"
+              size={26}
+              onPress={props.onLeftTopPress}
+            />
+            {props.unread !== 0 ? <HeaderBadge /> : null}
+          </>
         }
       />
       {props.currentClass ? (
@@ -313,6 +317,7 @@ const mapStateToProps = (state: StoreState) => {
     classes: state.classes,
     isOwner,
     premiumAllowed,
+    unread: state.unreads.totalUnread,
   };
 };
 

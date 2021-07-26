@@ -21,7 +21,7 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import AndroidPicker from 'react-native-android-dialog-picker';
 import Share from 'react-native-share';
 
-import {HeaderBadge} from '../components/common';
+import {HeaderBadge} from '../../shared/components/common';
 import {Card} from '../../shared/components/common';
 import {QuizInfo, ImportExcel} from '../../shared/components/main';
 

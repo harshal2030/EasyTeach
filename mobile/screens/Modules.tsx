@@ -18,7 +18,7 @@ import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
 import LottieView from 'lottie-react-native';
 
-import {HeaderBadge} from '../components/common';
+import {HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';

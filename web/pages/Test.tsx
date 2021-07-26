@@ -17,7 +17,7 @@ import Dialog from 'react-native-dialog';
 import MenuIcon from '@iconify-icons/ic/menu';
 
 import {TouchableIcon} from '../components';
-import {Card} from '../../shared/components/common';
+import {Card, HeaderBadge} from '../../shared/components/common';
 import {QuizInfo} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
@@ -44,6 +44,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   registerCurrentClass: typeof registerCurrentClass;
   classes: Class[];
   onLeftTopPress: () => void;
+  unread: number;
 };
 
 interface State {
@@ -238,12 +239,15 @@ class Test extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={MenuIcon}
-              size={26}
-              color="#fff"
-              onPress={this.props.onLeftTopPress}
-            />
+            <>
+              <TouchableIcon
+                icon={MenuIcon}
+                size={26}
+                color="#fff"
+                onPress={this.props.onLeftTopPress}
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
         />
         {this.renderContent()}
@@ -419,6 +423,7 @@ const mapStateToProps = (state: StoreState) => {
     quizzes: state.quizzes,
     classes: state.classes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
+    unread: state.unreads.totalUnread,
   };
 };
 

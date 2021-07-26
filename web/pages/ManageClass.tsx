@@ -17,7 +17,7 @@ import MenuIcon from '@iconify-icons/ic/menu';
 import CopyIcon from '@iconify-icons/ic/content-copy';
 
 import {TouchableIcon} from '../components';
-import {CheckBox} from '../../shared/components/common';
+import {CheckBox, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -48,6 +48,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   classes: Class[];
   onTopLeftPress: () => void;
   premiumAllowed: boolean;
+  unread: number;
 };
 
 interface State {
@@ -304,12 +305,15 @@ class ManageClass extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={MenuIcon}
-              size={26}
-              color="#fff"
-              onPress={this.props.onTopLeftPress}
-            />
+            <>
+              <TouchableIcon
+                icon={MenuIcon}
+                size={26}
+                color="#fff"
+                onPress={this.props.onTopLeftPress}
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
         />
 
@@ -522,6 +526,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     classes: state.classes,
     premiumAllowed: state.currentClass?.planId !== 'free',
+    unread: state.unreads.totalUnread,
   };
 };
 

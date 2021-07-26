@@ -16,6 +16,7 @@ import MegaText from '../../shared/images/announcement.svg';
 import MenuIcon from '@iconify-icons/ic/baseline-menu';
 import SendIcon from '@iconify-icons/ic/baseline-send';
 
+import {HeaderBadge} from '../../shared/components/common';
 import {TouchableIcon} from '../components';
 import {MsgCard} from '../../shared/components/common';
 
@@ -65,6 +66,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   registerCurrentClass: typeof registerCurrentClass;
   isOwner: boolean;
   onLeftTopPress: () => void;
+  unread: number;
 };
 
 interface State {
@@ -276,12 +278,15 @@ class Home extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={MenuIcon}
-              size={26}
-              onPress={this.props.onLeftTopPress}
-              color="#fff"
-            />
+            <>
+              <TouchableIcon
+                icon={MenuIcon}
+                size={26}
+                onPress={this.props.onLeftTopPress}
+                color="#fff"
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
         />
         <View
@@ -343,6 +348,7 @@ const mapStateToProps = (state: StoreState) => {
       msgs: [],
     },
     isOwner,
+    unread: state.unreads.totalUnread,
   };
 };
 

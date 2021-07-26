@@ -15,7 +15,7 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
-import {HeaderBadge} from '../components/common';
+import {HeaderBadge} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {DrawerParamList, RootStackParamList} from '../navigators/types';

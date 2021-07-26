@@ -19,7 +19,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
 
-import {HeaderBadge} from '../components/common';
+import {HeaderBadge} from '../../shared/components/common';
 import {PhotoPicker} from '../components/common';
 import {CheckBox} from '../../shared/components/common';
 
