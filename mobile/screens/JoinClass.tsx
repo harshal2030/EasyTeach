@@ -113,7 +113,6 @@ class JoinClass extends React.Component<Props, State> {
         });
       })
       .catch((e) => {
-        console.log(e);
         this.setState({loading: false});
         if (e.response && e.response.status === 400) {
           return Alert.alert('Oops!', e.response.data.error);
