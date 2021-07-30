@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
-import {Header, Input, Button} from 'react-native-elements';
+import {Header, Input, Button, Icon} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -19,6 +19,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import Share from 'react-native-share';
 import MI from 'react-native-vector-icons/MaterialIcons';
 
+import {HeaderBadge} from '../../shared/components/common';
 import {PhotoPicker} from '../components/common';
 import {CheckBox} from '../../shared/components/common';
 
@@ -57,6 +58,7 @@ interface Props {
   };
   classes: Class[];
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface State {
@@ -306,12 +308,17 @@ class ManageClass extends React.Component<Props, State> {
             text: this.props.isOwner ? 'Manage' : 'Info',
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
-          }}
+          leftComponent={
+            <>
+              <Icon
+                name="menu"
+                size={26}
+                onPress={this.props.navigation.openDrawer}
+                color="#ffff"
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
+          }
         />
 
         <ScrollView keyboardShouldPersistTaps="handled">
@@ -445,6 +452,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     classes: state.classes,
     premiumAllowed,
+    unread: state.unreads.totalUnread,
   };
 };
 

@@ -18,6 +18,8 @@ import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
 import LottieView from 'lottie-react-native';
 
+import {HeaderBadge} from '../../shared/components/common';
+
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
 
@@ -44,6 +46,7 @@ interface Props {
   token: string;
   isOwner: boolean;
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface ModuleRes {
@@ -332,12 +335,17 @@ class Module extends React.Component<Props, State> {
             text: 'Modules',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
-          }}
+          leftComponent={
+            <>
+              <Icon
+                name="menu"
+                size={26}
+                onPress={this.props.navigation.openDrawer}
+                color="#ffff"
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
+          }
           rightComponent={{
             icon: 'refresh-ccw',
             type: 'feather',
@@ -462,6 +470,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token!,
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
+    unread: state.unreads.totalUnread,
   };
 };
 

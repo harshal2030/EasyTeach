@@ -11,7 +11,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import {useRouteMatch, useHistory} from 'react-router-dom';
-import {Button} from 'react-native-elements';
+import {Button, Badge} from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
@@ -27,7 +27,8 @@ import Group from '../../shared/images/group.svg';
 import Checklist from '../../shared/images/checklist.svg';
 import Settings from '../../shared/images/settings.svg';
 
-import {StoreState} from '../../shared/global';
+import {StoreState} from '../../shared/global/index.web';
+import {UnreadState} from '../../shared/global/actions/unreads';
 import {removeToken} from '../../shared/global/actions/token';
 import {
   Class,
@@ -60,6 +61,7 @@ type Props = {
   removeCurrentClass: typeof removeCurrentClass;
   isOwner: boolean;
   onOptionPress: () => void;
+  unread: UnreadState;
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -101,6 +103,17 @@ const DrawerContent = (props: Props): JSX.Element => {
           }}
           style={avatarImageStyle}
         />
+        {props.unread.data[item.id]?.unread ? (
+          <Badge
+            status="error"
+            value={props.unread.data[item.id]?.unread}
+            badgeStyle={{
+              position: 'absolute',
+              right: -1,
+              top: -4,
+            }}
+          />
+        ) : null}
         <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
       </TouchableOpacity>
     );
@@ -209,6 +222,19 @@ const DrawerContent = (props: Props): JSX.Element => {
                     props.onOptionPress();
                   }}>
                   <Home />
+                  {props.unread.data[currentClass!.id]?.unread ? (
+                    <Badge
+                      status="error"
+                      badgeStyle={{
+                        position: 'absolute',
+                        top: -10,
+                        height: 10,
+                        width: 10,
+                        borderWidth: 1,
+                        borderRadius: 5,
+                      }}
+                    />
+                  ) : null}
                   <Text style={optionText}> Home</Text>
                 </TouchableOpacity>
 
@@ -354,6 +380,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,
+    unread: state.unreads,
   };
 };
 

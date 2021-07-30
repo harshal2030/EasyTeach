@@ -11,7 +11,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import {Button} from 'react-native-elements';
+import {Button, Badge} from 'react-native-elements';
 import {MMKV} from '../../MMKV';
 import {connect} from 'react-redux';
 import axios from 'axios';
@@ -21,6 +21,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MI from 'react-native-vector-icons/MaterialIcons';
 
 import {StoreState} from '../../../shared/global';
+import {UnreadState} from '../../../shared/global/actions/unreads';
 import {removeToken} from '../../../shared/global/actions/token';
 import {
   Class,
@@ -64,6 +65,7 @@ type Props = DrawerContentComponentProps & {
   };
   removeCurrentClass: typeof removeCurrentClass;
   isOwner: boolean;
+  unread: UnreadState;
 };
 
 const DrawerContent = (props: Props): JSX.Element => {
@@ -101,6 +103,17 @@ const DrawerContent = (props: Props): JSX.Element => {
           }}
           style={avatarImageStyle}
         />
+        {props.unread.data[item.id]?.unread ? (
+          <Badge
+            status="error"
+            value={props.unread.data[item.id]?.unread}
+            badgeStyle={{
+              position: 'absolute',
+              right: -1,
+              top: -4,
+            }}
+          />
+        ) : null}
         <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
           {item.name}
         </Text>
@@ -215,6 +228,19 @@ const DrawerContent = (props: Props): JSX.Element => {
                   style={optionContainer}
                   onPress={() => props.navigation.navigate('Home')}>
                   <Entypo name="home" color="#34495e" size={23} />
+                  {props.unread.data[currentClass?.id || 'test']?.unread ? (
+                    <Badge
+                      status="error"
+                      badgeStyle={{
+                        position: 'absolute',
+                        top: -10,
+                        height: 10,
+                        width: 10,
+                        borderWidth: 1,
+                        borderRadius: 5,
+                      }}
+                    />
+                  ) : null}
                   <Text style={optionText}> Home</Text>
                 </TouchableOpacity>
 
@@ -344,6 +370,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,
+    unread: state.unreads,
   };
 };
 

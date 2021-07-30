@@ -16,12 +16,14 @@ import MegaText from '../../shared/images/announcement.svg';
 import MenuIcon from '@iconify-icons/ic/baseline-menu';
 import SendIcon from '@iconify-icons/ic/baseline-send';
 
+import {HeaderBadge} from '../../shared/components/common';
 import {TouchableIcon} from '../components';
 import {MsgCard} from '../../shared/components/common';
 
 import {StoreState, store} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
+import {addUnread} from '../../shared/global/actions/unreads';
 
 import {ContainerStyles} from '../../shared/styles/styles';
 import {
@@ -33,6 +35,8 @@ import {mediaUrl, msgUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
+  // @ts-ignore
+  store.dispatch(addUnread(data.payload.classId));
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
@@ -51,7 +55,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   classes: Class[];
   classIsLoading: boolean;
   token: string | null;
-  fetchMsgs(token: string, classId: string): void;
+  fetchMsgs(token: string, classId: string, endReached?: boolean): void;
   addMsg: typeof addMsg;
   msgs: {
     loading: boolean;
@@ -62,6 +66,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   registerCurrentClass: typeof registerCurrentClass;
   isOwner: boolean;
   onLeftTopPress: () => void;
+  unread: number;
 };
 
 interface State {
@@ -92,7 +97,7 @@ class Home extends React.Component<Props, State> {
     }
 
     if (this.props.currentClass) {
-      this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+      this.props.fetchMsgs(this.props.token!, this.props.match.params.classId);
     }
   }
 
@@ -179,7 +184,11 @@ class Home extends React.Component<Props, State> {
 
   fetchMsg = () => {
     if (!this.props.msgs.end) {
-      this.props.fetchMsgs(this.props.token!, this.props.match.params.classId);
+      this.props.fetchMsgs(
+        this.props.token!,
+        this.props.match.params.classId,
+        true,
+      );
     }
   };
 
@@ -269,12 +278,15 @@ class Home extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={MenuIcon}
-              size={26}
-              onPress={this.props.onLeftTopPress}
-              color="#fff"
-            />
+            <>
+              <TouchableIcon
+                icon={MenuIcon}
+                size={26}
+                onPress={this.props.onLeftTopPress}
+                color="#fff"
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
         />
         <View
@@ -336,9 +348,14 @@ const mapStateToProps = (state: StoreState) => {
       msgs: [],
     },
     isOwner,
+    unread: state.unreads.totalUnread,
   };
 };
 
 export default withRouter(
-  connect(mapStateToProps, {fetchMsgs, addMsg, registerCurrentClass})(Home),
+  connect(mapStateToProps, {
+    fetchMsgs,
+    addMsg,
+    registerCurrentClass,
+  })(Home),
 );

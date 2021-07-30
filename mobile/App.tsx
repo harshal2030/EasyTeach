@@ -2,7 +2,6 @@ import React, {useRef} from 'react';
 import axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
 import * as Analytics from 'expo-firebase-analytics';
-import AsyncStorage from '@react-native-community/async-storage';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
   NavigationContainer,
@@ -88,16 +87,6 @@ const App: React.FC<Props> = (props) => {
   };
 
   const checkToken = async () => {
-    const hasMigrated = MMKV.getBool('hasMigrated');
-
-    if (!hasMigrated) {
-      const t = await AsyncStorage.getItem('token');
-      MMKV.setBool('hasMigrated', true);
-      if (t) {
-        MMKV.setString('token', t);
-      }
-    }
-
     const token = MMKV.getString('token');
     setLoading(false);
     if (token) {

@@ -5,6 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const JSONMinimizer = require('json-minimizer-webpack-plugin');
+
 const ImageMin = require('image-minimizer-webpack-plugin');
 const {extendDefaultPlugins} = require('svgo');
 
@@ -104,6 +107,15 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new UglifyJsPlugin({
+        test: /\.(js|ts|tsx|jsx)$/i,
+      }),
+      new JSONMinimizer(),
+    ],
   },
   plugins: [
     new HtmlWebpackPlugin({

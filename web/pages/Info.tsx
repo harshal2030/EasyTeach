@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import {View, Text, FlatList, ActivityIndicator} from 'react-native';
-import {Header, ListItem} from 'react-native-elements';
+import {Header, ListItem, Button} from 'react-native-elements';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import {connect} from 'react-redux';
 import backIcon from '@iconify-icons/ic/arrow-back';
@@ -146,6 +146,21 @@ class Info extends React.Component<Props, State> {
     );
   };
 
+  renderListFooter = () => {
+    if (this.state.info.length !== 0) {
+      return (
+        <View style={{padding: 50}}>
+          <a
+            target="_blank"
+            style={{textDecoration: 'none'}}
+            href={`${vidTrackerUrl}/file/${this.props.match.params.classId}/${this.props.match.params.moduleId}/${this.props.match.params.videoId}`}>
+            <Button title="Download Full Report" />
+          </a>
+        </View>
+      );
+    }
+  };
+
   renderContent = () => {
     const {loading, errored, info} = this.state;
 
@@ -178,6 +193,7 @@ class Info extends React.Component<Props, State> {
         data={info}
         keyExtractor={(_, i) => i.toString()}
         renderItem={this.renderItem}
+        ListFooterComponent={this.renderListFooter()}
       />
     );
   };

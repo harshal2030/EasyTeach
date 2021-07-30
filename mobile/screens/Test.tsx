@@ -10,7 +10,7 @@ import {
   ActionSheetIOS,
 } from 'react-native';
 import Modal from 'react-native-modal';
-import {Header, Button} from 'react-native-elements';
+import {Header, Button, Icon} from 'react-native-elements';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
@@ -21,6 +21,7 @@ import {DrawerNavigationProp} from '@react-navigation/drawer';
 import AndroidPicker from 'react-native-android-dialog-picker';
 import Share from 'react-native-share';
 
+import {HeaderBadge} from '../../shared/components/common';
 import {Card} from '../../shared/components/common';
 import {QuizInfo, ImportExcel} from '../../shared/components/main';
 
@@ -52,6 +53,7 @@ interface Props {
   quizzes: ObQuizRes;
   fetchQuiz(token: string, classId: string, quizType?: string): void;
   isOwner: boolean;
+  unread: number;
 }
 
 interface State {
@@ -294,6 +296,7 @@ class Test extends React.Component<Props, State> {
   };
 
   render() {
+    const {unread} = this.props;
     return (
       <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
         <Header
@@ -301,12 +304,17 @@ class Test extends React.Component<Props, State> {
             text: 'Tests',
             style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
           }}
-          leftComponent={{
-            icon: 'menu',
-            color: '#ffff',
-            size: 26,
-            onPress: () => this.props.navigation.openDrawer(),
-          }}
+          leftComponent={
+            <>
+              <Icon
+                name="menu"
+                size={26}
+                onPress={this.props.navigation.openDrawer}
+                color="#ffff"
+              />
+              {unread !== 0 ? <HeaderBadge /> : null}
+            </>
+          }
         />
         {this.renderContent()}
         {this.props.isOwner && (
@@ -437,6 +445,7 @@ const mapStateToProps = (state: StoreState) => {
     quizErrored: state.quizErrored,
     quizzes: state.quizzes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
+    unread: state.unreads.totalUnread,
   };
 };
 

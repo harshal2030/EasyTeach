@@ -17,7 +17,7 @@ import MenuIcon from '@iconify-icons/ic/menu';
 import CopyIcon from '@iconify-icons/ic/content-copy';
 
 import {TouchableIcon} from '../components';
-import {CheckBox} from '../../shared/components/common';
+import {CheckBox, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {
@@ -48,6 +48,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   classes: Class[];
   onTopLeftPress: () => void;
   premiumAllowed: boolean;
+  unread: number;
 };
 
 interface State {
@@ -60,6 +61,10 @@ interface State {
   loading: boolean;
   deleteModal: boolean;
   lockMsg: boolean;
+  ownerChangeModal: boolean;
+  ownerChangeClassName: string;
+  ownerChangeContinue: boolean;
+  newOwner: string;
 }
 
 class ManageClass extends React.Component<Props, State> {
@@ -80,6 +85,10 @@ class ManageClass extends React.Component<Props, State> {
       photo: null,
       loading: false,
       deleteModal: false,
+      ownerChangeModal: false,
+      ownerChangeClassName: '',
+      ownerChangeContinue: false,
+      newOwner: '',
     };
   }
 
@@ -218,6 +227,47 @@ class ManageClass extends React.Component<Props, State> {
     }
   };
 
+  cancelOwnershipChange = () => {
+    this.setState({
+      ownerChangeClassName: '',
+      ownerChangeContinue: false,
+      ownerChangeModal: false,
+      newOwner: '',
+    });
+  };
+
+  ownerChangeContinue = () => {
+    if (this.state.ownerChangeClassName === this.props.currentClass?.name) {
+      this.setState({ownerChangeContinue: true});
+      return;
+    }
+
+    toast.error('Class Name does not match');
+  };
+
+  changeOwner = () => {
+    axios
+      .post(
+        `${classUrl}/${this.props.match.params.classId}`,
+        {user: this.state.newOwner, class: this.state.ownerChangeClassName},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then(() => {
+        this.cancelOwnershipChange();
+        this.props.removeClass(this.props.currentClass!.id);
+        this.props.revokeCurrentClass(this.props.classes);
+        this.props.history.push(`/classes/home/${this.props.currentClass!.id}`);
+        toast.success('Successfully transferred class');
+      })
+      .catch(() =>
+        toast.error('Unable to transfer Ownership. Please try again later'),
+      );
+  };
+
   renderNextPayDate = () => {
     const {currentClass, premiumAllowed, isOwner} = this.props;
 
@@ -255,12 +305,15 @@ class ManageClass extends React.Component<Props, State> {
             style: {fontSize: 24, color: '#fff', fontWeight: '600'},
           }}
           leftComponent={
-            <TouchableIcon
-              icon={MenuIcon}
-              size={26}
-              color="#fff"
-              onPress={this.props.onTopLeftPress}
-            />
+            <>
+              <TouchableIcon
+                icon={MenuIcon}
+                size={26}
+                color="#fff"
+                onPress={this.props.onTopLeftPress}
+              />
+              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+            </>
           }
         />
 
@@ -300,6 +353,14 @@ class ManageClass extends React.Component<Props, State> {
               value={this.props.currentClass!.owner.name}
               label="Class Owner"
               disabled
+              rightIcon={
+                isOwner && (
+                  <Button
+                    title="Transfer Ownership"
+                    onPress={() => this.setState({ownerChangeModal: true})}
+                  />
+                )
+              }
             />
             <Input
               value={about}
@@ -376,6 +437,67 @@ class ManageClass extends React.Component<Props, State> {
           </View>
         </ScrollView>
 
+        <Dialog.Container visible={this.state.ownerChangeModal}>
+          <Dialog.Title style={{color: flatRed}}>Danger Zone</Dialog.Title>
+          {this.state.ownerChangeContinue ? (
+            <>
+              <Dialog.Description>
+                Enter the new owner's username or E-mail and click submit
+              </Dialog.Description>
+              <Input
+                label="Username or E-mail"
+                inputStyle={{padding: 5}}
+                value={this.state.newOwner}
+                onChangeText={(text) => this.setState({newOwner: text})}
+              />
+              <View style={{flexDirection: 'row'}}>
+                <Button
+                  title="SUBMIT"
+                  buttonStyle={{marginHorizontal: 10}}
+                  onPress={this.changeOwner}
+                />
+                <Button
+                  title="CANCEL"
+                  buttonStyle={{marginHorizontal: 10}}
+                  onPress={this.cancelOwnershipChange}
+                />
+              </View>
+            </>
+          ) : (
+            <>
+              <Dialog.Description>
+                You're going to change the owner of the class. You no longer
+                will be able access this class
+              </Dialog.Description>
+              <Dialog.Description>
+                {`Type ${
+                  this.props.currentClass!.name
+                } (CASE SENSITIVE) below and click continue`}
+              </Dialog.Description>
+              <Input
+                label="Your Class Name"
+                value={this.state.ownerChangeClassName}
+                inputStyle={{paddingHorizontal: 5}}
+                onChangeText={(text) =>
+                  this.setState({ownerChangeClassName: text})
+                }
+              />
+              <View style={{flexDirection: 'row'}}>
+                <Button
+                  title="CONTINUE"
+                  buttonStyle={{backgroundColor: flatRed, marginHorizontal: 10}}
+                  onPress={this.ownerChangeContinue}
+                />
+                <Button
+                  title="CANCEL"
+                  buttonStyle={{marginHorizontal: 10}}
+                  onPress={this.cancelOwnershipChange}
+                />
+              </View>
+            </>
+          )}
+        </Dialog.Container>
+
         <Dialog.Container visible={this.state.deleteModal}>
           <Dialog.Title>Confirm</Dialog.Title>
           <Dialog.Description>{`Are you sure to unenroll from ${
@@ -404,6 +526,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     classes: state.classes,
     premiumAllowed: state.currentClass?.planId !== 'free',
+    unread: state.unreads.totalUnread,
   };
 };
 

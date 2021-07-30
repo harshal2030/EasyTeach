@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {useHistory, useParams, Link} from 'react-router-dom';
-import {Header, ListItem, Text} from 'react-native-elements';
+import {Header, ListItem, Text, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
@@ -16,7 +16,7 @@ import MenuIcon from '@iconify-icons/ic/menu';
 
 import {TouchableIcon} from '../components';
 import Cross from '../../shared/images/cross.svg';
-import {Avatar} from '../../shared/components/common';
+import {Avatar, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -37,6 +37,7 @@ interface Props {
   onLeftTopPress: () => void;
   registerCurrentClass: typeof registerCurrentClass;
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface peopleProp {
@@ -53,6 +54,42 @@ const People = (props: Props) => {
     name: '',
     username: '',
   });
+  const [offset, setOffset] = React.useState(0);
+
+  const fetchPeople = () => {
+    setPeople([]);
+    setLoading(true);
+    axios
+      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
+        headers: {
+          Authorization: `Bearer ${props.token!}`,
+        },
+        params: {
+          offset,
+        },
+        timeout: 20000,
+      })
+      .then((res) => {
+        setLoading(false);
+        setPeople(res.data);
+      })
+      .catch(() => {
+        setLoading(false);
+        toast.error('Unable to show people. Please try again later');
+      });
+  };
+
+  const onNextPress = () => {
+    if (people.length >= 10) {
+      setOffset((prevValue) => prevValue + 10);
+    }
+  };
+
+  const onPrevPress = () => {
+    if (offset !== 0) {
+      setOffset((prevValue) => prevValue - 10);
+    }
+  };
 
   const history = useHistory();
 
@@ -70,24 +107,10 @@ const People = (props: Props) => {
     }
 
     if (props.currentClass) {
-      axios
-        .get<peopleProp[]>(`${studentUrl}/${classId}`, {
-          headers: {
-            Authorization: `Bearer ${props.token!}`,
-          },
-          timeout: 20000,
-        })
-        .then((res) => {
-          setLoading(false);
-          setPeople(res.data);
-        })
-        .catch(() => {
-          setLoading(false);
-          toast.error('Unable to show people. Please try again later');
-        });
+      fetchPeople();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass, classId]);
+  }, [props.currentClass, classId, offset]);
 
   const removeStudent = () => {
     setAlert(false);
@@ -156,9 +179,15 @@ const People = (props: Props) => {
         </ListItem>
 
         {people.length !== 0 && (
-          <Text h4 style={styles.titleStyle}>
-            Students
-          </Text>
+          <View style={styles.studentTextContainer}>
+            <Text h4 style={styles.titleStyle}>
+              Students
+            </Text>
+
+            <Text>
+              Showing {offset} - {offset + 10}
+            </Text>
+          </View>
         )}
       </>
     );
@@ -168,6 +197,23 @@ const People = (props: Props) => {
     if (loading) {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
     }
+
+    return (
+      <View style={styles.listFooterContainer}>
+        <Button
+          title="PREV"
+          type="clear"
+          disabled={offset === 0}
+          onPress={onPrevPress}
+        />
+        <Button
+          title="NEXT"
+          type="clear"
+          disabled={people.length < 10}
+          onPress={onNextPress}
+        />
+      </View>
+    );
   };
 
   return (
@@ -178,12 +224,15 @@ const People = (props: Props) => {
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
         leftComponent={
-          <TouchableIcon
-            icon={MenuIcon}
-            color="#fff"
-            size={26}
-            onPress={props.onLeftTopPress}
-          />
+          <>
+            <TouchableIcon
+              icon={MenuIcon}
+              color="#fff"
+              size={26}
+              onPress={props.onLeftTopPress}
+            />
+            {props.unread !== 0 ? <HeaderBadge /> : null}
+          </>
         }
       />
       {props.currentClass ? (
@@ -229,6 +278,19 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
+  studentTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  listFooterContainer: {
+    height: 50,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   footerContainer: {
     padding: 8,
     borderTopColor: greyWithAlpha(0.5),
@@ -255,6 +317,7 @@ const mapStateToProps = (state: StoreState) => {
     classes: state.classes,
     isOwner,
     premiumAllowed,
+    unread: state.unreads.totalUnread,
   };
 };
 

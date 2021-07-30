@@ -3,7 +3,7 @@ import axios from 'axios';
 import {Alert} from 'react-native';
 import {connect} from 'react-redux';
 import {MMKV} from '../MMKV';
-import validator from 'validator';
+import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import {StackNavigationProp} from '@react-navigation/stack';
 
@@ -111,7 +111,7 @@ class AuthScreen extends React.Component<Props, State> {
       );
     }
 
-    if (!validator.isEmail(email)) {
+    if (!isEmail(email)) {
       return Alert.alert('', 'Please enter valid e-mail');
     }
 

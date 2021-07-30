@@ -8,13 +8,14 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import {Header, ListItem, Text} from 'react-native-elements';
+import {Header, ListItem, Text, Button, Icon} from 'react-native-elements';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
+import {HeaderBadge} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
 import {DrawerParamList, RootStackParamList} from '../navigators/types';
@@ -40,6 +41,7 @@ interface Props {
   token: string | null;
   isOwner: boolean;
   premiumAllowed: boolean;
+  unread: number;
 }
 
 interface peopleProp {
@@ -51,34 +53,54 @@ interface peopleProp {
 const People = (props: Props) => {
   const [people, setPeople] = React.useState<peopleProp[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
+  const [offset, setOffset] = React.useState(0);
+
+  const fetchPeople = () => {
+    setPeople([]);
+    setLoading(true);
+    axios
+      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
+        headers: {
+          Authorization: `Bearer ${props.token!}`,
+        },
+        params: {
+          offset,
+        },
+        timeout: 20000,
+      })
+      .then((res) => {
+        setLoading(false);
+        setPeople(res.data);
+      })
+      .catch(() => {
+        setLoading(false);
+        SnackBar.show({
+          text: 'Unable to show people. Please try again later',
+          backgroundColor: flatRed,
+          duration: SnackBar.LENGTH_SHORT,
+          textColor: '#ffff',
+        });
+      });
+  };
+
+  const onNextPress = () => {
+    if (people.length >= 10) {
+      setOffset((prevValue) => prevValue + 10);
+    }
+  };
+
+  const onPrevPress = () => {
+    if (offset !== 0) {
+      setOffset((prevValue) => prevValue - 10);
+    }
+  };
 
   React.useEffect(() => {
     if (props.currentClass) {
-      setPeople([]);
-      setLoading(true);
-      axios
-        .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
-          headers: {
-            Authorization: `Bearer ${props.token!}`,
-          },
-          timeout: 20000,
-        })
-        .then((res) => {
-          setLoading(false);
-          setPeople(res.data);
-        })
-        .catch(() => {
-          setLoading(false);
-          SnackBar.show({
-            text: 'Unable to show people. Please try again later',
-            backgroundColor: flatRed,
-            duration: SnackBar.LENGTH_SHORT,
-            textColor: '#ffff',
-          });
-        });
+      fetchPeople();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass]);
+  }, [props.currentClass, offset]);
 
   const removeStudent = (name: string, username: string) => {
     const removeReq = () => {
@@ -165,9 +187,15 @@ const People = (props: Props) => {
         </ListItem>
 
         {people.length !== 0 && (
-          <Text h4 style={styles.titleStyle}>
-            Students
-          </Text>
+          <View style={styles.studentTextContainer}>
+            <Text h4 style={styles.titleStyle}>
+              Students
+            </Text>
+
+            <Text>
+              Showing {offset} - {offset + 10}
+            </Text>
+          </View>
         )}
       </>
     );
@@ -178,7 +206,22 @@ const People = (props: Props) => {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
     }
 
-    return <View style={{height: 50}} />;
+    return (
+      <View style={styles.listFooterContainer}>
+        <Button
+          title="PREV"
+          type="clear"
+          disabled={offset === 0}
+          onPress={onPrevPress}
+        />
+        <Button
+          title="NEXT"
+          type="clear"
+          disabled={people.length < 10}
+          onPress={onNextPress}
+        />
+      </View>
+    );
   };
 
   return (
@@ -188,12 +231,17 @@ const People = (props: Props) => {
           text: 'People',
           style: {fontSize: 24, color: '#fff', fontWeight: '600'},
         }}
-        leftComponent={{
-          icon: 'menu',
-          color: '#ffff',
-          size: 26,
-          onPress: () => props.navigation.openDrawer(),
-        }}
+        leftComponent={
+          <>
+            <Icon
+              name="menu"
+              size={26}
+              onPress={props.navigation.openDrawer}
+              color="#ffff"
+            />
+            {props.unread !== 0 ? <HeaderBadge /> : null}
+          </>
+        }
       />
       {props.currentClass ? (
         <FlatList
@@ -231,6 +279,18 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
+  studentTextContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  listFooterContainer: {
+    height: 50,
+    justifyContent: 'space-between',
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
   footerContainer: {
     padding: 8,
     borderTopColor: greyWithAlpha(0.5),
@@ -256,6 +316,7 @@ const mapStateToProps = (state: StoreState) => {
     profile: state.profile,
     isOwner,
     premiumAllowed,
+    unread: state.unreads.totalUnread,
   };
 };
 
