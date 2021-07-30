@@ -14,6 +14,7 @@ import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Share from 'react-native-share';
+import * as Analytics from 'expo-firebase-analytics';
 
 import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
@@ -111,9 +112,17 @@ class Home extends React.Component<Props, State> {
     }
   }
 
-  postMessage = () => {
+  postMessage = async () => {
     if (this.state.message.trim().length === 0) {
       return;
+    }
+
+    try {
+      await Analytics.logEvent('send_message', {
+        username: this.props.profile.username,
+      });
+    } catch (e) {
+      // do nothing
     }
 
     this.setState({message: ''});
@@ -140,15 +149,22 @@ class Home extends React.Component<Props, State> {
       });
   };
 
-  shareCode = () => {
-    Share.open({
-      title: 'Join my class on EasyTeach',
-      message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
-        this.props.currentClass!.joinCode
-      }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
-    })
-      .then(() => null)
-      .catch(() => null);
+  shareCode = async () => {
+    try {
+      await Share.open({
+        title: 'Join my class on EasyTeach',
+        message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+          this.props.currentClass!.joinCode
+        }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+      });
+
+      await Analytics.logEvent('button_press', {
+        username: this.props.profile.username,
+        purpose: 'share_join_code',
+      });
+    } catch (e) {
+      // do nothing
+    }
   };
 
   fetchMsg = () => {
