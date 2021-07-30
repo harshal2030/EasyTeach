@@ -122,10 +122,9 @@ class Home extends React.Component<Props, State> {
         username: this.props.profile.username,
       });
     } catch (e) {
-      // do nothing
+      null;
     }
 
-    this.setState({message: ''});
     axios
       .post<Msg>(
         `${msgUrl}/${this.props.currentClass!.id}`,
@@ -147,23 +146,26 @@ class Home extends React.Component<Props, State> {
           duration: SnackBar.LENGTH_LONG,
         });
       });
+    this.setState({message: ''});
   };
 
   shareCode = async () => {
-    try {
-      await Share.open({
-        title: 'Join my class on EasyTeach',
-        message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
-          this.props.currentClass!.joinCode
-        }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
-      });
+    Share.open({
+      title: 'Join my class on EasyTeach',
+      message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+        this.props.currentClass!.joinCode
+      }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
 
+    try {
       await Analytics.logEvent('button_press', {
         username: this.props.profile.username,
         purpose: 'share_join_code',
       });
     } catch (e) {
-      // do nothing
+      null;
     }
   };
 
