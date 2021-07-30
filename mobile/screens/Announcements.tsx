@@ -122,7 +122,7 @@ class Home extends React.Component<Props, State> {
         username: this.props.profile.username,
       });
     } catch (e) {
-      null;
+      // do nothing
     }
 
     axios
@@ -150,22 +150,20 @@ class Home extends React.Component<Props, State> {
   };
 
   shareCode = async () => {
-    Share.open({
-      title: 'Join my class on EasyTeach',
-      message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
-        this.props.currentClass!.joinCode
-      }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
-    })
-      .then(() => null)
-      .catch(() => null);
-
     try {
+      Share.open({
+        title: 'Join my class on EasyTeach',
+        message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+          this.props.currentClass!.joinCode
+        }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+      });
+
       await Analytics.logEvent('button_press', {
         username: this.props.profile.username,
         purpose: 'share_join_code',
       });
     } catch (e) {
-      null;
+      // do nothing
     }
   };
 
