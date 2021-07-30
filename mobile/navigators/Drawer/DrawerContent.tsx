@@ -228,7 +228,7 @@ const DrawerContent = (props: Props): JSX.Element => {
                   style={optionContainer}
                   onPress={() => props.navigation.navigate('Home')}>
                   <Entypo name="home" color="#34495e" size={23} />
-                  {props.unread.data[currentClass!.id]?.unread ? (
+                  {props.unread.data[currentClass?.id || 'test']?.unread ? (
                     <Badge
                       status="error"
                       badgeStyle={{

@@ -3,7 +3,7 @@ import axios from 'axios';
 import {View, Text, TextInput, StyleSheet, Alert, Keyboard} from 'react-native';
 import {Header, Button} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
-import validator from 'validator';
+import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import ViewPager from '@react-native-community/viewpager';
 import Feather from 'react-native-vector-icons/Feather';
@@ -46,7 +46,7 @@ class Forgot extends React.Component<Props, State> {
   onSendCodePress = () => {
     const {email} = this.state;
 
-    if (!validator.isEmail(email)) {
+    if (!isEmail(email)) {
       return Alert.alert(
         '',
         'Please enter E-mail which is registered with our services.',
