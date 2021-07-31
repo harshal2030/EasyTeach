@@ -48,9 +48,11 @@ import {mediaUrl, logOutUrl} from '../../shared/utils/urls';
 type Props = {
   token: string | null;
   removeToken: typeof removeToken;
-  classes: Class[];
-  classIsLoading: boolean;
-  classErrored: boolean;
+  classes: {
+    classes: Class[];
+    loading: boolean;
+    errored: boolean;
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
   profile: {
@@ -130,17 +132,17 @@ const DrawerContent = (props: Props): JSX.Element => {
   };
 
   const renderClasses = () => {
-    if (props.classErrored) {
+    if (props.classes.errored) {
       return <Text>Errored</Text>;
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return <Text>Loading...</Text>;
     }
 
     return (
       <FlatList
-        data={props.classes}
+        data={props.classes.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         removeClippedSubviews
@@ -213,7 +215,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
 
           <View style={optionListContainer}>
-            {props.classes.length === 0 ? null : (
+            {props.classes.classes.length === 0 ? null : (
               <>
                 <TouchableOpacity
                   style={optionContainer}
@@ -375,8 +377,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classErrored: state.classHasErrored,
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,

@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    classIsLoading: state.classIsLoading,
+    classIsLoading: state.classes.loading,
     currentClass: state.currentClass,
   };
 };

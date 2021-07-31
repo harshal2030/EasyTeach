@@ -9,12 +9,7 @@ import {UnreadState} from './actions/unreads';
 
 import {tokenReducer, fcmReducer} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
-import {
-  classReducer,
-  classHasErrored,
-  classIsLoading,
-  classes,
-} from './reducers/classReducer';
+import {classReducer, classesReducer} from './reducers/classReducer';
 import {msgsReducer} from './reducers/msgReducer';
 import {quizErrored, quizLoading, quizzes} from './reducers/quizReducer';
 import {questions} from './reducers/questionReducer';
@@ -24,9 +19,11 @@ export interface StoreState {
   token: string | null;
   profile: {name: string; username: string; avatar: string};
   currentClass: Class | null;
-  classes: Class[];
-  classIsLoading: boolean;
-  classHasErrored: boolean;
+  classes: {
+    loading: boolean;
+    errored: boolean;
+    classes: Class[];
+  };
   quizErrored: boolean;
   quizLoading: boolean;
   quizzes: {
@@ -47,9 +44,7 @@ export const reducers = combineReducers<StoreState>({
   token: tokenReducer,
   profile: profileReducer,
   currentClass: classReducer,
-  classHasErrored,
-  classIsLoading,
-  classes,
+  classes: classesReducer,
   quizErrored,
   quizLoading,
   quizzes,

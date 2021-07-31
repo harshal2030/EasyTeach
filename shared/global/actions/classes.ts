@@ -61,7 +61,10 @@ interface classLoadingAction {
 
 interface classFetchedAction {
   type: ActionTypes.classesFetchSuccess;
-  payload: Class[];
+  payload: {
+    classes: Class[];
+    loading: boolean;
+  };
 }
 
 interface addedClassAction {
@@ -114,7 +117,10 @@ const classesLoading = (bool: boolean): classLoadingAction => {
 const classesFetchedSuccess = (classes: Class[]): classFetchedAction => {
   return {
     type: ActionTypes.classesFetchSuccess,
-    payload: classes,
+    payload: {
+      classes,
+      loading: false,
+    },
   };
 };
 
@@ -132,8 +138,8 @@ const fetchClasses = (token: string) => {
         dispatch(registerCurrentClass(classes.data[0]));
       }
 
-      dispatch(classesFetchedSuccess(classes.data));
       dispatch(classesLoading(false));
+      dispatch(classesFetchedSuccess(classes.data));
     } catch (e) {
       dispatch(classesLoading(false));
       dispatch(classesHasErrored(true));

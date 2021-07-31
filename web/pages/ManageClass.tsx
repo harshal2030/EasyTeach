@@ -524,7 +524,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     isOwner,
     profile: state.profile,
-    classes: state.classes,
+    classes: state.classes.classes,
     premiumAllowed: state.currentClass?.planId !== 'free',
     unread: state.unreads.totalUnread,
   };

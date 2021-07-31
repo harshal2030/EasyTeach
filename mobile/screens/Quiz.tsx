@@ -407,8 +407,8 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    classIsLoading: state.classIsLoading,
-    classes: state.classes,
+    classes: state.classes.classes,
+    classIsLoading: state.classes.loading,
   };
 };
 

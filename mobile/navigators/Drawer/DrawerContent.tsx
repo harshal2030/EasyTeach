@@ -52,9 +52,11 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
 type Props = DrawerContentComponentProps & {
   token: string | null;
   removeToken: typeof removeToken;
-  classes: Class[];
-  classIsLoading: boolean;
-  classErrored: boolean;
+  classes: {
+    loading: boolean;
+    errored: boolean;
+    classes: Class[];
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
   navigation: HomeScreenNavigationProp;
@@ -137,17 +139,17 @@ const DrawerContent = (props: Props): JSX.Element => {
   };
 
   const renderClasses = () => {
-    if (props.classErrored) {
+    if (props.classes.errored) {
       return <Text>Errored</Text>;
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return <Text>Loading...</Text>;
     }
 
     return (
       <FlatList
-        data={props.classes}
+        data={props.classes.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         removeClippedSubviews
@@ -222,7 +224,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
 
           <View style={optionListContainer}>
-            {props.classes.length === 0 ? null : (
+            {props.classes.classes.length === 0 ? null : (
               <>
                 <TouchableOpacity
                   style={optionContainer}
@@ -365,8 +367,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classErrored: state.classHasErrored,
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,

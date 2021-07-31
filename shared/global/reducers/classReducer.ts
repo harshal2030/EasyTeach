@@ -13,25 +13,16 @@ import {
   revokeCurrentClassAction,
 } from '../actions/classes';
 
-const classHasErrored = (
-  state: boolean = false,
-  action: classHasErroredAction,
-) => {
-  switch (action.type) {
-    case ActionTypes.classesHasErrored:
-      return action.payload;
-    default:
-      return state;
-  }
+type classState = {
+  loading: boolean;
+  errored: boolean;
+  classes: Class[];
 };
 
-const classIsLoading = (state: boolean = true, action: classLoadingAction) => {
-  switch (action.type) {
-    case ActionTypes.classesLoading:
-      return action.payload;
-    default:
-      return state;
-  }
+const initialState: classState = {
+  loading: true,
+  errored: false,
+  classes: [],
 };
 
 type ClassesAction =
@@ -39,34 +30,72 @@ type ClassesAction =
   | addedClassAction
   | updatedClassAction
   | updateClassOwnerAction
-  | removeClassAction;
+  | removeClassAction
+  | classHasErroredAction
+  | classLoadingAction;
 
-const classes = (state: Class[] = [], action: ClassesAction) => {
+const classesReducer = (
+  state: classState = initialState,
+  action: ClassesAction,
+): classState => {
+  const {loading, errored, classes} = state;
+
   switch (action.type) {
+    case ActionTypes.classesLoading:
+      return {
+        loading: action.payload,
+        errored,
+        classes,
+      };
+    case ActionTypes.classesHasErrored:
+      return {
+        loading,
+        errored: action.payload,
+        classes,
+      };
     case ActionTypes.classesFetchSuccess:
-      return action.payload;
+      return {
+        errored,
+        ...action.payload,
+      };
     case ActionTypes.addClass:
-      return [...state, action.payload];
+      return {
+        loading,
+        errored,
+        classes: [...classes, action.payload],
+      };
     case ActionTypes.updateClass:
-      const temp = [...state];
+      const temp = [...state.classes];
       const classToUpdate = temp.findIndex(
         (cls) => cls.id === action.payload.id,
       );
       if (classToUpdate !== -1) {
         temp[classToUpdate] = action.payload;
       }
-      return temp;
+      return {
+        loading,
+        errored,
+        classes: temp,
+      };
     case ActionTypes.removeClass:
-      return state.filter((cls) => cls.id !== action.payload);
+      return {
+        loading,
+        errored,
+        classes: classes.filter((cls) => cls.id !== action.payload),
+      };
     case ActionTypes.updateClassOwner:
-      const tempClass = [...state];
+      const tempClass = [...state.classes];
       tempClass.forEach((cls) => {
         if (cls.owner.username === action.payload.oldUsername) {
           cls.owner = action.payload.newUser;
         }
       });
 
-      return tempClass;
+      return {
+        loading,
+        errored,
+        classes: tempClass,
+      };
     default:
       return state;
   }
@@ -96,4 +125,4 @@ const classReducer = (
   }
 };
 
-export {classReducer, classHasErrored, classes, classIsLoading};
+export {classReducer, classesReducer};

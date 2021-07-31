@@ -51,9 +51,11 @@ type Props = RouteComponentProps<{classId: string}> & {
     avatar: string;
   };
   currentClass: Class | null;
-  classHasErrored: boolean;
-  classes: Class[];
-  classIsLoading: boolean;
+  classes: {
+    classes: Class[];
+    loading: boolean;
+    errored: boolean;
+  };
   token: string | null;
   fetchMsgs(token: string, classId: string, endReached?: boolean): void;
   addMsg: typeof addMsg;
@@ -84,7 +86,7 @@ class Home extends React.Component<Props, State> {
 
   componentDidMount() {
     const {classId} = this.props.match.params;
-    const {classes} = this.props;
+    const {classes} = this.props.classes;
 
     const classFound = classes.find((cls) => cls.id === classId);
 
@@ -103,7 +105,7 @@ class Home extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     const {classId} = this.props.match.params;
-    const {classes} = this.props;
+    const {classes} = this.props.classes;
 
     const hasClassChanged = prevProps.match.params.classId !== classId;
 
@@ -195,7 +197,7 @@ class Home extends React.Component<Props, State> {
   renderContent = () => {
     const {props} = this;
 
-    if (props.classHasErrored) {
+    if (props.classes.errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text>
@@ -206,7 +208,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator color={commonBlue} animating size="large" />
@@ -214,7 +216,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.classes.length === 0) {
+    if (props.classes.classes.length === 0) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text style={ContainerStyles.padder}>
@@ -337,8 +339,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     profile: state.profile,
     currentClass: state.currentClass,
-    classHasErrored: state.classHasErrored,
-    classIsLoading: state.classIsLoading,
     classes: state.classes,
     token: state.token,
     msgs: state.msgs[state.currentClass?.id || 'test'] || {

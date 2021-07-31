@@ -192,7 +192,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token!,
     currentClass: state.currentClass!,
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 

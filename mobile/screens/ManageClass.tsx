@@ -450,7 +450,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     isOwner,
     profile: state.profile,
-    classes: state.classes,
+    classes: state.classes.classes,
     premiumAllowed,
     unread: state.unreads.totalUnread,
   };

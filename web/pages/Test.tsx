@@ -421,7 +421,7 @@ const mapStateToProps = (state: StoreState) => {
     quizLoading: state.quizLoading,
     quizErrored: state.quizErrored,
     quizzes: state.quizzes,
-    classes: state.classes,
+    classes: state.classes.classes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
     unread: state.unreads.totalUnread,
   };
