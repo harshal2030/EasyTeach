@@ -278,7 +278,7 @@ class CreateTest extends React.Component<Props, State> {
       .then(async (res) => {
         this.setState({APILoading: false});
         if (res.status === 201) {
-          this.props.addQuiz(res.data);
+          this.props.addQuiz(res.data, this.props.match.params.classId);
           this.props.questions.forEach((que) => {
             const form = new FormData();
 
@@ -338,7 +338,7 @@ class CreateTest extends React.Component<Props, State> {
         },
       })
       .then(() => {
-        this.props.removeQuiz(this.quizId!);
+        this.props.removeQuiz(this.quizId!, this.props.match.params.classId);
         this.setState({APILoading: false});
         toast('Test deleted successfully');
         this.props.history.goBack();

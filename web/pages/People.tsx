@@ -20,6 +20,12 @@ import {Avatar, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  PeoplePayload,
+  fetchPeople,
+  removeUser,
+} from '../../shared/global/actions/people';
+
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, greyWithAlpha} from '../../shared/styles/colors';
 import {TextStyles} from '../../shared/styles/styles';
@@ -38,6 +44,9 @@ interface Props {
   registerCurrentClass: typeof registerCurrentClass;
   premiumAllowed: boolean;
   unread: number;
+  people: PeoplePayload;
+  removeUser: typeof removeUser;
+  fetchPeople: (classId: string, offsetChange?: number) => void;
 }
 
 interface peopleProp {
@@ -47,47 +56,23 @@ interface peopleProp {
 }
 
 const People = (props: Props) => {
-  const [people, setPeople] = React.useState<peopleProp[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [alertVisible, setAlert] = React.useState<boolean>(false);
   const [user, setUser] = React.useState<{name: string; username: string}>({
     name: '',
     username: '',
   });
-  const [offset, setOffset] = React.useState(0);
 
-  const fetchPeople = () => {
-    setPeople([]);
-    setLoading(true);
-    axios
-      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
-        headers: {
-          Authorization: `Bearer ${props.token!}`,
-        },
-        params: {
-          offset,
-        },
-        timeout: 20000,
-      })
-      .then((res) => {
-        setLoading(false);
-        setPeople(res.data);
-      })
-      .catch(() => {
-        setLoading(false);
-        toast.error('Unable to show people. Please try again later');
-      });
-  };
+  const {users: people, offset, loading} = props.people;
 
   const onNextPress = () => {
     if (people.length >= 10) {
-      setOffset((prevValue) => prevValue + 10);
+      props.fetchPeople(props.currentClass!.id, -10);
     }
   };
 
   const onPrevPress = () => {
     if (offset !== 0) {
-      setOffset((prevValue) => prevValue - 10);
+      props.fetchPeople(props.currentClass!.id, 10);
     }
   };
 
@@ -107,7 +92,7 @@ const People = (props: Props) => {
     }
 
     if (props.currentClass) {
-      fetchPeople();
+      props.fetchPeople(classFound!.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.currentClass, classId, offset]);
@@ -123,10 +108,7 @@ const People = (props: Props) => {
       .then(() => {
         toast.info(`${user.name} removed successfully from the class`);
 
-        const newPeople = people.filter(
-          (ppl) => ppl.username !== user.username,
-        );
-        setPeople(newPeople);
+        props.removeUser(user.username, props.currentClass!.id);
       })
       .catch(() => toast.error(`Unable to remove ${user.name} at the moment`));
   };
@@ -318,7 +300,17 @@ const mapStateToProps = (state: StoreState) => {
     isOwner,
     premiumAllowed,
     unread: state.unreads.totalUnread,
+    people: state.people[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      offset: 0,
+      users: [],
+    },
   };
 };
 
-export default connect(mapStateToProps, {registerCurrentClass})(People);
+export default connect(mapStateToProps, {
+  registerCurrentClass,
+  fetchPeople,
+  removeUser,
+})(People);

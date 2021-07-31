@@ -18,9 +18,15 @@ import SnackBar from 'react-native-snackbar';
 import {HeaderBadge} from '../../shared/components/common';
 import {Avatar} from '../../shared/components/common';
 
-import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
+import {
+  PeoplePayload,
+  fetchPeople,
+  removeUser,
+} from '../../shared/global/actions/people';
+
+import {DrawerParamList, RootStackParamList} from '../navigators/types';
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, flatRed, greyWithAlpha} from '../../shared/styles/colors';
 import {TextStyles} from '../../shared/styles/styles';
@@ -42,6 +48,9 @@ interface Props {
   isOwner: boolean;
   premiumAllowed: boolean;
   unread: number;
+  people: PeoplePayload;
+  fetchPeople(classId: string, offset?: number): void;
+  removeUser: typeof removeUser;
 }
 
 interface peopleProp {
@@ -51,56 +60,26 @@ interface peopleProp {
 }
 
 const People = (props: Props) => {
-  const [people, setPeople] = React.useState<peopleProp[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [offset, setOffset] = React.useState(0);
-
-  const fetchPeople = () => {
-    setPeople([]);
-    setLoading(true);
-    axios
-      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
-        headers: {
-          Authorization: `Bearer ${props.token!}`,
-        },
-        params: {
-          offset,
-        },
-        timeout: 20000,
-      })
-      .then((res) => {
-        setLoading(false);
-        setPeople(res.data);
-      })
-      .catch(() => {
-        setLoading(false);
-        SnackBar.show({
-          text: 'Unable to show people. Please try again later',
-          backgroundColor: flatRed,
-          duration: SnackBar.LENGTH_SHORT,
-          textColor: '#ffff',
-        });
-      });
-  };
+  const {users: people} = props.people;
 
   const onNextPress = () => {
     if (people.length >= 10) {
-      setOffset((prevValue) => prevValue + 10);
+      props.fetchPeople(props.currentClass!.id, 10);
     }
   };
 
   const onPrevPress = () => {
-    if (offset !== 0) {
-      setOffset((prevValue) => prevValue - 10);
+    if (props.people.offset !== 0) {
+      props.fetchPeople(props.currentClass!.id, -10);
     }
   };
 
   React.useEffect(() => {
     if (props.currentClass) {
-      fetchPeople();
+      props.fetchPeople(props.currentClass.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass, offset]);
+  }, [props.currentClass]);
 
   const removeStudent = (name: string, username: string) => {
     const removeReq = () => {
@@ -116,8 +95,7 @@ const People = (props: Props) => {
             duration: SnackBar.LENGTH_SHORT,
           });
 
-          const newPeople = people.filter((ppl) => ppl.username !== username);
-          setPeople(newPeople);
+          props.removeUser(username, props.currentClass!.id);
         })
         .catch(() =>
           SnackBar.show({
@@ -193,7 +171,7 @@ const People = (props: Props) => {
             </Text>
 
             <Text>
-              Showing {offset} - {offset + 10}
+              Showing {props.people.offset} - {props.people.offset + 10}
             </Text>
           </View>
         )}
@@ -202,7 +180,7 @@ const People = (props: Props) => {
   };
 
   const renderListFooter = () => {
-    if (loading) {
+    if (props.people.loading) {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
     }
 
@@ -211,7 +189,7 @@ const People = (props: Props) => {
         <Button
           title="PREV"
           type="clear"
-          disabled={offset === 0}
+          disabled={props.people.offset === 0}
           onPress={onPrevPress}
         />
         <Button
@@ -317,7 +295,13 @@ const mapStateToProps = (state: StoreState) => {
     isOwner,
     premiumAllowed,
     unread: state.unreads.totalUnread,
+    people: state.people[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      offset: 0,
+      users: [],
+    },
   };
 };
 
-export default connect(mapStateToProps)(People);
+export default connect(mapStateToProps, {fetchPeople, removeUser})(People);

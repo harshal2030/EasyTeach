@@ -27,7 +27,11 @@ import {QuizInfo, ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
-import {QuizRes, fetchQuiz, ObQuizRes} from '../../shared/global/actions/quiz';
+import {
+  fetchQuiz,
+  QuizPayload,
+  QuizRes,
+} from '../../shared/global/actions/quiz';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {
   commonBackground,
@@ -48,9 +52,7 @@ interface Props {
   token: string | null;
   navigation: NavigationProp;
   currentClass: Class | null;
-  quizErrored: boolean;
-  quizLoading: boolean;
-  quizzes: ObQuizRes;
+  quizzes: QuizPayload;
   fetchQuiz(token: string, classId: string, quizType?: string): void;
   isOwner: boolean;
   unread: number;
@@ -236,7 +238,7 @@ class Test extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {quizLoading, quizErrored, quizzes} = this.props;
+    const {loading, errored, quizzes} = this.props.quizzes;
     const data = [
       {
         title: 'Live',
@@ -252,7 +254,7 @@ class Test extends React.Component<Props, State> {
       },
     ];
 
-    if (quizErrored) {
+    if (errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text style={{padding: 10}}>
@@ -262,7 +264,7 @@ class Test extends React.Component<Props, State> {
       );
     }
 
-    if (quizLoading) {
+    if (loading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator animating size="large" color={commonBlue} />
@@ -441,9 +443,15 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    quizLoading: state.quizLoading,
-    quizErrored: state.quizErrored,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      quizzes: {
+        live: [],
+        expired: [],
+        scored: [],
+      },
+    },
     isOwner: state.currentClass!.owner.username === state.profile.username,
     unread: state.unreads.totalUnread,
   };

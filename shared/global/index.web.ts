@@ -3,17 +3,19 @@ import thunk from 'redux-thunk';
 
 import {Class} from './actions/classes';
 import {MsgState} from './actions/msgs';
-import {QuizRes} from './actions/quiz';
+import {QuizState} from './actions/quiz';
 import {Question} from './actions/questions';
 import {UnreadState} from './actions/unreads';
+import {PeopleState} from './actions/people';
 
 import {tokenReducer, fcmReducer} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
 import {classReducer, classesReducer} from './reducers/classReducer';
 import {msgsReducer} from './reducers/msgReducer';
-import {quizErrored, quizLoading, quizzes} from './reducers/quizReducer';
+import {quizzesReducer} from './reducers/quizReducer';
 import {questions} from './reducers/questionReducer';
 import {unreadReducer} from './reducers/unreadReducer';
+import {peopleReducer} from './reducers/peopleReducer';
 
 export interface StoreState {
   token: string | null;
@@ -24,13 +26,7 @@ export interface StoreState {
     errored: boolean;
     classes: Class[];
   };
-  quizErrored: boolean;
-  quizLoading: boolean;
-  quizzes: {
-    live: QuizRes[];
-    expired: QuizRes[];
-    scored: QuizRes[];
-  };
+  quizzes: QuizState;
   fcm: {
     os: string;
     fcmToken: string;
@@ -38,6 +34,7 @@ export interface StoreState {
   msgs: MsgState;
   questions: Question[];
   unreads: UnreadState;
+  people: PeopleState;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -45,13 +42,12 @@ export const reducers = combineReducers<StoreState>({
   profile: profileReducer,
   currentClass: classReducer,
   classes: classesReducer,
-  quizErrored,
-  quizLoading,
-  quizzes,
+  quizzes: quizzesReducer,
   fcm: fcmReducer,
   msgs: msgsReducer,
   questions,
   unreads: unreadReducer,
+  people: peopleReducer,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));
