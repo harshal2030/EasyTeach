@@ -88,6 +88,12 @@ const ImageStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: greyWithAlpha(0.3),
   },
+  classAvatarImage: {
+    height: 60,
+    width: 60,
+    marginTop: 10,
+    backgroundColor: commonGrey,
+  },
 });
 
 export {FormStyles, TextStyles, ContainerStyles, BottomSheetStyle, ImageStyles};

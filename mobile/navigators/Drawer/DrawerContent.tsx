@@ -30,6 +30,7 @@ import {
 } from '../../../shared/global/actions/classes';
 
 import {Avatar} from '../../../shared/components/common';
+import {SMClass} from '../../../shared/components/main';
 
 import {
   commonBackground,
@@ -94,32 +95,15 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <TouchableOpacity
+      <SMClass
         onPress={() => {
           props.registerCurrentClass(item);
           props.navigation.closeDrawer();
-        }}>
-        <FastImage
-          source={{
-            uri: `${mediaUrl}/class/avatar/${item.photo}`,
-          }}
-          style={avatarImageStyle}
-        />
-        {props.unread.data[item.id]?.unread ? (
-          <Badge
-            status="error"
-            value={props.unread.data[item.id]?.unread}
-            badgeStyle={{
-              position: 'absolute',
-              right: -1,
-              top: -4,
-            }}
-          />
-        ) : null}
-        <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
+        }}
+        photo={`${mediaUrl}/class/avatar/${item.photo}`}
+        unread={props.unread.data[item.id]?.unread}
+        name={item.name}
+      />
     );
   };
 
@@ -166,7 +150,6 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarText,
     optionText,
     optionListContainer,
-    avatarImageStyle,
     optionContainer,
   } = styles;
   return (
@@ -298,12 +281,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 5,
-  },
-  avatarImageStyle: {
-    height: 60,
-    width: 60,
-    marginTop: 10,
-    backgroundColor: commonGrey,
   },
   leftContainer: {
     width: 90,

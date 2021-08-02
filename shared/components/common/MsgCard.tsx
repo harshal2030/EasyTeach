@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {View, StyleSheet, Text} from 'react-native';
 import {commonGrey, greyWithAlpha} from '../../styles/colors';
 import {getDateAndMonth} from '../../utils/functions';
@@ -13,7 +13,7 @@ interface Props {
   createdAt: Date;
 }
 
-const MsgCard = (props: Props) => {
+const _MsgCard: React.FC<Props> = (props) => {
   return (
     <View style={styles.parent}>
       <View style={styles.userContainer}>
@@ -31,6 +31,8 @@ const MsgCard = (props: Props) => {
     </View>
   );
 };
+
+const MsgCard = memo(_MsgCard);
 
 const styles = StyleSheet.create({
   parent: {
