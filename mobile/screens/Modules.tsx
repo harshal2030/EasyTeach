@@ -22,6 +22,14 @@ import {HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
+import {
+  fetchModules,
+  ModulePayload,
+  Module as ModuleRes,
+  addModule,
+  updateModule,
+  removeModule,
+} from '../../shared/global/actions/modules';
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {moduleUrl} from '../../shared/utils/urls';
@@ -47,18 +55,14 @@ interface Props {
   isOwner: boolean;
   premiumAllowed: boolean;
   unread: number;
-}
-
-interface ModuleRes {
-  id: string;
-  title: string;
-  classId: string;
+  modules: ModulePayload;
+  fetchModules: (classId: string) => void;
+  addModule: typeof addModule;
+  updateModule: typeof updateModule;
+  removeModule: typeof removeModule;
 }
 
 interface State {
-  loading: boolean;
-  errored: boolean;
-  modules: ModuleRes[];
   dialogVisible: boolean;
   moduleName: string;
   moduleId: string | null;
@@ -69,9 +73,6 @@ class Module extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: true,
-      errored: false,
-      modules: [],
       dialogVisible: false,
       moduleName: '',
       moduleId: null,
@@ -80,7 +81,7 @@ class Module extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.premiumAllowed) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
     }
   }
 
@@ -89,32 +90,16 @@ class Module extends React.Component<Props, State> {
       prevProps.currentClass?.id === this.props.currentClass?.id &&
       this.props.premiumAllowed !== prevProps.premiumAllowed
     ) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
       return;
     }
 
     if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
     }
   }
 
-  fetchModules = async () => {
-    try {
-      this.setState({loading: true});
-      const res = await axios.get<ModuleRes[]>(
-        `${moduleUrl}/${this.props.currentClass?.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      );
-
-      this.setState({loading: false, modules: res.data});
-    } catch (e) {
-      this.setState({loading: false, errored: true});
-    }
-  };
+  fetchModules = () => this.props.fetchModules(this.props.currentClass!.id);
 
   confirmDelete = (id: string) => {
     const deleteModule = () => {
@@ -125,8 +110,8 @@ class Module extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          const temp = this.state.modules.filter((val) => val.id !== id);
-          this.setState({modules: temp, moduleId: null});
+          this.props.removeModule(id, this.props.currentClass!.id);
+          this.setState({moduleId: null});
         })
         .catch(() => {
           SnackBar.show({
@@ -170,8 +155,8 @@ class Module extends React.Component<Props, State> {
       );
 
       this.closeDialog();
+      this.props.addModule(res.data, this.props.currentClass!.id);
       this.setState({
-        modules: [...this.state.modules, res.data],
         moduleName: '',
       });
     } catch (e) {
@@ -194,12 +179,8 @@ class Module extends React.Component<Props, State> {
       );
 
       this.closeDialog();
-      const moduleIndex = this.state.modules.findIndex(
-        (val) => val.id === res.data.id,
-      );
-      const temp = [...this.state.modules];
-      temp[moduleIndex] = res.data;
-      this.setState({moduleId: null, modules: temp, moduleName: ''});
+      this.props.updateModule(res.data, this.props.currentClass!.id);
+      this.setState({moduleId: null, moduleName: ''});
     } catch (e) {
       this.setState({moduleId: null, moduleName: ''});
       SnackBar.show({
@@ -256,7 +237,7 @@ class Module extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {loading, errored, modules} = this.state;
+    const {loading, errored, modules} = this.props.modules;
     const {isOwner, currentClass} = this.props;
 
     let upgradeText = '';
@@ -471,7 +452,17 @@ const mapStateToProps = (state: StoreState) => {
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
     unread: state.unreads.totalUnread,
+    modules: state.modules[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      modules: [],
+    },
   };
 };
 
-export default connect(mapStateToProps)(Module);
+export default connect(mapStateToProps, {
+  fetchModules,
+  removeModule,
+  addModule,
+  updateModule,
+})(Module);

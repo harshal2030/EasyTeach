@@ -25,6 +25,14 @@ import {HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  fetchModules,
+  ModulePayload,
+  Module as ModuleRes,
+  addModule,
+  updateModule,
+  removeModule,
+} from '../../shared/global/actions/modules';
 
 import {moduleUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -46,18 +54,14 @@ interface Props extends RouteComponentProps<{classId: string}> {
   registerCurrentClass: typeof registerCurrentClass;
   onLeftTopPress: () => void;
   unread: number;
-}
-
-interface ModuleRes {
-  id: string;
-  title: string;
-  classId: string;
+  modules: ModulePayload;
+  fetchModules: (classId: string) => void;
+  addModule: typeof addModule;
+  updateModule: typeof updateModule;
+  removeModule: typeof removeModule;
 }
 
 interface State {
-  loading: boolean;
-  errored: boolean;
-  modules: ModuleRes[];
   dialogVisible: boolean;
   moduleName: string;
   moduleId: string | null;
@@ -74,9 +78,6 @@ class Module extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: true,
-      errored: false,
-      modules: [],
       dialogVisible: false,
       moduleName: '',
       moduleId: null,
@@ -103,23 +104,28 @@ class Module extends React.Component<Props, State> {
       }
     }
     if (this.props.premiumAllowed) {
-      this.fetchModules();
+      this.props.fetchModules(classFound!.id);
     }
   }
 
   componentDidUpdate(prevProps: Props) {
+    const {classId} = this.props.match.params;
     if (
       prevProps.currentClass?.id === this.props.currentClass?.id &&
       this.props.premiumAllowed !== prevProps.premiumAllowed
     ) {
-      this.fetchModules();
+      this.props.fetchModules(classId);
       return;
     }
 
     if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchModules();
+      this.props.fetchModules(classId);
     }
   }
+
+  fetchModules = () => {
+    this.props.fetchModules(this.props.match.params.classId);
+  };
 
   Alert = (
     title: string,
@@ -140,24 +146,6 @@ class Module extends React.Component<Props, State> {
     });
   };
 
-  fetchModules = async () => {
-    try {
-      this.setState({loading: true});
-      const res = await axios.get<ModuleRes[]>(
-        `${moduleUrl}/${this.props.currentClass?.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      );
-
-      this.setState({loading: false, modules: res.data});
-    } catch (e) {
-      this.setState({loading: false, errored: true});
-    }
-  };
-
   confirmDelete = (id: string) => {
     const deleteModule = () => {
       this.setState({alertVisible: false});
@@ -168,8 +156,8 @@ class Module extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          const temp = this.state.modules.filter((val) => val.id !== id);
-          this.setState({modules: temp, moduleId: null});
+          this.props.removeModule(id, this.props.match.params.classId);
+          this.setState({moduleId: null});
         })
         .catch(() => {
           toast.error('Unable to delete module. Please try again later');
@@ -209,8 +197,8 @@ class Module extends React.Component<Props, State> {
         },
       );
 
+      this.props.addModule(res.data, this.props.match.params.classId);
       this.setState({
-        modules: [...this.state.modules, res.data],
         moduleName: '',
       });
     } catch (e) {
@@ -234,12 +222,8 @@ class Module extends React.Component<Props, State> {
         },
       );
 
-      const moduleIndex = this.state.modules.findIndex(
-        (val) => val.id === res.data.id,
-      );
-      const temp = [...this.state.modules];
-      temp[moduleIndex] = res.data;
-      this.setState({moduleId: null, modules: temp, moduleName: ''});
+      this.props.updateModule(res.data, this.props.match.params.classId);
+      this.setState({moduleName: ''});
     } catch (e) {
       this.setState({moduleId: null, moduleName: ''});
       toast.error('Unable to update. Please try again later');
@@ -293,7 +277,7 @@ class Module extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {loading, errored, modules} = this.state;
+    const {loading, errored, modules} = this.props.modules;
     const {isOwner, currentClass} = this.props;
 
     let upgradeText = '';
@@ -528,9 +512,20 @@ const mapStateToProps = (state: StoreState) => {
     premiumAllowed: state.currentClass?.planId !== 'free',
     classes: state.classes.classes,
     unread: state.unreads.totalUnread,
+    modules: state.modules[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      modules: [],
+    },
   };
 };
 
 export default withRouter(
-  connect(mapStateToProps, {registerCurrentClass})(Module),
+  connect(mapStateToProps, {
+    registerCurrentClass,
+    fetchModules,
+    removeModule,
+    addModule,
+    updateModule,
+  })(Module),
 );
