@@ -41,7 +41,7 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  fetchQuiz(token: string, classId: string): void;
+  fetchQuiz(token: string, classId: string, updating?: boolean): void;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -192,7 +192,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.fetchQuiz(token!, currentClass!.id);
+          this.props.fetchQuiz(token!, currentClass!.id, true);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }
@@ -281,7 +281,7 @@ class CreateTest extends React.Component<Props, State> {
       .then((res) => {
         this.setState({APILoading: false});
         if (res.status === 201) {
-          this.props.addQuiz(res.data);
+          this.props.addQuiz(res.data, this.props.currentClass!.id);
           return this.props.navigation.goBack();
         }
         throw new Error();
@@ -316,7 +316,10 @@ class CreateTest extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          this.props.removeQuiz(route.params.quizId!);
+          this.props.removeQuiz(
+            route.params.quizId!,
+            this.props.currentClass!.id,
+          );
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         })

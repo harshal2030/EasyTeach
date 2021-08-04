@@ -41,7 +41,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   token: string | null;
   currentClass: Class | null;
   addQuiz: typeof addQuiz;
-  fetchQuiz(token: string, classId: string): void;
+  fetchQuiz(token: string, classId: string, updating: boolean): void;
   removeQuiz: typeof removeQuiz;
   classes: Class[];
   registerCurrentClass: typeof registerCurrentClass;
@@ -207,7 +207,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.fetchQuiz(token!, currentClass!.id);
+          this.props.fetchQuiz(token!, currentClass!.id, true);
           this.setState({APILoading: false});
           this.props.history.goBack();
         }

@@ -131,10 +131,14 @@ const quizFetched = (quiz: ObQuizRes, classId: string): quizFetchedAction => {
   };
 };
 
-const fetchQuiz = (token: string, classId: string) => {
+const fetchQuiz = (
+  token: string,
+  classId: string,
+  updating: boolean = false,
+) => {
   return async (dispatch: Dispatch, getState: () => StoreState) => {
     const state = getState();
-    if (state.quizzes[classId]) {
+    if (state.quizzes[classId] && !updating) {
       return;
     }
     try {
