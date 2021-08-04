@@ -27,10 +27,7 @@ import {TouchableIcon} from '../components/TouchableIcon';
 import {Video} from '../components/Video';
 
 import {StoreState} from '../../shared/global';
-import {
-  Class,
-  registerCurrentClass,
-} from '../../shared/global/actions/classes.web';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 
 import {
   commonBlue,

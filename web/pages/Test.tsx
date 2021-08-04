@@ -21,10 +21,7 @@ import {Card, HeaderBadge} from '../../shared/components/common';
 import {QuizInfo} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
-import {
-  Class,
-  registerCurrentClass,
-} from '../../shared/global/actions/classes.web';
+import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
 import {
   QuizRes,
   fetchQuiz,

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  Image as FastImage,
   ImageBackground,
 } from 'react-native';
 import {useRouteMatch, useHistory} from 'react-router-dom';
@@ -17,6 +16,8 @@ import {connect} from 'react-redux';
 import axios from 'axios';
 import {InlineIcon} from '@iconify/react';
 import ModuleIcon from '@iconify-icons/ic/view-module';
+
+import {SMClass} from '../../shared/components/main';
 
 import LogOut from '../../shared/images/log-out.svg';
 import Plus from '../../shared/images/plus-36.svg';
@@ -93,32 +94,44 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <TouchableOpacity
+      <SMClass
         onPress={() => {
           props.registerCurrentClass(item);
           props.onOptionPress();
           history.push(`${url}/home/${item.id}`);
-        }}>
-        <FastImage
-          source={{
-            uri: `${mediaUrl}/class/avatar/${item.photo}`,
-          }}
-          style={avatarImageStyle}
-        />
-        {props.unread.data[item.id]?.unread ? (
-          <Badge
-            status="error"
-            value={props.unread.data[item.id]?.unread}
-            badgeStyle={{
-              position: 'absolute',
-              right: -1,
-              top: -4,
-            }}
-          />
-        ) : null}
-        <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
-      </TouchableOpacity>
+        }}
+        photo={`${mediaUrl}/class/avatar/${item.photo}`}
+        unread={props.unread.data[item.id]?.unread}
+        name={item.name}
+      />
     );
+    // return (
+    //   <TouchableOpacity
+    //     onPress={() => {
+    //       props.registerCurrentClass(item);
+    //       props.onOptionPress();
+    //       history.push(`${url}/home/${item.id}`);
+    //     }}>
+    //     <FastImage
+    //       source={{
+    //         uri: `${mediaUrl}/class/avatar/${item.photo}`,
+    //       }}
+    //       style={avatarImageStyle}
+    //     />
+    //     {props.unread.data[item.id]?.unread ? (
+    //       <Badge
+    //         status="error"
+    //         value={props.unread.data[item.id]?.unread}
+    //         badgeStyle={{
+    //           position: 'absolute',
+    //           right: -1,
+    //           top: -4,
+    //         }}
+    //       />
+    //     ) : null}
+    //     <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
+    //   </TouchableOpacity>
+    // );
   };
 
   const renderListFooter = () => {
@@ -160,7 +173,6 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarText,
     optionText,
     optionListContainer,
-    avatarImageStyle,
     optionContainer,
   } = styles;
   return (
@@ -307,12 +319,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 5,
     marginBottom: 5,
-  },
-  avatarImageStyle: {
-    height: 70,
-    width: 70,
-    marginTop: 10,
-    backgroundColor: commonGrey,
   },
   leftContainer: {
     width: 100,
