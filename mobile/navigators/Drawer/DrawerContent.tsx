@@ -184,11 +184,11 @@ const DrawerContent = (props: Props): JSX.Element => {
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
                 : 'https://api.easyetach.inddex.co/noimage',
             }}
-            style={mainImage}>
-            <Text style={classText}>
-              {currentClass ? currentClass.name : 'Current Class appears here'}
-            </Text>
-          </FastImage>
+            style={mainImage}
+          />
+          <Text style={classText}>
+            {currentClass ? currentClass.name : 'Current Class appears here'}
+          </Text>
 
           <View style={avatarContainer}>
             <Avatar
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     padding: 5,
-    backgroundColor: 'rgba(237, 240, 242, 0.8)',
+    backgroundColor: greyWithAlpha(0.4),
   },
   mainImage: {
     height: 200,

@@ -167,7 +167,7 @@ const People = (props: Props) => {
         {people.length !== 0 && (
           <View style={styles.studentTextContainer}>
             <Text h4 style={styles.titleStyle}>
-              Students
+              People
             </Text>
 
             <Text>

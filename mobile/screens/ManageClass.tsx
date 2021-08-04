@@ -201,7 +201,9 @@ class ManageClass extends React.Component<Props, State> {
       }),
     );
 
-    if (photo.uri !== 'none') {
+    if (
+      photo.uri !== `${mediaUrl}/class/avatar/${this.props.currentClass?.photo}`
+    ) {
       reqBody.append('classPhoto', {
         // @ts-ignore
         name: 'photo.jpeg',
@@ -212,8 +214,6 @@ class ManageClass extends React.Component<Props, State> {
             : photo.uri.replace('file://', ''),
       });
     }
-
-    console.log(`${classUrl}/${this.props.currentClass!.id}`);
 
     axios
       .put<Class>(`${classUrl}/${this.props.currentClass!.id}`, reqBody, {
