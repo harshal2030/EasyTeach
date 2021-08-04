@@ -193,7 +193,6 @@ class Files extends React.Component<Props, State> {
     }
 
     const path = this.state.file!.uri.replace('file://', '');
-    console.log(path);
 
     Upload.startUpload({
       url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,

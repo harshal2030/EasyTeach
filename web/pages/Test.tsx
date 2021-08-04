@@ -21,7 +21,10 @@ import {Card, HeaderBadge} from '../../shared/components/common';
 import {QuizInfo} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
-import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  Class,
+  registerCurrentClass,
+} from '../../shared/global/actions/classes.web';
 import {
   QuizRes,
   fetchQuiz,
@@ -419,7 +422,6 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state: StoreState) => {
-  console.log(state.quizzes[state.currentClass!.id]);
   return {
     token: state.token,
     currentClass: state.currentClass,

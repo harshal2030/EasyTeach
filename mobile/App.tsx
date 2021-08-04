@@ -113,7 +113,7 @@ const App: React.FC<Props> = (props) => {
           );
         }
 
-        props.fetchClasses(token);
+        props.fetchClasses(token, MMKV);
         Analytics.setUserId(res.data.user.username);
         props.registerProfile(res.data.user);
       } catch (e) {

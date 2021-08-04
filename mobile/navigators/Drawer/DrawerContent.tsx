@@ -76,6 +76,10 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const logOut = async () => {
     try {
+      MMKV.removeItem('token');
+      props.removeToken();
+      props.removeCurrentClass();
+
       await axios.post(
         logOutUrl,
         {},
@@ -85,9 +89,6 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      MMKV.removeItem('token');
-      props.removeToken();
-      props.removeCurrentClass();
     } catch (e) {
       Alert.alert('Error', 'Unable to logout please try again later');
     }

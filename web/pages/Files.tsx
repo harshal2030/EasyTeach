@@ -27,7 +27,10 @@ import {TouchableIcon} from '../components/TouchableIcon';
 import {Video} from '../components/Video';
 
 import {StoreState} from '../../shared/global';
-import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  Class,
+  registerCurrentClass,
+} from '../../shared/global/actions/classes.web';
 
 import {
   commonBlue,
@@ -147,7 +150,6 @@ class Files extends React.Component<Props, State> {
 
       this.setState({files: res.data, loading: false});
     } catch (e) {
-      console.log(e);
       this.setState({errored: true, loading: false});
     }
   };
@@ -241,7 +243,6 @@ class Files extends React.Component<Props, State> {
   onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      console.log(file.name);
       if (!(videoExtPattern.test(file.name) || pdfExtPattern.test(file.name))) {
         toast.error('File format is not supported');
         return;

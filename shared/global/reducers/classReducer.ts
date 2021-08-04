@@ -55,8 +55,9 @@ const classesReducer = (
       };
     case ActionTypes.classesFetchSuccess:
       return {
+        loading: false,
         errored,
-        ...action.payload,
+        classes: action.payload.classes,
       };
     case ActionTypes.addClass:
       return {

@@ -32,7 +32,7 @@ const _MsgCard: React.FC<Props> = (props) => {
   );
 };
 
-const MsgCard = memo(_MsgCard);
+const MsgCard = memo(_MsgCard, () => false);
 
 const styles = StyleSheet.create({
   parent: {

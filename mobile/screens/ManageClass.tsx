@@ -232,7 +232,6 @@ class ManageClass extends React.Component<Props, State> {
         this.props.navigation.goBack();
       })
       .catch((e) => {
-        console.log(JSON.stringify(e));
         this.setState({loading: false});
         if (e.response) {
           if (e.response.status === 400) {
