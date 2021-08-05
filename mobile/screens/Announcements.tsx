@@ -9,12 +9,13 @@ import {
 } from 'react-native';
 import {Header, Button, Input, Icon} from 'react-native-elements';
 import {connect} from 'react-redux';
-import SnackBar from 'react-native-snackbar';
+import SnackBar, {SnackBarOptions} from 'react-native-snackbar';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Share from 'react-native-share';
 import * as Analytics from 'expo-firebase-analytics';
+import RBSheet from 'react-native-raw-bottom-sheet';
 
 import Megaphone from '../../shared/images/Megaphone.svg';
 import MegaText from '../../shared/images/announcement.svg';
@@ -30,6 +31,7 @@ import {
   MsgPayload,
   addMsg,
   Msg,
+  removeMsg,
 } from '../../shared/global/actions/msgs';
 import {addUnread} from '../../shared/global/actions/unreads';
 
@@ -48,6 +50,13 @@ socket.on('message', (data: {type: string; payload: WSMsg}) => {
   store.dispatch(addUnread(data.payload.classId));
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
+
+socket.on(
+  'message:delete',
+  (data: {type: string; payload: {classId: string; msgId: string}}) => {
+    store.dispatch(removeMsg(data.payload.msgId, data.payload.classId));
+  },
+);
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Home'>,
@@ -78,18 +87,28 @@ type Props = {
   isOwner: boolean;
   navigation: NavigationProp;
   unread: number;
+  removeMsg: typeof removeMsg;
 };
 
 interface State {
   message: string;
+  msgDelete: {
+    author: string;
+    msgId: string;
+  };
 }
 
 class Home extends React.Component<Props, State> {
+  sheet: RBSheet | null = null;
   constructor(props: Props) {
     super(props);
 
     this.state = {
       message: '',
+      msgDelete: {
+        author: '',
+        msgId: '',
+      },
     };
   }
 
@@ -102,11 +121,9 @@ class Home extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     const {currentClass} = this.props;
 
-    const prevClassId = prevProps.currentClass
-      ? prevProps.currentClass.id
-      : null;
+    const prevClassId = prevProps.currentClass?.id;
 
-    const currentClassId = currentClass ? currentClass.id : null;
+    const currentClassId = currentClass?.id;
     if (currentClass) {
       if (currentClassId !== prevClassId) {
         this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
@@ -179,14 +196,67 @@ class Home extends React.Component<Props, State> {
     }
   };
 
+  showSnackBar = (opts: SnackBarOptions) => {
+    setTimeout(() => {
+      SnackBar.show(opts);
+    }, 500);
+  };
+
+  removeMessage = async () => {
+    const {msgId, author} = this.state.msgDelete;
+    this.sheet!.close();
+
+    if (!this.props.isOwner && author !== this.props.profile.username) {
+      this.showSnackBar({
+        text: 'You cannot delete this message',
+        backgroundColor: flatRed,
+        textColor: '#fff',
+        duration: SnackBar.LENGTH_LONG,
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.delete<string>(
+        `${msgUrl}/${this.props.currentClass!.id}/${msgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+
+      this.props.removeMsg(res.data, this.props.currentClass!.id);
+
+      this.showSnackBar({
+        text: 'Message deleted',
+        duration: SnackBar.LENGTH_LONG,
+      });
+    } catch (e) {
+      this.showSnackBar({
+        text: 'Unable to delete message. Please try again later',
+        backgroundColor: flatRed,
+        textColor: '#ffff',
+        duration: SnackBar.LENGTH_LONG,
+      });
+    }
+  };
+
+  setDeleteMsg = (msgId: string, author: string) => {
+    this.sheet!.open();
+    this.setState({msgDelete: {msgId, author}});
+  };
+
   renderListItem = ({item}: {item: Msg}) => {
     return (
       <MsgCard
+        msgId={item.id}
         avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
         name={item.user.name}
         username={item.user.username}
         message={item.message}
         createdAt={new Date(item.createdAt)}
+        onOptionPress={this.setDeleteMsg}
       />
     );
   };
@@ -349,6 +419,28 @@ class Home extends React.Component<Props, State> {
             </View>
           )}
         </View>
+
+        <RBSheet
+          height={80}
+          ref={(ref) => (this.sheet = ref)}
+          closeOnPressMask
+          closeOnDragDown
+          customStyles={{
+            container: {
+              borderTopWidth: 1,
+              borderTopLeftRadius: 10,
+              borderTopRightRadius: 10,
+              borderColor: 'transparent',
+            },
+          }}>
+          <Button
+            title="Delete"
+            type="clear"
+            onPress={this.removeMessage}
+            titleStyle={{color: flatRed, fontSize: 20}}
+            icon={{name: 'delete', color: flatRed}}
+          />
+        </RBSheet>
       </View>
     );
   }
@@ -379,4 +471,5 @@ export default connect(mapStateToProps, {
   fetchMsgs,
   addMsg,
   registerCurrentClass,
+  removeMsg,
 })(Home);

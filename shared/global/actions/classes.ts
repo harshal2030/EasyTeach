@@ -151,11 +151,13 @@ const fetchClasses = (token: string, storage?: MMKVStorage.API) => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      dispatch(classesFetchedSuccess(classes.data));
+
       if (classes.data.length !== 0 && !currentClass) {
         dispatch(registerCurrentClass(classes.data[0]));
       }
 
-      dispatch(classesFetchedSuccess(classes.data));
       if (storage) {
         storage.setArray('classes', classes.data);
       }

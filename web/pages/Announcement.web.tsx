@@ -22,7 +22,12 @@ import {MsgCard} from '../../shared/components/common';
 
 import {StoreState, store} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
-import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
+import {
+  fetchMsgs,
+  Msg,
+  addMsg,
+  removeMsg,
+} from '../../shared/global/actions/msgs';
 import {addUnread} from '../../shared/global/actions/unreads';
 
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -69,6 +74,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   isOwner: boolean;
   onLeftTopPress: () => void;
   unread: number;
+  removeMsg: typeof removeMsg;
 };
 
 interface State {
@@ -156,14 +162,39 @@ class Home extends React.Component<Props, State> {
       );
   };
 
+  removeMessage = async (msgId: string, author: string) => {
+    if (!this.props.isOwner && author !== this.props.profile.username) {
+      toast.error('You cannot delete this message');
+      return;
+    }
+
+    try {
+      const res = await axios.delete<string>(
+        `${msgUrl}/${this.props.currentClass!.id}/${msgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+
+      this.props.removeMsg(res.data, this.props.currentClass!.id);
+      toast.info('Message deleted');
+    } catch (e) {
+      toast.error('Unable to delete message. Please try again later');
+    }
+  };
+
   renderListItem = ({item}: {item: Msg}) => {
     return (
       <MsgCard
         avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
         name={item.user.name}
         username={item.user.username}
+        msgId={item.id}
         message={item.message}
         createdAt={new Date(item.createdAt)}
+        onOptionPress={this.removeMessage}
       />
     );
   };
@@ -356,6 +387,7 @@ export default withRouter(
   connect(mapStateToProps, {
     fetchMsgs,
     addMsg,
+    removeMsg,
     registerCurrentClass,
   })(Home),
 );

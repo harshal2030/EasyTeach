@@ -1,10 +1,14 @@
-import React, {memo} from 'react';
-import {View, StyleSheet, Text, TouchableNativeFeedback} from 'react-native';
-import {Button} from 'react-native-elements';
-import {commonGrey, greyWithAlpha} from '../../styles/colors';
-import {getDateAndMonth} from '../../utils/functions';
+import React, {memo, useRef} from 'react';
+import {View, StyleSheet, Text} from 'react-native';
+import {Button, Tooltip} from 'react-native-elements';
+import dotIcon from '@iconify-icons/mdi/dots-vertical';
+import deleteIcon from '@iconify-icons/ic/delete';
 
+import {TouchableIcon} from '../../../web/components';
 import {Avatar} from './Avatar';
+
+import {commonGrey, flatRed, greyWithAlpha} from '../../styles/colors';
+import {getDateAndMonth} from '../../utils/functions';
 
 interface Props {
   message: string;
@@ -17,6 +21,8 @@ interface Props {
 }
 
 const _MsgCard: React.FC<Props> = (props) => {
+  const tooltipRef = useRef(null);
+
   return (
     <View style={styles.parent}>
       <View style={styles.topContainer}>
@@ -31,14 +37,26 @@ const _MsgCard: React.FC<Props> = (props) => {
           </View>
         </View>
 
-        <Button
-          icon={{name: 'dots-vertical', type: 'material-community'}}
-          type="clear"
-          onPress={() => props.onOptionPress(props.msgId, props.username)}
-          containerStyle={{padding: 2}}
-          buttonStyle={{padding: 2}}
-          background={TouchableNativeFeedback.Ripple(greyWithAlpha(0.3), true)}
-        />
+        <Tooltip
+          // @ts-ignore
+          ref={tooltipRef}
+          popover={
+            <Button
+              title="Delete"
+              titleStyle={{color: flatRed}}
+              icon={<TouchableIcon icon={deleteIcon} color={flatRed} />}
+              type="clear"
+              onPress={() => {
+                // @ts-ignore
+                tooltipRef.current.toggleTooltip();
+                props.onOptionPress(props.msgId, props.username);
+              }}
+            />
+          }
+          backgroundColor={greyWithAlpha(0.5)}
+          withOverlay={false}>
+          <TouchableIcon icon={dotIcon} color="#000" size={24} />
+        </Tooltip>
       </View>
 
       <Text style={styles.msgContainer}>{props.message}</Text>
