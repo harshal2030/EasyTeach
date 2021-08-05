@@ -45,6 +45,13 @@ socket.on('message', (data: {type: string; payload: WSMsg}) => {
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
+socket.on(
+  'message:delete',
+  (data: {type: string; payload: {classId: string; msgId: string}}) => {
+    store.dispatch(removeMsg(data.payload.msgId, data.payload.classId));
+  },
+);
+
 type WSMsg = Msg & {
   classId: string;
 };
