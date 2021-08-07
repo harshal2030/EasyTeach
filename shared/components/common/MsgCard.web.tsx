@@ -1,14 +1,16 @@
 import React, {memo, useRef} from 'react';
-import {View, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text, Linking} from 'react-native';
 import {Button, Tooltip} from 'react-native-elements';
 import dotIcon from '@iconify-icons/mdi/dots-vertical';
 import deleteIcon from '@iconify-icons/ic/delete';
+import ParsedText from 'react-native-parsed-text';
 
 import {TouchableIcon} from '../../../web/components';
 import {Avatar} from './Avatar';
 
 import {commonGrey, flatRed, greyWithAlpha} from '../../styles/colors';
 import {getDateAndMonth} from '../../utils/functions';
+import {TextStyles} from '../../styles/styles';
 
 interface Props {
   message: string;
@@ -22,6 +24,12 @@ interface Props {
 
 const _MsgCard: React.FC<Props> = (props) => {
   const tooltipRef = useRef(null);
+
+  const onUrlPress = (url: string) => {
+    Linking.openURL(url)
+      .then(() => null)
+      .catch(() => null);
+  };
 
   return (
     <View style={styles.parent}>
@@ -59,7 +67,18 @@ const _MsgCard: React.FC<Props> = (props) => {
         </Tooltip>
       </View>
 
-      <Text style={styles.msgContainer}>{props.message}</Text>
+      <View style={styles.msgContainer}>
+        <ParsedText
+          parse={[
+            {
+              type: 'url',
+              style: [TextStyles.link, {padding: 0}],
+              onPress: onUrlPress,
+            },
+          ]}>
+          {props.message}
+        </ParsedText>
+      </View>
     </View>
   );
 };

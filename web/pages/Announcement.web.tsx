@@ -341,6 +341,7 @@ class Home extends React.Component<Props, State> {
               value={this.state.message}
               errorStyle={{height: 0}}
               returnKeyType="send"
+              multiline
               onSubmitEditing={this.postMessage}
               onChangeText={(message) => this.setState({message})}
               rightIcon={

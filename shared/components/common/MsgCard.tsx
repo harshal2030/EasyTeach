@@ -1,6 +1,15 @@
 import React, {memo} from 'react';
-import {View, StyleSheet, Text, TouchableNativeFeedback} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableNativeFeedback,
+  Linking,
+} from 'react-native';
 import {Button} from 'react-native-elements';
+import ParsedText from 'react-native-parsed-text';
+
+import {TextStyles} from '../../styles/styles';
 import {commonGrey, greyWithAlpha} from '../../styles/colors';
 import {getDateAndMonth} from '../../utils/functions';
 
@@ -17,6 +26,12 @@ interface Props {
 }
 
 const _MsgCard: React.FC<Props> = (props) => {
+  const onUrlPress = (url: string) => {
+    Linking.openURL(url)
+      .then(() => null)
+      .catch(() => null);
+  };
+
   return (
     <View style={styles.parent}>
       <View style={styles.topContainer}>
@@ -41,7 +56,17 @@ const _MsgCard: React.FC<Props> = (props) => {
         />
       </View>
 
-      <Text style={styles.msgContainer}>{props.message}</Text>
+      <ParsedText
+        parse={[
+          {
+            type: 'url',
+            style: [TextStyles.link, {padding: 0}],
+            onPress: onUrlPress,
+          },
+        ]}
+        style={styles.msgContainer}>
+        {props.message}
+      </ParsedText>
     </View>
   );
 };

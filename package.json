@@ -54,6 +54,7 @@
     "react-native-mmkv-storage": "^0.5.9",
     "react-native-modal": "^11.10.0",
     "react-native-orientation-locker": "^1.2.0",
+    "react-native-parsed-text": "^0.0.22",
     "react-native-photo-view-ex": "git+https://github.com/harshal2030/react-native-photo-view-ex.git",
     "react-native-push-notification": "^7.3.1",
     "react-native-raw-bottom-sheet": "^2.2.0",
