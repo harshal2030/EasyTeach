@@ -64,14 +64,14 @@ const People = (props: Props) => {
 
   const {users: people, offset, loading} = props.people;
 
-  const onNextPress = () => {
-    if (people.length >= 10) {
+  const onPrevPress = () => {
+    if (offset !== 0) {
       props.fetchPeople(props.currentClass!.id, -10);
     }
   };
 
-  const onPrevPress = () => {
-    if (offset !== 0) {
+  const onNextPress = () => {
+    if (people.length >= 10) {
       props.fetchPeople(props.currentClass!.id, 10);
     }
   };
@@ -95,7 +95,7 @@ const People = (props: Props) => {
       props.fetchPeople(classFound!.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass, classId, offset]);
+  }, [props.currentClass, classId]);
 
   const removeStudent = () => {
     setAlert(false);

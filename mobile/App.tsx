@@ -10,7 +10,7 @@ import {
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
-import {MMKV} from './MMKV';
+import {MMKV, dataStore} from './MMKV';
 import * as Update from 'expo-updates';
 import Config from 'react-native-config';
 
@@ -113,7 +113,7 @@ const App: React.FC<Props> = (props) => {
           );
         }
 
-        props.fetchClasses(token, MMKV);
+        props.fetchClasses(token, dataStore);
         Analytics.setUserId(res.data.user.username);
         props.registerProfile(res.data.user);
       } catch (e) {

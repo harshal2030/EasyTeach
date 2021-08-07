@@ -181,7 +181,10 @@ const Home = () => {
         </View>
 
         <View style={{width: 200, marginVertical: 10}}>
-          <a href="" style={{textDecoration: 'none'}}>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.hcodes.easyteach"
+            target="_blank"
+            style={{textDecoration: 'none'}}>
             <Image
               source={require('../../shared/images/google-play-badge.png')}
               style={{height: 80, width: 200}}
