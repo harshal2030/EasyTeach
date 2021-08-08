@@ -79,7 +79,7 @@ type Props = {
   registerFCM: typeof registerFCM;
   fetchClasses: Function;
   classIsLoading: boolean;
-  currentClass: Class | null;
+  classes: Class[];
 };
 
 interface State {
@@ -168,10 +168,10 @@ class App extends React.Component<Props, State> {
   };
 
   handleRedirect = () => {
-    return !this.props.currentClass ? (
+    return this.props.classes.length === 0 ? (
       <Redirect to="/classes/home" />
     ) : (
-      <Redirect to={`/classes/home/${this.props.currentClass.id}`} />
+      <Redirect to={`/classes/home/${this.props.classes[0].id}`} />
     );
   };
 
@@ -288,7 +288,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     classIsLoading: state.classes.loading,
-    currentClass: state.currentClass,
+    classes: state.classes.classes,
   };
 };
 

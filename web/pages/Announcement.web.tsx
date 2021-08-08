@@ -102,6 +102,7 @@ class Home extends React.Component<Props, State> {
     const {classes} = this.props.classes;
 
     const classFound = classes.find((cls) => cls.id === classId);
+    console.log(classFound, this.props.classes);
 
     if (classFound) {
       this.props.registerCurrentClass(classFound);

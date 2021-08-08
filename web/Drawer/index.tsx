@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  ImageBackground,
+  Image,
 } from 'react-native';
 import {useRouteMatch, useHistory} from 'react-router-dom';
 import {Button, Badge} from 'react-native-elements';
@@ -105,33 +105,6 @@ const DrawerContent = (props: Props): JSX.Element => {
         name={item.name}
       />
     );
-    // return (
-    //   <TouchableOpacity
-    //     onPress={() => {
-    //       props.registerCurrentClass(item);
-    //       props.onOptionPress();
-    //       history.push(`${url}/home/${item.id}`);
-    //     }}>
-    //     <FastImage
-    //       source={{
-    //         uri: `${mediaUrl}/class/avatar/${item.photo}`,
-    //       }}
-    //       style={avatarImageStyle}
-    //     />
-    //     {props.unread.data[item.id]?.unread ? (
-    //       <Badge
-    //         status="error"
-    //         value={props.unread.data[item.id]?.unread}
-    //         badgeStyle={{
-    //           position: 'absolute',
-    //           right: -1,
-    //           top: -4,
-    //         }}
-    //       />
-    //     ) : null}
-    //     <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
-    //   </TouchableOpacity>
-    // );
   };
 
   const renderListFooter = () => {
@@ -198,17 +171,17 @@ const DrawerContent = (props: Props): JSX.Element => {
       </View>
       <View style={styles.rightContainer}>
         <ScrollView>
-          <ImageBackground
+          <Image
             source={{
               uri: currentClass
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
                 : 'https://easyteach.harshall.codes/noimage',
             }}
-            style={mainImage}>
-            <Text style={classText}>
-              {currentClass ? currentClass.name : 'Current Class appears here'}
-            </Text>
-          </ImageBackground>
+            style={mainImage}
+          />
+          <Text style={classText}>
+            {currentClass ? currentClass.name : 'Current Class appears here'}
+          </Text>
 
           <View style={avatarContainer}>
             <Avatar
@@ -335,7 +308,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     padding: 5,
-    backgroundColor: 'rgba(237, 240, 242, 0.8)',
+    backgroundColor: greyWithAlpha(0.3),
   },
   mainImage: {
     height: 200,
