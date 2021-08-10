@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import axios from 'axios';
 import {
   View,
@@ -6,11 +6,12 @@ import {
   ActivityIndicator,
   FlatList,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {Header, Button, Input, Icon} from 'react-native-elements';
 import {connect} from 'react-redux';
 import SnackBar, {SnackBarOptions} from 'react-native-snackbar';
-import {CompositeNavigationProp} from '@react-navigation/native';
+import {CompositeNavigationProp, useLinkTo} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {StackNavigationProp} from '@react-navigation/stack';
 import Share from 'react-native-share';
@@ -34,6 +35,7 @@ import {
   removeMsg,
 } from '../../shared/global/actions/msgs';
 import {addUnread} from '../../shared/global/actions/unreads';
+import {redirected} from '../../shared/global/actions/token';
 
 import {ContainerStyles} from '../../shared/styles/styles';
 import {
@@ -87,7 +89,9 @@ type Props = {
   isOwner: boolean;
   navigation: NavigationProp;
   unread: number;
+  linkRedirected: boolean;
   removeMsg: typeof removeMsg;
+  redirected: typeof redirected;
 };
 
 interface State {
@@ -98,47 +102,91 @@ interface State {
   };
 }
 
-class Home extends React.Component<Props, State> {
-  sheet: RBSheet | null = null;
-  constructor(props: Props) {
-    super(props);
+const Home: React.FC<Props> = (props) => {
+  const [message, setMessage] = useState<string>('');
+  const [msgToDelete, setMsgToDelete] = useState<{
+    author: string;
+    msgId: string;
+  }>({author: '', msgId: ''});
+  const linkTo = useLinkTo();
 
-    this.state = {
-      message: '',
-      msgDelete: {
-        author: '',
-        msgId: '',
-      },
-    };
-  }
+  const sheet = useRef<RBSheet | null>(null);
 
-  componentDidMount() {
-    if (this.props.currentClass) {
-      this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
+  const handleRedirect = () => {
+    if (!props.linkRedirected) {
+      props.redirected();
+      Linking.getInitialURL()
+        .then((url) => {
+          if (url) {
+            linkTo(url.replace('https://easyteach.inddex.co', ''));
+          }
+        })
+        .catch(() => null);
     }
-  }
+  };
 
-  componentDidUpdate(prevProps: Props) {
-    const {currentClass} = this.props;
-
-    const prevClassId = prevProps.currentClass?.id;
-
-    const currentClassId = currentClass?.id;
-    if (currentClass) {
-      if (currentClassId !== prevClassId) {
-        this.props.fetchMsgs(this.props.token!, this.props.currentClass!.id);
-      }
+  useEffect(() => {
+    handleRedirect();
+    if (props.currentClass) {
+      props.fetchMsgs(props.token!, props.currentClass!.id);
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.currentClass?.id]);
 
-  postMessage = async () => {
-    if (this.state.message.trim().length === 0) {
+  const showSnackBar = (opts: SnackBarOptions) => {
+    setTimeout(() => {
+      SnackBar.show(opts);
+    }, 500);
+  };
+
+  const removeMessage = async () => {
+    const {msgId, author} = msgToDelete;
+    sheet.current!.close();
+
+    if (!props.isOwner && author !== props.profile.username) {
+      showSnackBar({
+        text: 'You cannot delete this message',
+        backgroundColor: flatRed,
+        textColor: '#fff',
+        duration: SnackBar.LENGTH_LONG,
+      });
+      return;
+    }
+
+    try {
+      const res = await axios.delete<string>(
+        `${msgUrl}/${props.currentClass!.id}/${msgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${props.token}`,
+          },
+        },
+      );
+
+      props.removeMsg(res.data, props.currentClass!.id);
+
+      showSnackBar({
+        text: 'Message deleted',
+        duration: SnackBar.LENGTH_LONG,
+      });
+    } catch (e) {
+      showSnackBar({
+        text: 'Unable to delete message. Please try again later',
+        backgroundColor: flatRed,
+        textColor: '#ffff',
+        duration: SnackBar.LENGTH_LONG,
+      });
+    }
+  };
+
+  const postMessage = async () => {
+    if (message.trim().length === 0) {
       return;
     }
 
     try {
       await Analytics.logEvent('send_message', {
-        username: this.props.profile.username,
+        username: props.profile.username,
       });
     } catch (e) {
       // do nothing
@@ -146,13 +194,13 @@ class Home extends React.Component<Props, State> {
 
     axios
       .post<Msg>(
-        `${msgUrl}/${this.props.currentClass!.id}`,
+        `${msgUrl}/${props.currentClass!.id}`,
         {
-          message: this.state.message,
+          message,
         },
         {
           headers: {
-            Authorization: `Bearer ${this.props.token}`,
+            Authorization: `Bearer ${props.token}`,
           },
         },
       )
@@ -165,20 +213,20 @@ class Home extends React.Component<Props, State> {
           duration: SnackBar.LENGTH_LONG,
         });
       });
-    this.setState({message: ''});
+    setMessage('');
   };
 
-  shareCode = async () => {
+  const shareCode = async () => {
     try {
       Share.open({
         title: 'Join my class on EasyTeach',
         message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
-          this.props.currentClass!.joinCode
+          props.currentClass!.joinCode
         }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
       });
 
       await Analytics.logEvent('button_press', {
-        username: this.props.profile.username,
+        username: props.profile.username,
         purpose: 'share_join_code',
       });
     } catch (e) {
@@ -186,68 +234,18 @@ class Home extends React.Component<Props, State> {
     }
   };
 
-  fetchMsg = () => {
-    if (!this.props.msgs.end) {
-      this.props.fetchMsgs(
-        this.props.token!,
-        this.props.currentClass!.id,
-        true,
-      );
+  const fetchMsg = () => {
+    if (!props.msgs.end) {
+      props.fetchMsgs(props.token!, props.currentClass!.id, true);
     }
   };
 
-  showSnackBar = (opts: SnackBarOptions) => {
-    setTimeout(() => {
-      SnackBar.show(opts);
-    }, 500);
+  const setDeleteMsg = (msgId: string, author: string) => {
+    sheet.current!.open();
+    setMsgToDelete({author, msgId});
   };
 
-  removeMessage = async () => {
-    const {msgId, author} = this.state.msgDelete;
-    this.sheet!.close();
-
-    if (!this.props.isOwner && author !== this.props.profile.username) {
-      this.showSnackBar({
-        text: 'You cannot delete this message',
-        backgroundColor: flatRed,
-        textColor: '#fff',
-        duration: SnackBar.LENGTH_LONG,
-      });
-      return;
-    }
-
-    try {
-      const res = await axios.delete<string>(
-        `${msgUrl}/${this.props.currentClass!.id}/${msgId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      );
-
-      this.props.removeMsg(res.data, this.props.currentClass!.id);
-
-      this.showSnackBar({
-        text: 'Message deleted',
-        duration: SnackBar.LENGTH_LONG,
-      });
-    } catch (e) {
-      this.showSnackBar({
-        text: 'Unable to delete message. Please try again later',
-        backgroundColor: flatRed,
-        textColor: '#ffff',
-        duration: SnackBar.LENGTH_LONG,
-      });
-    }
-  };
-
-  setDeleteMsg = (msgId: string, author: string) => {
-    this.sheet!.open();
-    this.setState({msgDelete: {msgId, author}});
-  };
-
-  renderListItem = ({item}: {item: Msg}) => {
+  const renderListItem = ({item}: {item: Msg}) => {
     return (
       <MsgCard
         msgId={item.id}
@@ -256,13 +254,13 @@ class Home extends React.Component<Props, State> {
         username={item.user.username}
         message={item.message}
         createdAt={new Date(item.createdAt)}
-        onOptionPress={this.setDeleteMsg}
+        onOptionPress={setDeleteMsg}
       />
     );
   };
 
-  renderListFooter = () => {
-    if (this.props.msgs.loading) {
+  const renderListFooter = () => {
+    if (props.msgs.loading) {
       return (
         <View
           style={{
@@ -277,9 +275,7 @@ class Home extends React.Component<Props, State> {
     }
   };
 
-  renderContent = () => {
-    const {props} = this;
-
+  const renderContent = () => {
     if (props.classes.errored) {
       return (
         <View style={ContainerStyles.centerElements}>
@@ -308,7 +304,7 @@ class Home extends React.Component<Props, State> {
           </Text>
           <Button
             title="Create or Join class"
-            onPress={() => this.props.navigation.navigate('JoinClass')}
+            onPress={() => props.navigation.navigate('JoinClass')}
           />
         </View>
       );
@@ -338,13 +334,13 @@ class Home extends React.Component<Props, State> {
           <Text style={{padding: 5}}>
             Open drawer by swiping or click on menu icon in header to navigate.
           </Text>
-          {this.props.isOwner && (
+          {props.isOwner && (
             <Button
               title="Share Join Code"
               type="clear"
               icon={{name: 'share', color: commonBlue}}
               titleStyle={{color: commonBlue}}
-              onPress={this.shareCode}
+              onPress={shareCode}
             />
           )}
         </ScrollView>
@@ -353,98 +349,94 @@ class Home extends React.Component<Props, State> {
 
     return (
       <FlatList
-        data={this.props.msgs.msgs}
+        data={props.msgs.msgs}
         keyExtractor={(_item, i) => i.toString()}
         inverted
-        renderItem={this.renderListItem}
-        ListFooterComponent={this.renderListFooter()}
-        onEndReached={this.fetchMsg}
+        renderItem={renderListItem}
+        ListFooterComponent={renderListFooter()}
+        onEndReached={fetchMsg}
         onEndReachedThreshold={0.3}
       />
     );
   };
 
-  render() {
-    const {unread} = this.props;
-    return (
-      <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
-        <Header
-          centerComponent={{
-            text: this.props.currentClass
-              ? this.props.currentClass!.name
-              : 'Home',
-            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-          }}
-          leftComponent={
-            <>
-              <Icon
-                name="menu"
-                size={26}
-                onPress={this.props.navigation.openDrawer}
-                color="#ffff"
-              />
-              {unread !== 0 ? <HeaderBadge /> : null}
-            </>
-          }
-        />
-        <View
-          style={{
-            flex: 1,
-          }}>
-          {this.renderContent()}
-
-          {this.props.isOwner || !this.props.currentClass?.lockMsg ? (
-            <Input
-              placeholder="Type here..."
-              value={this.state.message}
-              errorStyle={{height: 0}}
-              returnKeyType="send"
-              onSubmitEditing={this.postMessage}
-              onChangeText={(message) => this.setState({message})}
-              rightIcon={{
-                name: 'send',
-                color: commonBlue,
-                onPress: this.postMessage,
-              }}
+  const {unread} = props;
+  return (
+    <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
+      <Header
+        centerComponent={{
+          text: props.currentClass ? props.currentClass!.name : 'Home',
+          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+        }}
+        leftComponent={
+          <>
+            <Icon
+              name="menu"
+              size={26}
+              onPress={props.navigation.openDrawer}
+              color="#ffff"
             />
-          ) : (
-            <View
-              style={{
-                backgroundColor: commonBackground,
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 10,
-              }}>
-              <Text style={{color: commonGrey}}>Read Only</Text>
-            </View>
-          )}
-        </View>
+            {unread !== 0 ? <HeaderBadge /> : null}
+          </>
+        }
+      />
+      <View
+        style={{
+          flex: 1,
+        }}>
+        {renderContent()}
 
-        <RBSheet
-          height={80}
-          ref={(ref) => (this.sheet = ref)}
-          closeOnPressMask
-          closeOnDragDown
-          customStyles={{
-            container: {
-              borderTopWidth: 1,
-              borderTopLeftRadius: 10,
-              borderTopRightRadius: 10,
-              borderColor: 'transparent',
-            },
-          }}>
-          <Button
-            title="Delete"
-            type="clear"
-            onPress={this.removeMessage}
-            titleStyle={{color: flatRed, fontSize: 20}}
-            icon={{name: 'delete', color: flatRed}}
+        {props.isOwner || !props.currentClass?.lockMsg ? (
+          <Input
+            placeholder="Type here..."
+            value={message}
+            errorStyle={{height: 0}}
+            returnKeyType="send"
+            onSubmitEditing={postMessage}
+            onChangeText={setMessage}
+            rightIcon={{
+              name: 'send',
+              color: commonBlue,
+              onPress: postMessage,
+            }}
           />
-        </RBSheet>
+        ) : (
+          <View
+            style={{
+              backgroundColor: commonBackground,
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 10,
+            }}>
+            <Text style={{color: commonGrey}}>Read Only</Text>
+          </View>
+        )}
       </View>
-    );
-  }
-}
+
+      <RBSheet
+        height={80}
+        ref={sheet}
+        closeOnPressMask
+        closeOnDragDown
+        customStyles={{
+          container: {
+            borderTopWidth: 1,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            borderColor: 'transparent',
+          },
+        }}>
+        <Button
+          title="Delete"
+          type="clear"
+          onPress={removeMessage}
+          titleStyle={{color: flatRed, fontSize: 20}}
+          icon={{name: 'delete', color: flatRed}}
+        />
+      </RBSheet>
+    </View>
+  );
+};
 
 const mapStateToProps = (state: StoreState) => {
   let isOwner = false;
@@ -456,6 +448,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass,
     classes: state.classes,
     token: state.token,
+    linkRedirected: state.redirected,
     msgs: state.msgs[state.currentClass?.id || 'test'] || {
       loading: true,
       errored: false,
@@ -472,4 +465,5 @@ export default connect(mapStateToProps, {
   addMsg,
   registerCurrentClass,
   removeMsg,
+  redirected,
 })(Home);

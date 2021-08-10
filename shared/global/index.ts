@@ -8,7 +8,7 @@ import {UnreadState} from './actions/unreads';
 import {PeopleState} from './actions/people';
 import {ModuleState} from './actions/modules';
 
-import {tokenReducer, fcmReducer} from './reducers/tokenReducer';
+import {tokenReducer, fcmReducer, redirected} from './reducers/tokenReducer';
 import {profileReducer} from './reducers/profileReducer';
 import {classReducer, classesReducer} from './reducers/classReducer';
 import {msgsReducer} from './reducers/msgReducer';
@@ -35,6 +35,7 @@ export interface StoreState {
   unreads: UnreadState;
   people: PeopleState;
   modules: ModuleState;
+  redirected: boolean;
 }
 
 export const reducers = combineReducers<StoreState>({
@@ -48,6 +49,7 @@ export const reducers = combineReducers<StoreState>({
   unreads: unreadReducer,
   people: peopleReducer,
   modules: moduleReducer,
+  redirected,
 });
 
 export const store = createStore(reducers, applyMiddleware(thunk));

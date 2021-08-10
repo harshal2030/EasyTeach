@@ -3,6 +3,7 @@ enum ActionTypes {
   registerToken = 'registerToken',
   removeToken = 'removeToken',
   registerFCM = 'registerFCM',
+  redirected = 'link_redirected',
 }
 
 interface RegisterTokenAction {
@@ -22,6 +23,16 @@ interface RegisterFCMAction {
     fcmToken: string;
   };
 }
+
+interface RedirectAction {
+  type: ActionTypes.redirected;
+}
+
+const redirected = (): RedirectAction => {
+  return {
+    type: ActionTypes.redirected,
+  };
+};
 
 const registerToken = (token: string): RegisterTokenAction => {
   return {
@@ -55,4 +66,6 @@ export {
   ActionTypes,
   RegisterTokenAction,
   RemoveTokenAction,
+  RedirectAction,
+  redirected,
 };
