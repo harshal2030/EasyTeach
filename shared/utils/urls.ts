@@ -26,6 +26,7 @@ const moduleUrl = `${root}/module`;
 const fileUrl = `${root}/file`;
 const vidTrackerUrl = `${root}/vidtracker`;
 const paymentUrl = `${root}/pay`;
+const discussUrl = `${root}/discuss`;
 
 export {
   root,
@@ -46,4 +47,5 @@ export {
   vidTrackerUrl,
   paymentUrl,
   websiteRoot,
+  discussUrl,
 };

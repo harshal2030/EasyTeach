@@ -32,33 +32,39 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       drawerContent={(pprops) => <DrawerContent {...pprops} />}>
       <Drawer.Screen
         name="Home"
-        component={require('../../screens/Announcements').default}
+        getComponent={() => require('../../screens/Announcements').default}
       />
       <Drawer.Screen
         name="People"
-        component={require('../../screens/People').default}
+        getComponent={() => require('../../screens/People').default}
       />
       {props.currentClass && (
         <Drawer.Screen
+          name="Discuss"
+          getComponent={() => require('../../screens/Discuss').default}
+        />
+      )}
+      {props.currentClass && (
+        <Drawer.Screen
           name="Test"
-          component={require('../../screens/Test').default}
+          getComponent={() => require('../../screens/Test').default}
         />
       )}
       {props.currentClass && (
         <Drawer.Screen
           name="Modules"
-          component={require('../../screens/Modules').default}
+          getComponent={() => require('../../screens/Modules').default}
         />
       )}
       {props.currentClass && (
         <Drawer.Screen
           name="Manage"
-          component={require('../../screens/ManageClass').default}
+          getComponent={() => require('../../screens/ManageClass').default}
         />
       )}
       <Drawer.Screen
         name="Settings"
-        component={require('../../screens/Settings').default}
+        getComponent={() => require('../../screens/Settings').default}
       />
     </Drawer.Navigator>
   );

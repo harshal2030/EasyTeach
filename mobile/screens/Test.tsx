@@ -37,7 +37,6 @@ import {
   commonBackground,
   commonBlue,
   flatRed,
-  greyWithAlpha,
   commonGrey,
 } from '../../shared/styles/colors';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -53,7 +52,7 @@ interface Props {
   navigation: NavigationProp;
   currentClass: Class | null;
   quizzes: QuizPayload;
-  fetchQuiz(token: string, classId: string, quizType?: string): void;
+  fetchQuiz(token: string, classId: string, updating?: boolean): void;
   isOwner: boolean;
   unread: number;
 }
@@ -373,19 +372,6 @@ class Test extends React.Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  collapseContainer: {
-    marginLeft: 30,
-    flexDirection: 'row',
-  },
-  collapseButton: {
-    marginHorizontal: 5,
-    padding: 3,
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: greyWithAlpha(0.8),
-    backgroundColor: greyWithAlpha(0.2),
-    borderRadius: 2,
-  },
   collapseText: {
     fontSize: 17,
     fontWeight: '600',

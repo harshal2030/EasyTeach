@@ -47,11 +47,13 @@ type RootStackParamList = {
   PDFViewer: {
     url: string;
   };
+  Chat: undefined;
 };
 
 type DrawerParamList = {
   Home: undefined;
   Test: undefined;
+  Discuss: undefined;
   Manage: undefined;
   People: undefined;
   Settings: undefined;

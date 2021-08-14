@@ -175,63 +175,69 @@ const App: React.FC<Props> = (props) => {
           <>
             <Stack.Screen
               name="Auth"
-              component={require('./screens/AuthScreen').default}
+              getComponent={() => require('./screens/AuthScreen').default}
             />
             <Stack.Screen
               name="Forgot"
-              component={require('./screens/Forgot').default}
+              getComponent={() => require('./screens/Forgot').default}
             />
           </>
         ) : (
           <>
             <Stack.Screen
               name="Drawer"
-              component={require('./navigators/Drawer').default}
+              getComponent={() => require('./navigators/Drawer').default}
             />
             <Stack.Screen
               name="Info"
-              component={require('./screens/Info').default}
+              getComponent={() => require('./screens/Info').default}
             />
             <Stack.Screen
               name="JoinClass"
-              component={require('./screens/JoinClass').default}
+              getComponent={() => require('./screens/JoinClass').default}
             />
             <Stack.Screen
               name="Quiz"
-              component={require('./screens/Quiz').default}
+              getComponent={() => require('./screens/Quiz').default}
             />
             <Stack.Screen
               name="EditProfile"
-              component={require('./screens/EditProfile').default}
+              getComponent={() => require('./screens/EditProfile').default}
             />
             <Stack.Screen
               name="Files"
-              component={require('./screens/Files').default}
+              getComponent={() => require('./screens/Files').default}
             />
             <Stack.Screen
               name="Video"
-              component={require('./screens/Video').default}
+              getComponent={() => require('./screens/Video').default}
             />
             <Stack.Screen
               name="PDFViewer"
-              component={require('./screens/PdfViewer').default}
+              getComponent={() => require('./screens/PdfViewer').default}
             />
+            {props.currentClass && (
+              <Stack.Screen
+                name="Chat"
+                getComponent={() => require('./screens/Chat').default}
+              />
+            )}
             {props.isOwner && (
               <Stack.Screen
                 name="CreateTest"
-                component={require('./screens/CreateTest').default}
+                getComponent={() => require('./screens/CreateTest').default}
               />
             )}
             {props.isOwner && (
               <Stack.Screen
                 name="Checkout"
-                component={require('./screens/Checkout').default}
+                getComponent={() => require('./screens/Checkout').default}
               />
             )}
             {props.currentClass && (
               <Stack.Screen
                 name="ShowScore"
-                component={require('./screens/ShowScore').default}
+                getComponent={() => require('./screens/ShowScore').default}
               />
             )}
           </>

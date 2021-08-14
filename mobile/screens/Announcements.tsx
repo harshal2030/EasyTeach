@@ -94,14 +94,6 @@ type Props = {
   redirected: typeof redirected;
 };
 
-interface State {
-  message: string;
-  msgDelete: {
-    author: string;
-    msgId: string;
-  };
-}
-
 const Home: React.FC<Props> = (props) => {
   const [message, setMessage] = useState<string>('');
   const [msgToDelete, setMsgToDelete] = useState<{

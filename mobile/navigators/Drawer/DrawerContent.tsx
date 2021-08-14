@@ -239,6 +239,13 @@ const DrawerContent = (props: Props): JSX.Element => {
 
                 <TouchableOpacity
                   style={optionContainer}
+                  onPress={() => props.navigation.navigate('Discuss')}>
+                  <Entypo name="chat" color="#34495e" size={22} />
+                  <Text style={optionText}> Discuss</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
                   onPress={() => props.navigation.navigate('Test')}>
                   <Octicons name="checklist" color="#34495e" size={25} />
                   <Text style={optionText}> Tests</Text>
@@ -300,7 +307,7 @@ const styles = StyleSheet.create({
     backgroundColor: greyWithAlpha(0.4),
   },
   mainImage: {
-    height: 200,
+    height: 170,
     width: '100%',
     justifyContent: 'flex-end',
     backgroundColor: commonGrey,
