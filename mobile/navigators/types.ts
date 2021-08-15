@@ -47,7 +47,9 @@ type RootStackParamList = {
   PDFViewer: {
     url: string;
   };
-  Chat: undefined;
+  Chat: {
+    discussId: string;
+  };
 };
 
 type DrawerParamList = {

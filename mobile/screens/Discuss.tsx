@@ -65,7 +65,7 @@ const Discuss: React.FC<Props> = (props) => {
     return (
       <DiscussCard
         title={item.title}
-        onPress={() => props.navigation.navigate('Chat')}
+        onPress={() => props.navigation.navigate('Chat', {discussId: item.id})}
         comments={item.comments}
         author={item.author}
         createdAt={item.createdAt}
