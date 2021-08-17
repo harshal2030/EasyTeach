@@ -5,4 +5,3 @@ export * from './CheckBox';
 export * from './Chip';
 export * from './HeadProfile';
 export * from './HeaderBadge';
-export * from './DiscussCard';
