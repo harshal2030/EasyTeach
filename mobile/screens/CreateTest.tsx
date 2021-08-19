@@ -59,6 +59,7 @@ interface State {
   loading: boolean;
   errored: boolean;
   APILoading: boolean;
+  allowBlur: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -83,6 +84,7 @@ class CreateTest extends React.Component<Props, State> {
       timeRange: [today, tomorrow],
       loading: false,
       errored: false,
+      allowBlur: true,
       APILoading: false,
     };
   }
@@ -110,9 +112,11 @@ class CreateTest extends React.Component<Props, State> {
             randomQue,
             questions,
             timePeriod,
+            allowBlur,
           } = res.data;
           this.setState({
             title,
+            allowBlur,
             description,
             releaseScore,
             randomOp,
@@ -139,6 +143,7 @@ class CreateTest extends React.Component<Props, State> {
       description,
       timeRange,
       releaseScore,
+      allowBlur,
       randomQue,
       randomOp,
     } = this.state;
@@ -183,6 +188,7 @@ class CreateTest extends React.Component<Props, State> {
           releaseScore,
           randomQue,
           randomOp,
+          allowBlur,
         },
         {
           headers: {
@@ -216,6 +222,7 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
+      allowBlur,
     } = this.state;
 
     const start = timeRange[0].getTime(),
@@ -255,6 +262,7 @@ class CreateTest extends React.Component<Props, State> {
         timePeriod: timeRange,
         releaseScore,
         randomQue,
+        allowBlur,
         randomOp,
       }),
     );
@@ -386,6 +394,7 @@ class CreateTest extends React.Component<Props, State> {
       type,
       mode,
       loading,
+      allowBlur,
       errored,
       APILoading,
     } = this.state;
@@ -494,6 +503,13 @@ class CreateTest extends React.Component<Props, State> {
               />
             )}
           </View>
+
+          <CheckBox
+            checked={allowBlur}
+            onPress={() => this.setState({allowBlur: !allowBlur})}
+            title="Allow focus blur"
+            desc="Disabling this will lock test when trying to change screen"
+          />
 
           <CheckBox
             checked={releaseScore}

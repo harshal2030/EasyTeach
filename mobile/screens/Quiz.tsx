@@ -56,6 +56,8 @@ interface State {
   loading: boolean;
   errored: boolean;
   quizTitle: string;
+  allowBlur: boolean;
+  blurred: boolean;
 }
 
 class Quiz extends React.Component<Props, State> {
@@ -69,6 +71,8 @@ class Quiz extends React.Component<Props, State> {
       loading: true,
       errored: false,
       quizTitle: '',
+      allowBlur: true,
+      blurred: false,
     };
   }
 
@@ -104,7 +108,26 @@ class Quiz extends React.Component<Props, State> {
   }
 
   appStateHandler = (state: AppStateStatus) => {
+    if (state === 'active' && !this.state.allowBlur && this.state.blurred) {
+      Alert.alert(
+        'Test locked',
+        'You have changed screen while giving test, which is violation of test rules. Hence, test is locked for you',
+        [
+          {
+            text: 'Ok',
+            onPress: this.goBack,
+          },
+        ],
+      );
+      return;
+    }
+
     if (state === 'background' || state === 'inactive') {
+      if (!this.state.allowBlur) {
+        this.postBlur();
+        this.setState({blurred: true});
+      }
+
       this.setState({currentIndex: 0});
       this.fetchQues();
     }
@@ -124,6 +147,23 @@ class Quiz extends React.Component<Props, State> {
     }
   };
 
+  postBlur = () => {
+    axios
+      .post(
+        `${quizUrl}/blur/${this.props.currentClass!.id}/${
+          this.props.route.params.quizId
+        }`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then(() => null)
+      .catch((e) => console.log(e, e.response.data));
+  };
+
   fetchQues = () => {
     const {quizId} = this.props.route.params;
     const id = this.props.currentClass?.id || this.props.route.params.classId;
@@ -134,6 +174,7 @@ class Quiz extends React.Component<Props, State> {
         totalScore: number;
         quizId: string;
         quizTitle: string;
+        allowBlur: boolean;
       }>(`${quizUrl}/que/${id}/${quizId}`, {
         headers: {
           Authorization: `Bearer ${this.props.token!}`,
@@ -144,6 +185,7 @@ class Quiz extends React.Component<Props, State> {
           loading: false,
           questions: res.data.questions,
           quizTitle: res.data.quizTitle,
+          allowBlur: res.data.allowBlur,
         });
         const images = res.data.questions
           .filter((que) => (que.attachments ? true : false))

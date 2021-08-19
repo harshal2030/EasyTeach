@@ -26,6 +26,7 @@ type QuizRes = {
   description: string;
   randomOp: boolean;
   randomQue: boolean;
+  allowBlur: boolean;
 };
 
 type ObQuizRes = {

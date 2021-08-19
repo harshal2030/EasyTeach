@@ -65,6 +65,7 @@ interface State {
   datePicker: boolean;
   type: 0 | 1;
   deleteModal: boolean;
+  allowBlur: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -97,6 +98,7 @@ class CreateTest extends React.Component<Props, State> {
         this.quizId || this.props.questions.length !== 0 ? false : true,
       type: 0,
       deleteModal: false,
+      allowBlur: true,
     };
   }
 
@@ -135,9 +137,11 @@ class CreateTest extends React.Component<Props, State> {
             randomQue,
             questions,
             timePeriod,
+            allowBlur,
           } = res.data;
           this.setState({
             title,
+            allowBlur,
             description,
             releaseScore,
             randomOp,
@@ -165,6 +169,7 @@ class CreateTest extends React.Component<Props, State> {
       timeRange,
       releaseScore,
       randomQue,
+      allowBlur,
       randomOp,
     } = this.state;
     const {currentClass, token} = this.props;
@@ -198,6 +203,7 @@ class CreateTest extends React.Component<Props, State> {
           releaseScore,
           randomQue,
           randomOp,
+          allowBlur,
         },
         {
           headers: {
@@ -227,6 +233,7 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
+      allowBlur,
       excelSheet,
     } = this.state;
 
@@ -259,6 +266,7 @@ class CreateTest extends React.Component<Props, State> {
         releaseScore,
         randomQue,
         randomOp,
+        allowBlur,
       }),
     );
 
@@ -378,6 +386,7 @@ class CreateTest extends React.Component<Props, State> {
       timeRange,
       loading,
       errored,
+      allowBlur,
       APILoading,
       excelSheet,
     } = this.state;
@@ -492,6 +501,13 @@ class CreateTest extends React.Component<Props, State> {
               <Text style={{color: commonGrey}}>Stop Accepting Response</Text>
             </TouchableOpacity>
           </View>
+
+          <CheckBox
+            checked={allowBlur}
+            onPress={() => this.setState({allowBlur: !allowBlur})}
+            title="Allow focus blur"
+            desc="Disabling this will lock test when trying to change screen"
+          />
 
           <CheckBox
             checked={releaseScore}
