@@ -269,9 +269,9 @@ class Checkout extends React.Component<Props, State> {
             price={'\u20B9 100 per month per class'}
             pricingStyle={styles.pricingStyle}
             info={[
-              '1000 Students',
+              '500 Students',
               'Unlimited tests',
-              '20 GB Video Storage',
+              '20 GB Module Storage',
               'All Core Feature Included',
               'No upfront Cost',
             ]}

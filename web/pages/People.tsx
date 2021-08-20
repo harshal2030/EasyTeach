@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   FlatList,
+  Image,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
@@ -13,6 +14,9 @@ import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
 import MenuIcon from '@iconify-icons/ic/menu';
+import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
+import lockIcon from '@iconify-icons/ic/lock';
+import Modal from 'react-native-modal';
 
 import {TouchableIcon} from '../components';
 import Cross from '../../shared/images/cross.svg';
@@ -29,6 +33,7 @@ import {
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, greyWithAlpha} from '../../shared/styles/colors';
 import {TextStyles} from '../../shared/styles/styles';
+import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
 interface Props {
   profile: {
@@ -61,6 +66,9 @@ const People = (props: Props) => {
     name: '',
     username: '',
   });
+  const [visible, setVisible] = React.useState(false);
+
+  const fileRef = React.useRef<HTMLImageElement | null>(null);
 
   const {users: people, offset, loading} = props.people;
 
@@ -175,6 +183,30 @@ const People = (props: Props) => {
     );
   };
 
+  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (!excelExtPattern.test(file.name)) {
+        return toast.error('Please select a valid file');
+      }
+
+      const form = new FormData();
+      form.append('sheet', file);
+
+      axios
+        .post(`${studentUrl}/${props.currentClass!.id}`, form, {
+          headers: {
+            Authorization: `Bearer ${props.token}`,
+          },
+        })
+        .then(() => {
+          setVisible(false);
+          toast.info('Sheet upload successfully');
+        })
+        .catch(() => toast.error('Unable to upload sheet'));
+    }
+  };
+
   const renderListFooter = () => {
     if (loading) {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
@@ -216,6 +248,18 @@ const People = (props: Props) => {
             {props.unread !== 0 ? <HeaderBadge /> : null}
           </>
         }
+        rightComponent={
+          <>
+            {props.isOwner && (
+              <TouchableIcon
+                icon={uploadIcon}
+                size={34}
+                color="#fff"
+                onPress={() => setVisible(true)}
+              />
+            )}
+          </>
+        }
       />
       {props.currentClass ? (
         <FlatList
@@ -242,6 +286,54 @@ const People = (props: Props) => {
           </Text>
         </View>
       )}
+
+      <Modal
+        isVisible={visible}
+        onBackdropPress={() => setVisible(false)}
+        style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View
+          style={{
+            backgroundColor: '#fff',
+            height: 500,
+            width: 400,
+            padding: 20,
+          }}>
+          <h2>Selective class joining</h2>
+          <Text>
+            Upload a excel sheet with pattern given below and people with given
+            email address can only join
+          </Text>
+          <Image
+            source={require('../../shared/images/people.png')}
+            style={{height: 200, width: 200, margin: 10}}
+            resizeMode="contain"
+          />
+          {props.premiumAllowed ? (
+            <Button
+              title="Upload sheet"
+              buttonStyle={{marginHorizontal: 10}}
+              onPress={() => fileRef.current!.click()}
+            />
+          ) : (
+            <Button
+              title="Upgrade Required"
+              buttonStyle={{marginHorizontal: 10}}
+              onPress={() =>
+                history.push(`/checkout/${props.currentClass?.id}`)
+              }
+              icon={<TouchableIcon icon={lockIcon} size={26} color="#fff" />}
+            />
+          )}
+        </View>
+      </Modal>
+
+      <input
+        type="file"
+        // @ts-ignore
+        ref={fileRef}
+        style={{display: 'none'}}
+        onChange={onFileSelect}
+      />
 
       <Dialog.Container visible={alertVisible}>
         <Dialog.Title>Confirm</Dialog.Title>
