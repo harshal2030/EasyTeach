@@ -7,7 +7,7 @@ import {TouchableIcon} from '../../../web/components';
 
 import {QuizRes} from '../../global/actions/quiz';
 import {ContainerStyles} from '../../styles/styles';
-import {commonGrey} from '../../styles/colors';
+import {commonGrey, flatRed} from '../../styles/colors';
 
 interface Props {
   quiz: QuizRes;
@@ -48,6 +48,11 @@ class QuizInfo extends React.PureComponent<Props> {
             {`Things to note:
 Screenshots on your phone are disabled while your Test is going on.`}
           </Text>
+          {!this.props.quiz.allowBlur && (
+            <Text style={{color: flatRed, fontSize: 19}}>
+              Note: Changing screen will lock test for you.
+            </Text>
+          )}
 
           <Button
             title="Everything's OK! Move On"
