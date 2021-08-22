@@ -19,6 +19,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MI from 'react-native-vector-icons/MaterialIcons';
+import AD from 'react-native-vector-icons/AntDesign';
 
 import {StoreState} from '../../../shared/global';
 import {UnreadState} from '../../../shared/global/actions/unreads';
@@ -235,6 +236,13 @@ const DrawerContent = (props: Props): JSX.Element => {
                   onPress={() => props.navigation.navigate('People')}>
                   <FontAwesome name="group" color="#34495e" size={20} />
                   <Text style={optionText}> People</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={optionContainer}
+                  onPress={() => props.navigation.navigate('Assignment')}>
+                  <AD name="form" color="#34495e" size={22} />
+                  <Text style={optionText}> Classwork</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity

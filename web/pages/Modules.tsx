@@ -40,7 +40,6 @@ import {
   commonBlue,
   greyWithAlpha,
   commonBackground,
-  commonGrey,
   flatRed,
 } from '../../shared/styles/colors';
 import {bytesToGB} from '../../shared/utils/functions';
@@ -423,7 +422,7 @@ class Module extends React.Component<Props, State> {
               icon={
                 <TouchableIcon icon={plusIcon} color={commonBlue} size={36} />
               }
-              containerStyle={styles.FABContainer}
+              containerStyle={ContainerStyles.FABContainer}
               onPress={() => this.setState({dialogVisible: true})}
               // eslint-disable-next-line react-native/no-inline-styles
               buttonStyle={{backgroundColor: '#ffff'}}
@@ -480,27 +479,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: commonBackground,
-  },
-  FABContainer: {
-    position: 'absolute',
-    height: 60,
-    width: 60,
-    bottom: 50,
-    right: 30,
-    backgroundColor: '#ffff',
-    borderWidth: 1,
-    borderColor: greyWithAlpha(0.3),
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: commonGrey,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2.62,
-    elevation: 4,
   },
 });
 

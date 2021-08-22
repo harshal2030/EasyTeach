@@ -50,11 +50,13 @@ type RootStackParamList = {
   Chat: {
     discussId: string;
   };
+  Assign: undefined;
 };
 
 type DrawerParamList = {
   Home: undefined;
   Test: undefined;
+  Assignment: undefined;
   Discuss: undefined;
   Manage: undefined;
   People: undefined;

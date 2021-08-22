@@ -27,6 +27,7 @@ const fileUrl = `${root}/file`;
 const vidTrackerUrl = `${root}/vidtracker`;
 const paymentUrl = `${root}/pay`;
 const discussUrl = `${root}/discuss`;
+const assignUrl = `${root}/assignment`;
 
 export {
   root,
@@ -48,4 +49,5 @@ export {
   paymentUrl,
   websiteRoot,
   discussUrl,
+  assignUrl,
 };

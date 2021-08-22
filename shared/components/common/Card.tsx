@@ -18,6 +18,8 @@ type Props = {
   expiresOn: Date;
   onGearPress?(): void;
   isOwner: boolean;
+  dateText?: string;
+  iconName?: string;
 };
 
 const _Card = (props: Props) => {
@@ -27,12 +29,12 @@ const _Card = (props: Props) => {
         <View style={styles.contentContainer}>
           <View>
             <View style={styles.iconTextContainer}>
-              <MaterialIcons name="assignment" size={26} />
+              <MaterialIcons name={props.iconName!} size={26} />
               <Text style={styles.titleStyle}>{props.title}</Text>
             </View>
 
             <Text style={styles.timeText}>
-              Expires On: {formatDate(props.expiresOn)}
+              {props.dateText}: {formatDate(props.expiresOn)}
             </Text>
           </View>
 
@@ -45,12 +47,19 @@ const _Card = (props: Props) => {
   );
 };
 
+_Card.defaultProps = {
+  dateText: 'Expires on',
+  iconName: 'assignment',
+};
+
 const Card = memo(_Card, (prevProps, nextProps) => {
   if (
     prevProps.title === nextProps.title &&
     prevProps.expiresOn === nextProps.expiresOn &&
     prevProps.isOwner === nextProps.isOwner &&
-    prevProps.containerStyle === nextProps.containerStyle
+    prevProps.containerStyle === nextProps.containerStyle &&
+    prevProps.iconName === nextProps.iconName &&
+    prevProps.dateText === nextProps.dateText
   ) {
     return true;
   }

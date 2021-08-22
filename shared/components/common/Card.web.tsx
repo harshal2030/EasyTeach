@@ -14,6 +14,7 @@ type Props = {
   expiresOn: Date;
   onGearPress?(): void;
   isOwner: boolean;
+  dateText?: string;
 };
 
 const Card = (props: Props) => {
@@ -28,7 +29,7 @@ const Card = (props: Props) => {
             </View>
 
             <Text style={styles.timeText}>
-              Expires On: {formatDate(props.expiresOn)}
+              {props.dateText}: {formatDate(props.expiresOn)}
             </Text>
           </View>
 
@@ -41,6 +42,10 @@ const Card = (props: Props) => {
       </TouchableOpacity>
     </View>
   );
+};
+
+Card.defaultProps = {
+  dateText: 'Expires on',
 };
 
 const styles = StyleSheet.create({

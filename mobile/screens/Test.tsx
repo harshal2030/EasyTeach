@@ -329,7 +329,7 @@ class Test extends React.Component<Props, State> {
         {this.props.isOwner && (
           <Button
             icon={<Octicons name="plus" size={26} color={commonBlue} />}
-            containerStyle={styles.FABContainer}
+            containerStyle={ContainerStyles.FABContainer}
             // eslint-disable-next-line react-native/no-inline-styles
             buttonStyle={{backgroundColor: '#ffff'}}
             onPress={() => this.setState({excelModal: true})}
@@ -392,28 +392,6 @@ const styles = StyleSheet.create({
   },
   modalStyle: {
     margin: 0,
-  },
-  FABContainer: {
-    position: 'absolute',
-    height: 60,
-    width: 60,
-    bottom: 50,
-    right: 20,
-    padding: 10,
-    backgroundColor: '#ffff',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: commonGrey,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
   },
   sectionHeader: {
     fontSize: 23,

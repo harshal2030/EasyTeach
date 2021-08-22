@@ -38,7 +38,6 @@ import {
   commonBlue,
   greyWithAlpha,
   commonBackground,
-  commonGrey,
   flatRed,
 } from '../../shared/styles/colors';
 import {bytesToGB} from '../../shared/utils/functions';
@@ -364,7 +363,7 @@ class Module extends React.Component<Props, State> {
                 type: 'octicon',
                 color: commonBlue,
               }}
-              containerStyle={styles.FABContainer}
+              containerStyle={ContainerStyles.FABContainer}
               onPress={() => this.setState({dialogVisible: true})}
               // eslint-disable-next-line react-native/no-inline-styles
               buttonStyle={{backgroundColor: '#ffff'}}
@@ -421,27 +420,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: commonBackground,
-  },
-  FABContainer: {
-    position: 'absolute',
-    height: 60,
-    width: 60,
-    bottom: 30,
-    right: 30,
-    backgroundColor: '#ffff',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: commonGrey,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
   },
 });
 
