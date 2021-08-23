@@ -9,7 +9,7 @@ import {
   ActionSheetIOS,
   Platform,
 } from 'react-native';
-import {Header, Input, Text, Button} from 'react-native-elements';
+import {Header, Input, Text, Button, Icon} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
@@ -25,7 +25,12 @@ import {Class} from '../../shared/global/actions/classes';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles, TextStyles} from '../../shared/styles/styles';
-import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
+import {
+  commonBlue,
+  commonGrey,
+  flatRed,
+  greyWithAlpha,
+} from '../../shared/styles/colors';
 import {assignUrl} from '../../shared/utils/urls';
 
 type Navigation = StackNavigationProp<RootStackParamList, 'Assign'>;
@@ -40,7 +45,8 @@ const CreateAssign: React.FC<Props> = (props) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState(new Date());
-  const [pickerType, setPickerType] = useState<'date' | 'time' | null>(null);
+  const [datePicker, setDatePicker] = useState(false);
+  const [pickerType, setPickerType] = useState<'date' | 'time'>('date');
   const [allowLate, setAllowLate] = useState(true);
   const [file, setFile] = useState<{
     uri: string;
@@ -51,20 +57,24 @@ const CreateAssign: React.FC<Props> = (props) => {
 
   const handleDate = (_e: Event, date?: Date) => {
     if (!date) {
-      setPickerType(null);
+      setDatePicker(false);
       return;
     }
 
     if (pickerType === 'date') {
       setDueDate(date);
       setPickerType('time');
+      setDatePicker(true);
+      return;
     }
 
     if (pickerType === 'time') {
       const temp = dueDate;
       temp.setHours(date.getHours(), date.getMinutes(), 0, 0);
       setDueDate(temp);
-      setPickerType(null);
+      setPickerType('date');
+      setDatePicker(false);
+      return;
     }
   };
 
@@ -170,6 +180,14 @@ const CreateAssign: React.FC<Props> = (props) => {
     try {
       const form = new FormData();
 
+      if (title.trim().length === 0 || title.trim().length > 50) {
+        Alert.alert(
+          'Invalid title',
+          'Your title length should not be empty and should have at most 50 characters long.',
+        );
+        return;
+      }
+
       form.append(
         'info',
         JSON.stringify({
@@ -179,8 +197,6 @@ const CreateAssign: React.FC<Props> = (props) => {
           dueDate,
         }),
       );
-
-      console.log(file?.name, file?.mime, file?.uri);
 
       if (file) {
         form.append(file.type, {
@@ -194,17 +210,46 @@ const CreateAssign: React.FC<Props> = (props) => {
         });
       }
 
-      console.log(form);
-
       await axios.post(`${assignUrl}/${props.currentClass.id}`, form, {
         headers: {
           Authorization: `Bearer ${props.token}`,
         },
       });
+      props.navigation.goBack();
     } catch (e) {
-      console.log(e);
       Alert.alert('Oops!', 'Something went wrong! please try again later');
     }
+  };
+
+  const renderAttach = () => {
+    if (file) {
+      return (
+        <View style={styles.fileChipContainer}>
+          <View style={styles.fileIconNameContainer}>
+            {file.type === 'image' ? (
+              <Icon name="image" size={26} />
+            ) : (
+              <Icon name="file-pdf" type="material-community" size={26} />
+            )}
+            <Text style={{fontSize: 17}}>
+              {file.type === 'image' ? 'Image' : 'PDF'}
+            </Text>
+          </View>
+          <Icon name="close" onPress={() => setFile(null)} />
+        </View>
+      );
+    }
+
+    return (
+      <Button
+        title="Add Attachment"
+        titleStyle={{color: commonBlue}}
+        icon={{name: 'add', color: commonBlue}}
+        onPress={onAttachPress}
+        type="outline"
+        containerStyle={{paddingHorizontal: 20, marginVertical: 10}}
+      />
+    );
   };
 
   return (
@@ -232,14 +277,14 @@ const CreateAssign: React.FC<Props> = (props) => {
 
         <TouchableOpacity
           style={{padding: 20}}
-          onPress={() => setPickerType('date')}>
+          onPress={() => setDatePicker(true)}>
           <Text h4 h4Style={TextStyles.h4Style}>
             Due Date:{' '}
           </Text>
           <Text style={styles.timeRangeText}>{dueDate.toString()}</Text>
         </TouchableOpacity>
 
-        {pickerType ? (
+        {datePicker ? (
           <DateTimePicker
             value={dueDate}
             mode={pickerType}
@@ -255,14 +300,7 @@ const CreateAssign: React.FC<Props> = (props) => {
           />
         </View>
 
-        <Button
-          title="Add Attachment"
-          titleStyle={{color: commonBlue}}
-          icon={{name: 'add', color: commonBlue}}
-          onPress={onAttachPress}
-          type="outline"
-          containerStyle={{paddingHorizontal: 20, marginVertical: 10}}
-        />
+        {renderAttach()}
 
         <Button
           title="Create Classwork"
@@ -280,6 +318,22 @@ const styles = StyleSheet.create({
     textDecorationColor: commonGrey,
     textDecorationStyle: 'solid',
     textDecorationLine: 'underline',
+  },
+  fileChipContainer: {
+    flexDirection: 'row',
+    backgroundColor: greyWithAlpha(0.2),
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 5,
+    marginHorizontal: 20,
+    marginVertical: 5,
+    justifyContent: 'space-between',
+    padding: 10,
+    alignItems: 'center',
+  },
+  fileIconNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
