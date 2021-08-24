@@ -308,6 +308,55 @@ class Home extends React.Component<Props, State> {
     );
   };
 
+  renderComposer = () => {
+    if (!this.props.currentClass) {
+      return (
+        <View
+          style={{
+            backgroundColor: commonBackground,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10,
+          }}>
+          <Text style={{color: commonGrey}}>
+            Join or create class to message
+          </Text>
+        </View>
+      );
+    }
+
+    if (this.props.currentClass.lockMsg) {
+      <View
+        style={{
+          backgroundColor: commonBackground,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 10,
+        }}>
+        <Text style={{color: commonGrey}}>Read Only</Text>
+      </View>;
+    }
+
+    return (
+      <Input
+        placeholder="Type here..."
+        value={this.state.message}
+        errorStyle={{height: 0}}
+        returnKeyType="send"
+        onSubmitEditing={this.postMessage}
+        onChangeText={(message) => this.setState({message})}
+        rightIcon={
+          <TouchableIcon
+            icon={SendIcon}
+            onPress={this.postMessage}
+            color={commonBlue}
+            size={28}
+          />
+        }
+      />
+    );
+  };
+
   render() {
     return (
       <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
@@ -336,35 +385,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.props.isOwner || !this.props.currentClass?.lockMsg ? (
-            <Input
-              placeholder="Type here..."
-              value={this.state.message}
-              errorStyle={{height: 0}}
-              returnKeyType="send"
-              multiline
-              onSubmitEditing={this.postMessage}
-              onChangeText={(message) => this.setState({message})}
-              rightIcon={
-                <TouchableIcon
-                  icon={SendIcon}
-                  onPress={this.postMessage}
-                  color={commonBlue}
-                  size={28}
-                />
-              }
-            />
-          ) : (
-            <View
-              style={{
-                backgroundColor: commonBackground,
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 10,
-              }}>
-              <Text style={{color: commonGrey}}>Read Only</Text>
-            </View>
-          )}
+          {this.renderComposer()}
         </View>
       </View>
     );

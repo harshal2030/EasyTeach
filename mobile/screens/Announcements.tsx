@@ -352,6 +352,52 @@ const Home: React.FC<Props> = (props) => {
     );
   };
 
+  const renderComposer = () => {
+    if (!props.currentClass) {
+      return (
+        <View
+          style={{
+            backgroundColor: commonBackground,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10,
+          }}>
+          <Text style={{color: commonGrey}}>
+            Join or create class to message
+          </Text>
+        </View>
+      );
+    }
+
+    if (props.currentClass.lockMsg) {
+      <View
+        style={{
+          backgroundColor: commonBackground,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 10,
+        }}>
+        <Text style={{color: commonGrey}}>Read Only</Text>
+      </View>;
+    }
+
+    return (
+      <Input
+        placeholder="Type here..."
+        value={message}
+        errorStyle={{height: 0}}
+        returnKeyType="send"
+        onSubmitEditing={postMessage}
+        onChangeText={setMessage}
+        rightIcon={{
+          name: 'send',
+          color: commonBlue,
+          onPress: postMessage,
+        }}
+      />
+    );
+  };
+
   const {unread} = props;
   return (
     <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
@@ -378,31 +424,7 @@ const Home: React.FC<Props> = (props) => {
         }}>
         {renderContent()}
 
-        {props.isOwner || !props.currentClass?.lockMsg ? (
-          <Input
-            placeholder="Type here..."
-            value={message}
-            errorStyle={{height: 0}}
-            returnKeyType="send"
-            onSubmitEditing={postMessage}
-            onChangeText={setMessage}
-            rightIcon={{
-              name: 'send',
-              color: commonBlue,
-              onPress: postMessage,
-            }}
-          />
-        ) : (
-          <View
-            style={{
-              backgroundColor: commonBackground,
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 10,
-            }}>
-            <Text style={{color: commonGrey}}>Read Only</Text>
-          </View>
-        )}
+        {renderComposer()}
       </View>
 
       <RBSheet
