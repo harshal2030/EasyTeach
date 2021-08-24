@@ -40,6 +40,12 @@ const DrawerNavigator = (props: Props): JSX.Element => {
       />
       {props.currentClass && (
         <Drawer.Screen
+          name="Discuss"
+          getComponent={() => require('../../screens/Discuss').default}
+        />
+      )}
+      {props.currentClass && (
+        <Drawer.Screen
           name="Test"
           getComponent={() => require('../../screens/Test').default}
         />
