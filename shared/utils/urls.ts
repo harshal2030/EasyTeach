@@ -19,7 +19,7 @@ const mediaUrl = `${root}/media`;
 const studentUrl = `${root}/student`;
 const quizUrl = `${root}/quiz`;
 const resultUrl = `${root}/result`;
-const msgUrl = `${root}/msg`;
+const announceUrl = `${root}/msg`;
 const questionUrl = `${root}/que`;
 const recoveryUrl = `${root}/users/recover`;
 const moduleUrl = `${root}/module`;
@@ -27,6 +27,7 @@ const fileUrl = `${root}/file`;
 const vidTrackerUrl = `${root}/vidtracker`;
 const paymentUrl = `${root}/pay`;
 const discussUrl = `${root}/discuss`;
+const msgUrl = `${root}/message`;
 
 export {
   root,
@@ -39,7 +40,7 @@ export {
   studentUrl,
   quizUrl,
   resultUrl,
-  msgUrl,
+  announceUrl,
   questionUrl,
   recoveryUrl,
   moduleUrl,
@@ -48,4 +49,5 @@ export {
   paymentUrl,
   websiteRoot,
   discussUrl,
+  msgUrl,
 };

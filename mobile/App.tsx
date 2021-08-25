@@ -216,6 +216,12 @@ const App: React.FC<Props> = (props) => {
               name="PDFViewer"
               getComponent={() => require('./screens/PdfViewer').default}
             />
+            {props.currentClass && (
+              <Stack.Screen
+                name="Chat"
+                getComponent={() => require('./screens/Chat').default}
+              />
+            )}
             {props.isOwner && (
               <Stack.Screen
                 name="CreateTest"

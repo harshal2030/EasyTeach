@@ -3,7 +3,7 @@ import {Dispatch} from 'redux';
 import axios from 'axios';
 import {StoreState} from '../index.web';
 
-import {msgUrl} from '../../utils/urls';
+import {announceUrl} from '../../utils/urls';
 import {setUnread, UnreadPayload, setUnreadZero} from './unreads';
 
 enum ActionTypes {
@@ -155,7 +155,7 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
 
     if (!state.unreads.fetched) {
       try {
-        const res = await axios.get<UnreadPayload>(`${msgUrl}/unread`, {
+        const res = await axios.get<UnreadPayload>(`${announceUrl}/unread`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -173,7 +173,7 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
 
       try {
         await axios.post(
-          `${msgUrl}/unread/${classId}`,
+          `${announceUrl}/unread/${classId}`,
           {
             lastMessageDate: new Date(),
           },
@@ -203,7 +203,7 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
 
       const params = lastMessage ? {after: lastMessage.id} : null;
 
-      const res = await axios.get<Msg[]>(`${msgUrl}/${classId}`, {
+      const res = await axios.get<Msg[]>(`${announceUrl}/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

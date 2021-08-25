@@ -77,7 +77,7 @@ const Discuss: React.FC<Props> = (props) => {
         comments={item.comments}
         author={item.author}
         createdAt={item.createdAt}
-        onPress={(id) => console.log(id)}
+        onPress={(id) => props.navigation.navigate('Chat', {discussId: id})}
       />
     );
   };

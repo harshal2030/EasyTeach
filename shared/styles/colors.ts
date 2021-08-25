@@ -5,6 +5,14 @@ const statusbarColor = '#19b5fe';
 const flatRed = '#d91e18';
 const eucalyptusGreen = '#26a65b';
 
+const greenWithAlpha = (alpha: number): string => {
+  if (alpha > 1 || alpha < 0) {
+    return eucalyptusGreen;
+  }
+
+  return `rgba(38, 166, 91, ${alpha})`;
+};
+
 const greyWithAlpha = (alpha: number): string => {
   if (alpha > 1 || alpha < 0) {
     return commonGrey;
@@ -21,4 +29,5 @@ export {
   flatRed,
   eucalyptusGreen,
   greyWithAlpha,
+  greenWithAlpha,
 };

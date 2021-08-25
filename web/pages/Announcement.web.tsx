@@ -36,7 +36,7 @@ import {
   commonBlue,
   commonGrey,
 } from '../../shared/styles/colors';
-import {mediaUrl, msgUrl} from '../../shared/utils/urls';
+import {mediaUrl, announceUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
@@ -154,7 +154,7 @@ class Home extends React.Component<Props, State> {
     this.setState({message: ''});
     axios
       .post<Msg>(
-        `${msgUrl}/${this.props.currentClass!.id}`,
+        `${announceUrl}/${this.props.currentClass!.id}`,
         {
           message: this.state.message,
         },
@@ -178,7 +178,7 @@ class Home extends React.Component<Props, State> {
 
     try {
       const res = await axios.delete<string>(
-        `${msgUrl}/${this.props.currentClass!.id}/${msgId}`,
+        `${announceUrl}/${this.props.currentClass!.id}/${msgId}`,
         {
           headers: {
             Authorization: `Bearer ${this.props.token}`,

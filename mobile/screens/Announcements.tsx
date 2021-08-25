@@ -44,7 +44,7 @@ import {
   commonGrey,
   flatRed,
 } from '../../shared/styles/colors';
-import {mediaUrl, msgUrl} from '../../shared/utils/urls';
+import {mediaUrl, announceUrl} from '../../shared/utils/urls';
 import {socket} from '../../shared/socket';
 
 socket.on('message', (data: {type: string; payload: WSMsg}) => {
@@ -147,7 +147,7 @@ const Home: React.FC<Props> = (props) => {
 
     try {
       const res = await axios.delete<string>(
-        `${msgUrl}/${props.currentClass!.id}/${msgId}`,
+        `${announceUrl}/${props.currentClass!.id}/${msgId}`,
         {
           headers: {
             Authorization: `Bearer ${props.token}`,
@@ -186,7 +186,7 @@ const Home: React.FC<Props> = (props) => {
 
     axios
       .post<Msg>(
-        `${msgUrl}/${props.currentClass!.id}`,
+        `${announceUrl}/${props.currentClass!.id}`,
         {
           message,
         },
