@@ -6,6 +6,7 @@ import {MMKV} from '../MMKV';
 import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import {StackNavigationProp} from '@react-navigation/stack';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {StoreState} from '../../shared/global';
 import {registerToken} from '../../shared/global/actions/token';
@@ -85,6 +86,12 @@ class AuthScreen extends React.Component<Props, State> {
         .catch(() => {
           this.setState({loading: false});
           Alert.alert('Invalid Credentials');
+
+          Analytics.logEvent('http_error', {
+            url: loginUrl,
+            method: 'post',
+            reason: 'unk',
+          });
         });
     });
   };
@@ -163,6 +170,11 @@ class AuthScreen extends React.Component<Props, State> {
             return Alert.alert('Oops!', e.response.data.error);
           }
         }
+        Analytics.logEvent('http_error', {
+          url: signUpUrl,
+          method: 'post',
+          reason: 'unk',
+        });
         return Alert.alert(
           'Oops!',
           'Something went wrong! Please try again later.',

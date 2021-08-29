@@ -168,6 +168,12 @@ const Home: React.FC<Props> = (props) => {
         textColor: '#ffff',
         duration: SnackBar.LENGTH_LONG,
       });
+
+      await Analytics.logEvent('http_error', {
+        url: `${msgUrl}/${props.currentClass!.id}/${msgId}`,
+        method: 'delete',
+        reason: 'unk',
+      });
     }
   };
 
@@ -203,6 +209,12 @@ const Home: React.FC<Props> = (props) => {
           backgroundColor: flatRed,
           textColor: '#fff',
           duration: SnackBar.LENGTH_LONG,
+        });
+
+        Analytics.logEvent('http_error', {
+          url: `${msgUrl}/${props.currentClass!.id}`,
+          method: 'post',
+          reason: 'unk',
         });
       });
     setMessage('');

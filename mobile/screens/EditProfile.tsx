@@ -8,6 +8,7 @@ import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import * as Analytics from 'expo-firebase-analytics';
 import {MMKV} from '../MMKV';
 
 import {CommonSetting} from '../../shared/components/main';
@@ -130,6 +131,11 @@ class EditProfile extends React.Component<Props, State> {
           text: 'Unable to update profile. please try again later',
           backgroundColor: flatRed,
           textColor: '#fff',
+        });
+        Analytics.logEvent('http_error', {
+          url: `${root}/users`,
+          method: 'put',
+          reason: 'unk',
         });
       });
   };

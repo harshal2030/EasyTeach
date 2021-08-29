@@ -5,6 +5,7 @@ import {Header, ListItem} from 'react-native-elements';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {Avatar} from '../../shared/components/common';
 
@@ -69,7 +70,14 @@ class Info extends React.Component<Props, State> {
         },
       })
       .then((res) => this.setState({loading: false, info: res.data}))
-      .catch(() => this.setState({loading: false, errored: true}));
+      .catch(() => {
+        this.setState({loading: false, errored: true});
+        Analytics.logEvent('http_error', {
+          url: `${vidTrackerUrl}/${id}/${moduleId}/${videoId}`,
+          method: 'get',
+          reason: 'unk',
+        });
+      });
   };
 
   renderItem = ({item}: {item: Res}) => {

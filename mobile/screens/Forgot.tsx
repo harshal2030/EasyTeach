@@ -7,6 +7,7 @@ import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import ViewPager from '@react-native-community/viewpager';
 import Feather from 'react-native-vector-icons/Feather';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {RootStackParamList} from '../navigators/types';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -77,6 +78,12 @@ class Forgot extends React.Component<Props, State> {
       .catch(() => {
         this.setState({loading: false});
         Alert.alert('', 'Unable to send code at the moment');
+
+        Analytics.logEvent('http_error', {
+          url: recoveryUrl,
+          method: 'post',
+          reason: 'unk',
+        });
       });
   };
 
@@ -112,6 +119,12 @@ class Forgot extends React.Component<Props, State> {
       .catch(() => {
         this.setState({loading: false});
         Alert.alert('', 'Unable to update password at the moment');
+
+        Analytics.logEvent('http_error', {
+          url: `${recoveryUrl}/new`,
+          method: 'post',
+          reason: 'unk',
+        });
       });
   };
 

@@ -26,6 +26,7 @@ import DocumentPicker from 'react-native-document-picker';
 import fs from 'react-native-fs';
 import PDFView from 'react-native-view-pdf';
 import {Picker} from '@react-native-picker/picker';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -112,6 +113,11 @@ class Files extends React.Component<Props, State> {
       this.setState({files: res.data, loading: false});
     } catch (e) {
       this.setState({errored: true, loading: false});
+      await Analytics.logEvent('http_error', {
+        url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,
+        method: 'get',
+        reason: 'unk',
+      });
     }
   };
 
@@ -183,6 +189,12 @@ class Files extends React.Component<Props, State> {
         backgroundColor: flatRed,
         textColor: '#fff',
         duration: SnackBar.LENGTH_LONG,
+      });
+
+      await Analytics.logEvent('http_error', {
+        url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${fileId}`,
+        method: 'get',
+        reason: 'unk',
       });
     }
   };

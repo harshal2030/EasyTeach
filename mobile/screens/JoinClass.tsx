@@ -18,6 +18,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from '../navigators/types';
 import SnackBar from 'react-native-snackbar';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {PhotoPicker} from '../components/common';
 
@@ -118,6 +119,12 @@ class JoinClass extends React.Component<Props, State> {
           return Alert.alert('Oops!', e.response.data.error);
         }
 
+        Analytics.logEvent('http_error', {
+          url: `${classUrl}/join`,
+          method: 'post',
+          reason: 'unk',
+        });
+
         SnackBar.show({
           text: 'Unable to join class at the moment',
           duration: SnackBar.LENGTH_SHORT,
@@ -171,6 +178,12 @@ class JoinClass extends React.Component<Props, State> {
             return Alert.alert('Oops!', e.response.data.error);
           }
         }
+
+        Analytics.logEvent('http_error', {
+          url: {classUrl},
+          method: 'post',
+          reason: 'unk',
+        });
 
         SnackBar.show({
           text: 'Unable to create class at the moment. Please try again later',

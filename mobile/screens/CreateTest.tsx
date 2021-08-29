@@ -15,6 +15,7 @@ import SnackBar from 'react-native-snackbar';
 import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {RootStackParamList} from '../navigators/types';
 import {Chip, CheckBox} from '../../shared/components/common';
@@ -131,6 +132,11 @@ class CreateTest extends React.Component<Props, State> {
         })
         .catch(() => {
           this.setState({errored: true, loading: false});
+          Analytics.logEvent('http_error', {
+            url: `${quizUrl}/${this.props.currentClass!.id}/${quizId}`,
+            method: 'get',
+            reason: 'unk',
+          });
         });
     }
   };
@@ -209,6 +215,14 @@ class CreateTest extends React.Component<Props, State> {
           text: 'Unable to update quiz, Please try again later',
           duration: SnackBar.LENGTH_SHORT,
           backgroundColor: flatRed,
+        });
+
+        Analytics.logEvent('http_error', {
+          url: `${quizUrl}/${this.props.currentClass!.id}/${
+            route.params.quizId
+          }`,
+          method: 'put',
+          reason: 'unk',
         });
       });
   };
@@ -301,6 +315,11 @@ class CreateTest extends React.Component<Props, State> {
           duration: SnackBar.LENGTH_SHORT,
           backgroundColor: flatRed,
         });
+        Analytics.logEvent('http_error', {
+          url: `${quizUrl}/${this.props.currentClass!.id}`,
+          method: 'post',
+          reason: 'unk',
+        });
       });
   };
 
@@ -337,6 +356,14 @@ class CreateTest extends React.Component<Props, State> {
             text: 'Unable to delete Test. Please try again later.',
             duration: SnackBar.LENGTH_SHORT,
             backgroundColor: flatRed,
+          });
+
+          Analytics.logEvent('http_error', {
+            url: `${quizUrl}/${this.props.currentClass!.id}/${
+              route.params.quizId
+            }`,
+            method: 'delete',
+            reason: 'unk',
           });
         });
     };
