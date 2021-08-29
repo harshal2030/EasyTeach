@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useMemo} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import axios from 'axios';
 import {View, FlatList, StyleSheet} from 'react-native';
 import {Header, Text} from 'react-native-elements';
@@ -6,9 +6,10 @@ import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 import {Avatar} from '../../shared/components/common';
+import {Comment} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -57,8 +58,20 @@ const Chat: React.FC<Props> = (props) => {
   const [discuss, setDiscuss] = useState<DiscussRes | null>(null);
   const [msgs, setMsgs] = useState<MsgRes[]>([]);
 
-  const sheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
+  const sheet = useRef<BottomSheet>(null);
+
+  const renderContent = () => (
+    <Comment
+      authorAvatar={`${mediaUrl}/avatar/${discuss?.user.avatar}`}
+      authorName={`${discuss?.user.name}`}
+    />
+  );
+
+  const renderSheetHeader = () => (
+    <View style={styles.sheetHeader}>
+      <View style={styles.headerHandle} />
+    </View>
+  );
 
   useEffect(() => {
     axios
@@ -145,16 +158,39 @@ const Chat: React.FC<Props> = (props) => {
         ListFooterComponent={<View style={{height: 100}} />}
       />
 
-      <BottomSheet ref={sheetRef} index={1} snapPoints={snapPoints}>
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <Text>Testing now</Text>
-        </View>
-      </BottomSheet>
+      <BottomSheet
+        ref={sheet}
+        snapPoints={['100%', 300, 100]}
+        renderHeader={renderSheetHeader}
+        enabledContentTapInteraction={false}
+        initialSnap={2}
+        renderContent={renderContent}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  sheetHeader: {
+    backgroundColor: '#ffffff',
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    borderStartColor: commonGrey,
+    width: '100%',
+    borderTopColor: commonGrey,
+  },
+  headerHandle: {
+    height: 10,
+    width: 30,
+    borderRadius: 5,
+    backgroundColor: commonGrey,
+    borderColor: 'transparent',
+    borderWidth: 1,
+  },
   headerContainer: {
     backgroundColor: '#ffffff',
     padding: 20,
