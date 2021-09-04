@@ -7,11 +7,12 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
+  ScrollView,
+  Image,
 } from 'react-native';
 import Dialog from 'react-native-dialog';
 import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
-import LottieView from 'lottie-react-native';
 import {toast} from 'react-toastify';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import pencilIcon from '@iconify-icons/mdi/pencil';
@@ -293,25 +294,33 @@ class Module extends React.Component<Props, State> {
 
     if (!this.props.premiumAllowed) {
       return (
-        <View style={styles.promotionView}>
-          <Text style={styles.promotionText}>{upgradeText}</Text>
-          <LottieView
-            source={require('../../shared/images/rocket.json')}
-            autoPlay
-            style={styles.rocket}
-            loop
+        <ScrollView style={ContainerStyles.padder}>
+          <Text style={styles.promoBigText}>Video lessons</Text>
+          <Text style={styles.promoInfoText}>
+            Engage with others with videos and PDFs with our free analytics
+            services
+          </Text>
+
+          <Image
+            source={require('../../shared/images/mock.jpg')}
+            style={styles.promoImage}
+            resizeMode="contain"
           />
+
+          <Text style={styles.promoUpgradeText}>{upgradeText}</Text>
+
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
               onPress={() =>
                 this.props.history.push(
-                  `/checkout/${this.props.currentClass?.id}`,
+                  `/checkout/${this.props.match.params.classId}`,
                 )
               }
+              containerStyle={styles.upgradeButton}
             />
           )}
-        </View>
+        </ScrollView>
       );
     }
 
@@ -456,6 +465,30 @@ const styles = StyleSheet.create({
   moduleText: {
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  promoBigText: {
+    color: '#2089dc',
+    fontSize: 50,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  promoInfoText: {
+    color: '#2089dc',
+    fontSize: 20,
+    alignSelf: 'center',
+  },
+  promoImage: {
+    height: 200,
+    width: '100%',
+    marginVertical: 20,
+  },
+  promoUpgradeText: {
+    alignSelf: 'center',
+    fontSize: 20,
+  },
+  upgradeButton: {
+    marginHorizontal: 10,
+    marginTop: 30,
   },
   iconContainer: {
     flexDirection: 'row',

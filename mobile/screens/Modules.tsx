@@ -7,8 +7,10 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
+  ScrollView,
   Alert,
 } from 'react-native';
+import Image from 'react-native-fast-image';
 import Dialog from 'react-native-dialog';
 import {Header, Icon, Button} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
@@ -16,7 +18,6 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
-import LottieView from 'lottie-react-native';
 
 import {HeaderBadge} from '../../shared/components/common';
 
@@ -248,26 +249,34 @@ class Module extends React.Component<Props, State> {
     } else if (!isOwner) {
       upgradeText = 'Ask class owner to unlock video lessons';
     } else {
-      upgradeText = 'Upgrade your class to unlock video lessons';
+      upgradeText = 'Upgrade to unlock full potential to your space';
     }
 
     if (!this.props.premiumAllowed) {
       return (
-        <View style={styles.promotionView}>
-          <Text style={styles.promotionText}>{upgradeText}</Text>
-          <LottieView
-            source={require('../../shared/images/rocket.json')}
-            autoPlay
-            style={styles.rocket}
-            loop
+        <ScrollView style={ContainerStyles.padder}>
+          <Text style={styles.promoBigText}>Video lessons</Text>
+          <Text style={styles.promoInfoText}>
+            Engage with others with videos and PDFs with our free analytics
+            services
+          </Text>
+
+          <Image
+            source={require('../../shared/images/mock.jpg')}
+            style={styles.promoImage}
+            resizeMode="contain"
           />
+
+          <Text style={styles.promoUpgradeText}>{upgradeText}</Text>
+
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
               onPress={() => this.props.navigation.navigate('Checkout')}
+              containerStyle={styles.upgradeButton}
             />
           )}
-        </View>
+        </ScrollView>
       );
     }
 
@@ -401,20 +410,29 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: 'row',
   },
-  promotionText: {
-    fontSize: 18,
-    padding: 10,
-    fontWeight: '800',
+  promoBigText: {
+    color: '#2089dc',
+    fontSize: 50,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  promoInfoText: {
+    color: '#2089dc',
+    fontSize: 20,
     alignSelf: 'center',
   },
-  rocket: {
-    position: 'relative',
-    height: 450,
+  promoImage: {
+    height: 200,
     width: '100%',
-    alignSelf: 'center',
+    marginVertical: 20,
   },
-  promotionView: {
-    padding: 20,
+  promoUpgradeText: {
+    alignSelf: 'center',
+    fontSize: 20,
+  },
+  upgradeButton: {
+    marginHorizontal: 10,
+    marginTop: 30,
   },
   bottomView: {
     padding: 5,

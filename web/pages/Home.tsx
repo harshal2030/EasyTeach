@@ -39,9 +39,7 @@ const Home = () => {
         </View>
 
         <View style={styles.heroContent}>
-          <Text style={styles.headingText}>
-            Delightful Teaching for Everyone
-          </Text>
+          <Text style={styles.headingText}>Complete classroom toolkit</Text>
           <Text style={styles.subText}>
             Handle your classes and tests hassle free with ease of the app
           </Text>

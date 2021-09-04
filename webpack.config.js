@@ -92,7 +92,6 @@ module.exports = {
     alias: {
       'react-native-config': 'react-web-config',
       'react-native$': 'react-native-web',
-      'lottie-react-native': 'react-native-web-lottie',
     },
   },
   module: {
