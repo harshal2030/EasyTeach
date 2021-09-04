@@ -1,7 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {View, StyleSheet, Text, Image, ImageBackground} from 'react-native';
 import {Input, Button} from 'react-native-elements';
-import {Picker} from '@react-native-picker/picker';
 import {toast} from 'react-toastify';
 import LightBox from 'react-native-lightbox-v2';
 import Dialog from 'react-native-dialog';
@@ -163,16 +162,20 @@ const CreateQuestionCard: React.FC<Props> = (props) => {
           <Text style={{fontWeight: '700', fontSize: 15}}>
             Correct Answer:{' '}
           </Text>
-          <Picker
-            selectedValue={correct}
-            style={{minWidth: 150, height: 30}}
-            onValueChange={(value) => setCorrect(value)}>
+          <select
+            value={correct}
+            onChange={(e) => setCorrect(e.target.value)}
+            style={{minWidth: 150, height: 30}}>
             {data.map((text, i) => {
               if (data[i].trim().length !== 0) {
-                return <Picker.Item value={text} label={text} key={i} />;
+                return (
+                  <option value={text} key={i}>
+                    {text}
+                  </option>
+                );
               }
             })}
-          </Picker>
+          </select>
         </View>
       </View>
 

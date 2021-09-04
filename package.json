@@ -24,7 +24,7 @@
     "@react-native-community/push-notification-ios": "^1.8.0",
     "@react-native-community/slider": "^3.0.3",
     "@react-native-community/viewpager": "^4.2.2",
-    "@react-native-picker/picker": "^1.16.1",
+    "@react-native-picker/picker": "^1.16.7",
     "@react-navigation/drawer": "^5.9.0",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
@@ -79,6 +79,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
     "@babel/preset-react": "^7.12.13",
     "@babel/runtime": "^7.11.2",
     "@iconify-icons/entypo": "^1.1.0",

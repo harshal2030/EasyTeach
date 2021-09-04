@@ -21,7 +21,6 @@ import backIcon from '@iconify-icons/ic/arrow-back';
 import refreshCw from '@iconify-icons/feather/refresh-ccw';
 import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
 import pdfIcon from '@iconify-icons/mdi/file-pdf';
-import {Picker} from '@react-native-picker/picker';
 
 import {TouchableIcon} from '../components/TouchableIcon';
 import {Video} from '../components/Video';
@@ -407,15 +406,16 @@ class Files extends React.Component<Props, State> {
           />
         )}
 
-        <Picker
-          onValueChange={(val) => {
-            this.getModules(val);
-            this.setState({fileType: val});
-          }}
-          selectedValue={this.state.fileType}>
-          <Picker.Item label="Videos" value="video" />
-          <Picker.Item label="PDFs" value="pdf" />
-        </Picker>
+        <select
+          value={this.state.fileType}
+          onChange={(e) => {
+            this.getModules(e.target.value);
+            // @ts-ignore
+            this.setState({fileType: e.target.value});
+          }}>
+          <option value="video">Videos</option>
+          <option value="pdf">PDFs</option>
+        </select>
       </View>
     );
   };
