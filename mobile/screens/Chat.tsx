@@ -1,15 +1,13 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {View, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet, TextInput} from 'react-native';
 import {Header, Text} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import MCI from 'react-native-vector-icons/MaterialCommunityIcons';
-import BottomSheet from 'reanimated-bottom-sheet';
 
 import {Avatar} from '../../shared/components/common';
-import {Comment} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -57,21 +55,6 @@ type MsgRes = {
 const Chat: React.FC<Props> = (props) => {
   const [discuss, setDiscuss] = useState<DiscussRes | null>(null);
   const [msgs, setMsgs] = useState<MsgRes[]>([]);
-
-  const sheet = useRef<BottomSheet>(null);
-
-  const renderContent = () => (
-    <Comment
-      authorAvatar={`${mediaUrl}/avatar/${discuss?.user.avatar}`}
-      authorName={`${discuss?.user.name}`}
-    />
-  );
-
-  const renderSheetHeader = () => (
-    <View style={styles.sheetHeader}>
-      <View style={styles.headerHandle} />
-    </View>
-  );
 
   useEffect(() => {
     axios
@@ -158,14 +141,15 @@ const Chat: React.FC<Props> = (props) => {
         ListFooterComponent={<View style={{height: 100}} />}
       />
 
-      <BottomSheet
-        ref={sheet}
-        snapPoints={['100%', 300, 100]}
-        renderHeader={renderSheetHeader}
-        enabledContentTapInteraction={false}
-        initialSnap={2}
-        renderContent={renderContent}
-      />
+      <View
+        style={{
+          backgroundColor: '#ffff',
+          padding: 2,
+          borderTopColor: greyWithAlpha(0.5),
+          borderTopWidth: 1,
+        }}>
+        <TextInput placeholder="Type here..." multiline />
+      </View>
     </View>
   );
 };
