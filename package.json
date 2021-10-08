@@ -12,14 +12,19 @@
   "dependencies": {
     "@react-navigation/native": "^6.0.4",
     "@react-navigation/native-stack": "^6.2.2",
+    "axios": "^0.22.0",
     "react": "17.0.2",
     "react-native": "0.65.1",
+    "react-native-config": "^1.4.4",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-reanimated": "^2.3.0-beta.1",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
+    "react-native-splash-screen": "^3.2.0",
     "react-native-unimodules": "^0.14.8",
-    "react-native-vector-icons": "^8.1.0"
+    "react-native-vector-icons": "^8.1.0",
+    "react-redux": "^7.2.5",
+    "redux": "^4.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -49,5 +54,14 @@
       "json",
       "node"
     ]
+  },
+  "react-native-unimodules": {
+    "android": {
+      "exclude": [
+        "expo-image-loader",
+        "expo-permissions",
+        "expo-file-system"
+      ]
+    }
   }
 }

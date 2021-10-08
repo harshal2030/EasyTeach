@@ -1,4 +1,14 @@
 apply plugin: "com.android.application"
+apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+project.ext.envConfigFiles = [
+    debug: ".env.development",
+    release: ".env.production",
+    anothercustombuild: ".env",
+]
+
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 import com.android.build.OutputFile
 
@@ -126,7 +136,7 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.easyteach"
+        applicationId "com.hcodes.easyteach"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -184,6 +194,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    addUnimodulesDependencies()
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
