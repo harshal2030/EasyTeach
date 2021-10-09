@@ -87,7 +87,6 @@
         <data android:scheme="https" android:host="easyteach.inddex.co" />
       </intent-filter>
       </activity>
-      <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
 
 </manifest>

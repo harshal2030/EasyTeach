@@ -76,6 +76,7 @@ class AuthScreen extends React.Component<Props, State> {
           },
         )
         .then((res) => {
+          console.log('lol');
           if (res.status === 200) {
             this.storeToken(res.data.token);
             this.props.fetchClasses(res.data.token);
@@ -85,8 +86,9 @@ class AuthScreen extends React.Component<Props, State> {
         })
         .catch(() => {
           this.setState({loading: false});
+          console.log('hii');
           Alert.alert('Invalid Credentials');
-
+          console.log('hii2');
           Analytics.logEvent('http_error', {
             url: loginUrl,
             method: 'post',

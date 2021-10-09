@@ -32,12 +32,12 @@
     "date-fns": "^2.21.1",
     "expo-asset": "^8.2.2",
     "expo-firebase-analytics": "^4.1.0",
-    "expo-screen-capture": "^3.0.0",
+    "expo-screen-capture": "^3.2.0",
     "expo-updates": "^0.4.2",
     "js-base64": "^3.6.0",
-    "react": "16.13.1",
+    "react": "17.0.2",
     "react-dom": "^17.0.2",
-    "react-native": "0.63.3",
+    "react-native": "0.65.1",
     "react-native-android-dialog-picker": "^0.1.0",
     "react-native-background-upload": "^6.2.0",
     "react-native-config": "^1.4.2",
@@ -63,7 +63,7 @@
     "react-native-snackbar": "^2.4.0",
     "react-native-splash-screen": "^3.2.0",
     "react-native-svg": "^12.1.0",
-    "react-native-unimodules": "^0.12.0",
+    "react-native-unimodules": "^0.14.8",
     "react-native-vector-icons": "^7.1.0",
     "react-native-video": "^5.1.1",
     "react-native-view-pdf": "^0.11.0",
@@ -124,5 +124,14 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "react-native-unimodules": {
+    "android": {
+      "exclude": [
+        "expo-image-loader",
+        "expo-permissions",
+        "expo-file-system"
+      ]
+    }
   }
 }
