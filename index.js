@@ -4,14 +4,21 @@
 import React from 'react';
 import {AppRegistry} from 'react-native';
 import App from './src/App';
-import {NavigationContainer} from '@react-navigation/native';
 import {name as appName} from './app.json';
+import {enableScreens} from 'react-native-screens';
+import {store} from './shared/global';
+import {Provider} from 'react-redux';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
+enableScreens();
 
 const Wrapper = () => {
   return (
-    <NavigationContainer>
-      <App />
-    </NavigationContainer>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <App />
+      </SafeAreaProvider>
+    </Provider>
   );
 };
 

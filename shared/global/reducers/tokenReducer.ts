@@ -1,0 +1,45 @@
+import {
+  ActionTypes,
+  RegisterTokenAction,
+  RemoveTokenAction,
+  RegisterFCMAction,
+  RedirectAction,
+} from '../actions/token';
+
+export const tokenReducer = (
+  state: string | null = null,
+  action: RegisterTokenAction | RemoveTokenAction,
+) => {
+  switch (action.type) {
+    case ActionTypes.registerToken:
+      return action.payload;
+    case ActionTypes.removeToken:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const fcmReducer = (
+  state: {os: string; fcmToken: string} | null = null,
+  action: RegisterFCMAction,
+) => {
+  switch (action.type) {
+    case ActionTypes.registerFCM:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const redirected = (
+  state: boolean = false,
+  action: RedirectAction,
+): boolean => {
+  switch (action.type) {
+    case ActionTypes.redirected:
+      return true;
+    default:
+      return state;
+  }
+};

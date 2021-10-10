@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "665109037312",
+    "firebase_url": "https://easy-3e6d3.firebaseio.com",
+    "project_id": "easy-3e6d3",
+    "storage_bucket": "easy-3e6d3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665109037312:android:469b2571f4d361cb29f3e5",
+        "android_client_info": {
+          "package_name": "com.hcodes.easyteach"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665109037312-j1mg9te5e7u793dlpn78bl2e2opn493n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmVW781Z5RpUMgCV1uaRL7nxPEB3YmHrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665109037312-j1mg9te5e7u793dlpn78bl2e2opn493n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
