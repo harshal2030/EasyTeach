@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import {View} from 'react-native-animatable';
 
-import {TouchableView} from './TouchableView';
+import TouchableView from './TouchableView';
 
 interface Props {
   onPress: () => void;

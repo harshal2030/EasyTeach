@@ -1,9 +1,10 @@
 /**
  * @format
  */
+import 'expo-asset';
 import React from 'react';
 import {AppRegistry} from 'react-native';
-import App from './src/App';
+import App from './mobile/App';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
 import {store} from './shared/global';

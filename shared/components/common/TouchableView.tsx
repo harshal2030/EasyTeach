@@ -16,12 +16,12 @@ interface Props {
   style: ViewStyle;
 }
 
-export const TouchableView: React.FC<Props> = ({
+const TouchableView = ({
   isRippleDisabled,
   children,
   style,
   ...props
-}) => {
+}: Props) => {
   if (IS_RIPPLE_EFFECT_SUPPORTED && !isRippleDisabled) {
     const background = TouchableNativeFeedback.Ripple('#FFF', false);
     return (
@@ -37,3 +37,5 @@ export const TouchableView: React.FC<Props> = ({
     );
   }
 };
+
+export default TouchableView;

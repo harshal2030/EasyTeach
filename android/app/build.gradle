@@ -138,8 +138,10 @@ android {
 
     defaultConfig {
         applicationId "com.hcodes.easyteach"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
     }
@@ -158,6 +160,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.env.get('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(project.env.get('MYAPP_UPLOAD_STORE_FILE'))
+                storePassword project.env.get('MYAPP_UPLOAD_STORE_PASSWORD')
+                keyAlias project.env.get('MYAPP_UPLOAD_KEY_ALIAS')
+                keyPassword project.env.get('MYAPP_UPLOAD_KEY_PASSWORD')
+            }
+        }
     }
     buildTypes {
         debug {
@@ -166,7 +176,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
