@@ -1,7 +1,7 @@
 package com.hcodes.easyteach;
 
-import com.hcodes.easyteach.generated.BasePackageList;
-
+import android.content.res.Configuration;
+import androidx.annotation.NonNull;
 import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
@@ -16,16 +16,13 @@ import com.hcodes.easyteach.MMKVJSIModulePackage;
 
 import com.facebook.react.bridge.JSIModulePackage; // <- add
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <- add
-
-import java.util.Arrays;
-
-import org.unimodules.adapters.react.ModuleRegistryAdapter;
-import org.unimodules.adapters.react.ReactModuleRegistryProvider;
+import expo.modules.ApplicationLifecycleDispatcher;
+import expo.modules.ReactNativeHostWrapper;
 
 public class MainApplication extends Application implements ReactApplication {
-  private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(new BasePackageList().getPackageList(), null);
 
-  private final ReactNativeHost mReactNativeHost =
+      private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(
+      this,
       new ReactNativeHost(this) {
         @Override
         public boolean getUseDeveloperSupport() {
@@ -38,10 +35,6 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
-          List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
-            new ModuleRegistryAdapter(mModuleRegistryProvider)
-          );
-          packages.addAll(unimodules);
           return packages;
         }
 
@@ -54,7 +47,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected JSIModulePackage getJSIModulePackage() {
           return new MMKVJSIModulePackage();
         }
-      };
+      });
 
   @Override
   public ReactNativeHost getReactNativeHost() {
@@ -66,6 +59,12 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    ApplicationLifecycleDispatcher.onApplicationCreate(this);
+  }
+  @Override
+  public void onConfigurationChanged(@NonNull Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
   }
 
   /**

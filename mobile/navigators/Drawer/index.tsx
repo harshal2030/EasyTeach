@@ -24,10 +24,12 @@ const DrawerNavigator = (props: Props): JSX.Element => {
   const isLargeScreen = width >= 768;
   return (
     <Drawer.Navigator
-      hideStatusBar={true}
-      // eslint-disable-next-line react-native/no-inline-styles
-      drawerStyle={{width: isLargeScreen ? 350 : '88%'}}
-      drawerType={isLargeScreen ? 'permanent' : 'front'}
+      screenOptions={{
+        drawerHideStatusBarOnOpen: true,
+        drawerStyle: {width: isLargeScreen ? 350 : '88%'},
+        drawerType: isLargeScreen ? 'permanent' : 'front',
+        headerShown: false,
+      }}
       // @ts-ignore
       drawerContent={(pprops) => <DrawerContent {...pprops} />}>
       <Drawer.Screen

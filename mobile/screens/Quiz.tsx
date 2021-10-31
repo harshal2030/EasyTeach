@@ -17,7 +17,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import LightBox from 'react-native-lightbox-v2';
-import PhotoView from 'react-native-photo-view-ex';
+// import PhotoView from 'react-native-photo-view-ex';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -295,17 +295,17 @@ class Quiz extends React.Component<Props, State> {
     );
   };
 
-  ZoomImage = () => {
-    const {currentIndex, questions} = this.state;
-    return (
-      <PhotoView
-        source={{uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`}}
-        style={{width: '100%', height: '100%'}}
-        resizeMode="contain"
-        maximumZoomScale={5}
-      />
-    );
-  };
+  // ZoomImage = () => {
+  //   const {currentIndex, questions} = this.state;
+  //   return (
+  //     <PhotoView
+  //       source={{uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`}}
+  //       style={{width: '100%', height: '100%'}}
+  //       resizeMode="contain"
+  //       maximumZoomScale={5}
+  //     />
+  //   );
+  // };
 
   renderContent = () => {
     const {loading, errored, questions, currentIndex} = this.state;
@@ -341,7 +341,7 @@ class Quiz extends React.Component<Props, State> {
         {questions[currentIndex].attachments && (
           <>
             <Text style={styles.imageText}>*click to enlarge</Text>
-            <LightBox renderContent={this.ZoomImage}>
+            <LightBox>
               <FastImage
                 source={{
                   uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`,

@@ -8,6 +8,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import org.devio.rn.splashscreen.SplashScreen;
 
 import com.facebook.react.ReactActivity;
+import expo.modules.ReactActivityDelegateWrapper;
 
 public class MainActivity extends ReactActivity {
   @Override
@@ -27,11 +28,14 @@ public class MainActivity extends ReactActivity {
 
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
-    return new ReactActivityDelegate(this, getMainComponentName()) {
-      @Override
-      protected ReactRootView createRootView() {
-        return new RNGestureHandlerEnabledRootView(MainActivity.this);
+    return new ReactActivityDelegateWrapper(
+      this,
+      new ReactActivityDelegate(this, getMainComponentName()) {
+        @Override
+        protected ReactRootView createRootView() {
+          return new RNGestureHandlerEnabledRootView(MainActivity.this);
+        }
       }
-    };
+    );
   }
 }

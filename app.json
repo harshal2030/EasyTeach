@@ -4,7 +4,6 @@
   "expo": {
     "name": "EasyTeach",
     "slug": "easy-teach",
-    "sdkVersion": "41.0.0",
     "packagerOpts": {
       "config": "metro.config.js",
       "sourceExts": [
