@@ -871,9 +871,9 @@
     "@babel/helper-plugin-utils" "^7.14.5"
 
 "@babel/plugin-transform-typescript@^7.16.0", "@babel/plugin-transform-typescript@^7.5.0":
-  version "7.16.0"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.16.0.tgz#6af3352077c7c11ba65a4d3e4666bd9fecb2183e"
-  integrity sha512-dNUn7RSt1dykzFTquwm7qND+dQ8u0SRhZpPFsm1GYAad+EEAirNTjqu/fnqB0zVPwjcZQd//DYWszVKoCrQuoQ==
+  version "7.16.1"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.16.1.tgz#cc0670b2822b0338355bc1b3d2246a42b8166409"
+  integrity sha512-NO4XoryBng06jjw/qWEU2LhcLJr1tWkhpMam/H4eas/CDKMX/b2/Ylb6EI256Y7+FVPCawwSM1rrJNOpDiz+Lg==
   dependencies:
     "@babel/helper-create-class-features-plugin" "^7.16.0"
     "@babel/helper-plugin-utils" "^7.14.5"
@@ -1927,6 +1927,14 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.5.tgz#75a2a8e7d8ab4b230414505d92335d1dcb53a6df"
   integrity sha512-L28j2FcJfSZOnL1WBjDYp2vUHCeIFlyYI/53EwD/rKUBQ7MtUUfbQWiyKJGpcnv4/WgrhWsFKrcPstcAt/J0tQ==
 
+"@types/react-native-photo-view@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@types/react-native-photo-view/-/react-native-photo-view-1.5.4.tgz#1b7fd19e14859e878182a28e217e7e8419319f6b"
+  integrity sha512-n8jYvFDICQyzgURvQU2l0sykoaqG/3efu/AJSGLhVMrzKr7pqegi4xDbJlKnCgjR/C2oRL0IqlAgsXZ9brM/qw==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
 "@types/react-native-vector-icons@^6.4.6":
   version "6.4.9"
   resolved "https://registry.yarnpkg.com/@types/react-native-vector-icons/-/react-native-vector-icons-6.4.9.tgz#643b852666681b36997899a94d940ad29d88176d"
@@ -2736,9 +2744,9 @@ camelcase@^6.0.0:
   integrity sha512-c7wVvbw3f37nuobQNtgsgG9POC9qMbNuMQmTCqZv23b6MIz0fcYpBiOlv9gEN/hdLdnZTDQhg6e9Dq5M1vKvfg==
 
 caniuse-lite@^1.0.30001271:
-  version "1.0.30001272"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001272.tgz#8e9790ff995e9eb6e1f4c45cd07ddaa87cddbb14"
-  integrity sha512-DV1j9Oot5dydyH1v28g25KoVm7l8MTxazwuiH3utWiAS6iL/9Nh//TGwqFEeqqN8nnWYQ8HHhUq+o4QPt9kvYw==
+  version "1.0.30001274"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001274.tgz#26ca36204d15b17601ba6fc35dbdad950a647cc7"
+  integrity sha512-+Nkvv0fHyhISkiMIjnyjmf5YJcQ1IQHZN6U9TLUMroWR38FNwpsC51Gb68yueafX1V6ifOisInSgP9WJFS13ew==
 
 capture-exit@^2.0.0:
   version "2.0.0"

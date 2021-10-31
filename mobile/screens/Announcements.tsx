@@ -396,7 +396,7 @@ const Home: React.FC<Props> = (props) => {
     return (
       <Input
         placeholder="Type here..."
-        autoCompleteType="name"
+        autoCompleteType="off"
         value={message}
         errorStyle={{height: 0}}
         returnKeyType="send"

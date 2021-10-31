@@ -497,14 +497,14 @@ class CreateTest extends React.Component<Props, State> {
 
           <Input
             label="Title"
-            autoCompleteType="name"
+            autoCompleteType="off"
             value={title}
             onChangeText={(text) => this.setState({title: text})}
           />
 
           <Input
             label="Description"
-            autoCompleteType="name"
+            autoCompleteType="off"
             value={description}
             inputStyle={{maxHeight: 100}}
             multiline

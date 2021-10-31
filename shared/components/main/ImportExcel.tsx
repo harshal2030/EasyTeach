@@ -1,5 +1,4 @@
 import React from 'react';
-// import PhotoView from 'react-native-photo-view-ex';
 import LightBox from 'react-native-lightbox-v2';
 import {View, StyleSheet, Linking} from 'react-native';
 import FastImage from 'react-native-fast-image';

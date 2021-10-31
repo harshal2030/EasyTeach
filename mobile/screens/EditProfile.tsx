@@ -171,13 +171,13 @@ class EditProfile extends React.Component<Props, State> {
           buttonProps={{title: 'Update'}}>
           <Input
             label="Name"
-            autoCompleteType="name"
+            autoCompleteType="off"
             value={name}
             onChangeText={(text) => this.setState({name: text})}
           />
           <Input
             label="Username"
-            autoCompleteType="name"
+            autoCompleteType="off"
             value={username}
             onChangeText={(text) => this.setState({username: text})}
           />

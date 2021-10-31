@@ -67,6 +67,7 @@
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/jest": "^26.0.23",
     "@types/react-native": "~0.64.12",
+    "@types/react-native-photo-view": "^1.5.4",
     "@types/react-native-video": "^5.0.10",
     "@types/react-test-renderer": "^17.0.1",
     "@types/validator": "^13.6.3",
@@ -98,7 +99,8 @@
       "exclude": [
         "expo-image-loader",
         "expo-permissions",
-        "expo-file-system"
+        "expo-file-system",
+        "expo-font"
       ]
     }
   }

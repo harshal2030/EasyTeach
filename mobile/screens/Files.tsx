@@ -141,11 +141,12 @@ class Files extends React.Component<Props, State> {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.pdf],
+        allowMultiSelection: false,
       });
 
       const dest = `${fs.TemporaryDirectoryPath}/${Date.now()}.pdf`;
 
-      await fs.copyFile(res.uri, dest);
+      await fs.copyFile(res[0].uri, dest);
 
       this.setState({file: {uri: dest, type: 'pdf'}, videoModal: true});
     } catch (e) {

@@ -116,14 +116,18 @@ class Test extends React.Component<Props, State> {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
+        allowMultiSelection: false,
       });
+      console.log(res);
 
       this.setState({excelModal: false});
       this.props.navigation.navigate('CreateTest', {
         file: {
-          name: res.name,
-          type: res.type,
-          uri: res.uri,
+          name: res[0].name,
+          type:
+            res[0].type ||
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          uri: res[0].uri,
         },
       });
     } catch (e) {
