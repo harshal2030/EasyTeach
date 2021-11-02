@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -56,55 +56,48 @@ type State = {
   loading: boolean;
 };
 
-class JoinClass extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+const JoinClass: React.FC<Props> = (props) => {
+  const [selected, setSelected] = useState(0);
+  const [photo, setPhoto] = useState({
+    uri: `${mediaUrl}/class/avatar`,
+    type: '',
+  });
+  const [joinCode, setJoinCode] = useState(props.route.params?.c || '');
+  const [className, setClassName] = useState('');
+  const [subject, setSubject] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    this.state = {
-      selected: 0,
-      photo: {
-        uri: `${mediaUrl}/class/avatar`,
-        type: '',
-      },
-      joinCode: props.route.params?.c || '',
-      className: '',
-      about: '',
-      subject: '',
-      loading: false,
-    };
-  }
+  const sheet = useRef<RBSheet | null>(null);
 
-  private joinSocketRoom = (classId: string) => {
+  const joinSocketRoom = (classId: string) => {
     socket.emit('class:join_create', classId);
   };
 
-  componentDidMount() {
-    if (this.props.route.params?.c) {
-      this.joinClassRequest();
+  useEffect(() => {
+    if (props.route.params?.c) {
+      joinClassRequest();
     }
-  }
+  });
 
-  private sheet: RBSheet | null = null;
-
-  private joinClassRequest = () => {
-    this.setState({loading: true});
+  const joinClassRequest = () => {
+    setLoading(true);
     axios
       .post<Class>(
         `${classUrl}/join`,
         {
-          joinCode: this.state.joinCode,
+          joinCode,
         },
         {
           headers: {
-            Authorization: `Bearer ${this.props.token}`,
+            Authorization: `Bearer ${props.token}`,
           },
         },
       )
       .then((res) => {
-        this.props.registerCurrentClass(res.data);
-        this.props.addClass(res.data);
-        this.props.navigation.navigate('Drawer');
-        this.joinSocketRoom(res.data.id);
+        props.registerCurrentClass(res.data);
+        props.addClass(res.data);
+        props.navigation.navigate('Drawer');
+        joinSocketRoom(res.data.id);
 
         SnackBar.show({
           text: `Successfully joined ${res.data.name} class, open drawer to navigate to new class`,
@@ -114,7 +107,7 @@ class JoinClass extends React.Component<Props, State> {
         });
       })
       .catch((e) => {
-        this.setState({loading: false});
+        setLoading(false);
         if (e.response && e.response.status === 400) {
           return Alert.alert('Oops!', e.response.data.error);
         }
@@ -132,9 +125,8 @@ class JoinClass extends React.Component<Props, State> {
       });
   };
 
-  private createClassRequest = () => {
-    this.setState({loading: true});
-    const {className, subject, about, photo} = this.state;
+  const createClassRequest = () => {
+    setLoading(true);
     const reqBody = new FormData();
 
     reqBody.append(
@@ -142,7 +134,6 @@ class JoinClass extends React.Component<Props, State> {
       JSON.stringify({
         name: className,
         subject,
-        about,
       }),
     );
 
@@ -161,18 +152,18 @@ class JoinClass extends React.Component<Props, State> {
     axios
       .post<Class>(classUrl, reqBody, {
         headers: {
-          Authorization: `Bearer ${this.props.token}`,
+          Authorization: `Bearer ${props.token}`,
           'Content-Type': 'multipart/form-data',
         },
       })
       .then((res) => {
-        this.props.addClass(res.data);
-        this.props.registerCurrentClass(res.data);
-        this.joinSocketRoom(res.data.id);
-        this.props.navigation.navigate('Drawer');
+        props.addClass(res.data);
+        props.registerCurrentClass(res.data);
+        joinSocketRoom(res.data.id);
+        props.navigation.navigate('Drawer');
       })
       .catch((e) => {
-        this.setState({loading: false});
+        setLoading(false);
         if (e.response) {
           if (e.response.status === 400) {
             return Alert.alert('Oops!', e.response.data.error);
@@ -192,7 +183,7 @@ class JoinClass extends React.Component<Props, State> {
       });
   };
 
-  private joinClass() {
+  const joinClass = () => {
     const {joinClassContainer, joinClassText} = styles;
     return (
       <KeyboardAvoidingView behavior="height" style={joinClassContainer}>
@@ -202,118 +193,103 @@ class JoinClass extends React.Component<Props, State> {
         </Text>
         <Input
           label="Class Code"
-          onChangeText={(joinCode) => this.setState({joinCode})}
-          value={this.state.joinCode}
+          onChangeText={setJoinCode}
+          defaultValue={joinCode}
         />
         <Button
           title="Join Class"
-          loading={this.state.loading}
-          onPress={this.joinClassRequest}
+          loading={loading}
+          onPress={joinClassRequest}
         />
       </KeyboardAvoidingView>
     );
-  }
+  };
 
-  private createClass() {
-    const {className, about, subject, loading, photo} = this.state;
+  const createClass = () => {
     return (
       <ScrollView>
         <CommonSetting
           buttonLoading={loading}
-          onButtonPress={this.createClassRequest}
+          onButtonPress={createClassRequest}
           buttonProps={{title: 'Create Class'}}
           imageSource={{uri: photo.uri}}
-          onImagePress={() => this.sheet!.open()}>
+          onImagePress={() => sheet.current!.open()}>
           <Input
             label="Class Name"
-            value={className}
-            onChangeText={(text) => this.setState({className: text})}
-          />
-          <Input
-            label="About"
-            multiline
-            numberOfLines={3}
-            value={about}
-            onChangeText={(text) => this.setState({about: text})}
+            defaultValue={className}
+            onChangeText={setClassName}
           />
           <Input
             label="Subject"
-            value={subject}
-            onChangeText={(text) => this.setState({subject: text})}
+            defaultValue={subject}
+            onChangeText={setSubject}
           />
         </CommonSetting>
       </ScrollView>
     );
-  }
+  };
 
-  private onImage = (image: ImageOrVideo) => {
-    this.sheet!.close();
-    this.setState({
-      photo: {
-        uri: image.path,
-        type: image.mime,
-      },
+  const onImage = (image: ImageOrVideo) => {
+    sheet.current!.close();
+    setPhoto({
+      uri: image.path,
+      type: image.mime,
     });
   };
 
-  private onImageError = () => {
+  const onImageError = () => {
     SnackBar.show({
       text: 'Unable to pick image',
       duration: SnackBar.LENGTH_SHORT,
     });
-    this.sheet!.close();
+    sheet.current!.close();
   };
 
-  private goBack = () => {
-    if (this.props.navigation.canGoBack()) {
-      this.props.navigation.goBack();
+  const goBack = () => {
+    if (props.navigation.canGoBack()) {
+      props.navigation.goBack();
     } else {
-      this.props.navigation.replace('Drawer');
+      props.navigation.replace('Drawer');
     }
   };
 
-  render() {
-    const {mainContainer, RBContainer} = styles;
-    const {loading} = this.state;
-
-    return (
-      <View style={mainContainer}>
-        <Header
-          leftComponent={
-            <MaterialIcons
-              name="arrow-back"
-              color="#fff"
-              size={28}
-              onPress={this.goBack}
-            />
-          }
-          centerComponent={{
-            text: 'Join or Create class',
-            style: {fontSize: 20, color: '#ffff'},
-          }}
-        />
-        <View style={RBContainer}>
-          <ButtonGroup
-            buttons={['Join Class', 'Create Class']}
-            disabled={loading}
-            onPress={(selected) => this.setState({selected})}
-            selectedIndex={this.state.selected}
+  return (
+    <View style={styles.mainContainer}>
+      <Header
+        leftComponent={
+          <MaterialIcons
+            name="arrow-back"
+            color="#fff"
+            size={28}
+            onPress={goBack}
           />
-        </View>
-
-        {this.state.selected === 0 ? this.joinClass() : this.createClass()}
-
-        <PhotoPicker
-          sheetRef={(ref) => (this.sheet = ref)}
-          onCameraImage={this.onImage}
-          onPickerImage={this.onImage}
-          onCameraError={this.onImageError}
-          onPickerError={this.onImageError}
+        }
+        centerComponent={{
+          text: 'Join or Create class',
+          style: {fontSize: 20, color: '#ffff'},
+        }}
+      />
+      <View style={styles.RBContainer}>
+        <ButtonGroup
+          buttons={['Join Class', 'Create Class']}
+          disabled={loading}
+          onPress={setSelected}
+          selectedIndex={selected}
         />
       </View>
-    );
-  }
-}
+
+      {selected === 0 ? joinClass() : createClass()}
+
+      <PhotoPicker
+        sheetRef={sheet}
+        onCameraImage={onImage}
+        onPickerImage={onImage}
+        onCameraError={onImageError}
+        onPickerError={onImageError}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   mainContainer: {

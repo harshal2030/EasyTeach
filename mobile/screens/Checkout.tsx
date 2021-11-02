@@ -1,5 +1,4 @@
 import React from 'react';
-// import axios from 'axios';
 import {View} from 'react-native';
 import {Header} from 'react-native-elements';
 import {WebView, WebViewMessageEvent} from 'react-native-webview';

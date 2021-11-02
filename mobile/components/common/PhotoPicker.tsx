@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {MutableRefObject} from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -8,7 +8,7 @@ import ImagePicker, {
 } from 'react-native-image-crop-picker';
 
 type Props = {
-  sheetRef(ref: RBSheet | null): any;
+  sheetRef: MutableRefObject<RBSheet | null>;
   onCameraImage(image: ImageOrVideo): any;
   onPickerImage(image: ImageOrVideo): any;
   onCameraError(e?: any): any;

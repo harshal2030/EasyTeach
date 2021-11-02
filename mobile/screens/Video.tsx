@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import {StatusBar, Text, StyleSheet} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
@@ -26,67 +26,58 @@ type State = {
   isFullScreen: boolean;
 };
 
-class Video extends React.Component<Props, State> {
-  start: Date = new Date();
+const Video: React.FC<Props> = (props) => {
+  const [isFullScreen, setFullScreen] = useState<boolean>(false);
+  const [start] = useState(new Date());
 
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      isFullScreen: false,
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     StatusBar.setHidden(true);
-  }
 
-  componentWillUnmount() {
-    Orientation.unlockAllOrientations();
-    StatusBar.setHidden(false);
+    return () => {
+      Orientation.unlockAllOrientations();
+      StatusBar.setHidden(false);
 
-    axios
-      .post(
-        `${vidTrackerUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${this.props.route.params.id}`,
-        {
-          start: this.start,
-          stop: new Date(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
+      axios
+        .post(
+          `${vidTrackerUrl}/${props.currentClass.id}/${props.route.params.moduleId}/${props.route.params.id}`,
+          {
+            start: start,
+            stop: new Date(),
           },
-        },
-      )
-      .catch(() => null);
-  }
+          {
+            headers: {
+              Authorization: `Bearer ${props.token}`,
+            },
+          },
+        )
+        .catch(() => null);
+    };
+  });
 
-  onFullScreenPress = () => {
-    if (!this.state.isFullScreen) {
+  const onFullScreenPress = () => {
+    if (!isFullScreen) {
       Orientation.lockToLandscape();
     } else {
       Orientation.lockToPortrait();
     }
 
-    this.setState({isFullScreen: !this.state.isFullScreen});
+    setFullScreen((prev) => !prev);
   };
 
-  render() {
-    return (
-      <VideoPlayer
-        source={{
-          uri: this.props.route.params.url,
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        }}
-        onFullScreenPress={this.onFullScreenPress}
-        style={styles.video}>
-        <Text style={styles.title}>{this.props.route.params.title}</Text>
-      </VideoPlayer>
-    );
-  }
-}
+  return (
+    <VideoPlayer
+      source={{
+        uri: props.route.params.url,
+        headers: {
+          Authorization: `Bearer ${props.token}`,
+        },
+      }}
+      onFullScreenPress={onFullScreenPress}
+      style={styles.video}>
+      <Text style={styles.title}>{props.route.params.title}</Text>
+    </VideoPlayer>
+  );
+};
 
 const styles = StyleSheet.create({
   video: {

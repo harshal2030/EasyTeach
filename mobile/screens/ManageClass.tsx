@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import axios from 'axios';
 import {
   View,
@@ -35,7 +35,7 @@ import {
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {ContainerStyles, ImageStyles} from '../../shared/styles/styles';
 import {mediaUrl, classUrl, studentUrl} from '../../shared/utils/urls';
-import {flatRed, eucalyptusGreen} from '../../shared/styles/colors';
+import {flatRed} from '../../shared/styles/colors';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Manage'>,
@@ -61,104 +61,73 @@ interface Props {
   unread: number;
 }
 
-interface State {
-  name: string;
-  about: string;
-  subject: string;
-  lockJoin: boolean;
-  photo: {
-    uri: string;
-    type: string;
-  };
-  loading: boolean;
-  lockMsg: boolean;
-}
+const ManageClass: React.FC<Props> = (props) => {
+  const [name, setName] = useState(props.currentClass!.name);
+  const [about, setAbout] = useState(props.currentClass!.about);
+  const [subject, setSubject] = useState(props.currentClass!.subject);
+  const [lockJoin, setLockJoin] = useState(props.currentClass!.lockJoin);
+  const [photo, setPhoto] = useState({
+    uri: `${mediaUrl}/class/avatar/${props.currentClass!.photo}`,
+    type: 'image/png',
+  });
+  const [lockMsg, setLockMsg] = useState(props.currentClass!.lockMsg);
+  const [loading, setLoading] = useState(false);
 
-class ManageClass extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+  const sheet = useRef<RBSheet | null>(null);
 
-    const {name, photo, about, subject, lockJoin, lockMsg} =
-      this.props.currentClass!;
+  useEffect(() => {
+    onClassChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.currentClass?.id]);
 
-    this.state = {
-      name,
-      about,
-      subject,
-      lockJoin,
-      lockMsg,
-      photo: {
-        uri: `${mediaUrl}/class/avatar/${photo}`,
-        type: 'image/png',
-      },
-      loading: false,
-    };
-  }
-
-  sheet: RBSheet | null = null;
-
-  onClassChange = () => {
-    const {name, about, subject, lockJoin, photo} = this.props.currentClass!;
-    this.setState({
-      name,
-      about,
-      subject,
-      lockJoin,
-      photo: {
-        uri: `${mediaUrl}/class/avatar/${photo}`,
-        type: 'image/png',
-      },
+  const onClassChange = () => {
+    setName(props.currentClass!.name);
+    setAbout(props.currentClass!.about);
+    setSubject(props.currentClass!.subject);
+    setLockJoin(props.currentClass!.lockJoin);
+    setLockMsg(props.currentClass!.lockMsg);
+    setPhoto({
+      uri: `${mediaUrl}/class/avatar/${props.currentClass!.photo}`,
+      type: 'image/png',
     });
   };
 
-  componentDidUpdate(prevProps: Props) {
-    if (this.props.currentClass) {
-      if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
-        this.onClassChange();
-      }
-    }
-  }
-
-  onImage = (image: ImageOrVideo) => {
-    this.sheet!.close();
-    this.setState({
-      photo: {
-        uri: image.path,
-        type: image.mime,
-      },
+  const onImage = (image: ImageOrVideo) => {
+    sheet.current!.close();
+    setPhoto({
+      uri: image.path,
+      type: image.mime,
     });
   };
 
-  onImageError = () => {
+  const onImageError = () => {
     SnackBar.show({
       text: 'Unable to pick image.',
       duration: SnackBar.LENGTH_SHORT,
     });
-    this.sheet!.close();
+    sheet.current!.close();
   };
 
-  unEnroll = () => {
+  const unEnroll = () => {
     const removeFromClass = () => {
-      this.setState({loading: true});
+      setLoading(true);
       axios
         .delete(
-          `${studentUrl}/${this.props.profile.username}/${
-            this.props.currentClass!.id
-          }`,
+          `${studentUrl}/${props.profile.username}/${props.currentClass!.id}`,
           {
             headers: {
-              Authorization: `Bearer ${this.props.token}`,
+              Authorization: `Bearer ${props.token}`,
             },
           },
         )
         .then(() => {
-          this.setState({loading: false});
-          this.props.removeClass(this.props.currentClass!.id);
-          this.props.navigation.navigate('Home');
-          this.props.revokeCurrentClass(this.props.classes);
+          setLoading(false);
+          props.removeClass(props.currentClass!.id);
+          props.navigation.navigate('Home');
+          props.revokeCurrentClass(props.classes);
         })
         .catch(() => {
-          this.setState({loading: false});
+          setLoading(false);
           SnackBar.show({
             text: 'Unable to unenroll at the moment. Please try again later',
             duration: SnackBar.LENGTH_LONG,
@@ -171,7 +140,7 @@ class ManageClass extends React.Component<Props, State> {
     Alert.alert(
       'Confirm',
       `Are you sure to unenroll from ${
-        this.props.currentClass!.name
+        props.currentClass!.name
       }? You won't have access to this class.`,
       [
         {
@@ -185,9 +154,8 @@ class ManageClass extends React.Component<Props, State> {
     );
   };
 
-  updateClass = () => {
-    this.setState({loading: true});
-    const {name, subject, about, photo, lockJoin, lockMsg} = this.state;
+  const updateClass = () => {
+    setLoading(true);
     const reqBody = new FormData();
 
     reqBody.append(
@@ -201,9 +169,7 @@ class ManageClass extends React.Component<Props, State> {
       }),
     );
 
-    if (
-      photo.uri !== `${mediaUrl}/class/avatar/${this.props.currentClass?.photo}`
-    ) {
+    if (photo.uri !== `${mediaUrl}/class/avatar/${props.currentClass?.photo}`) {
       reqBody.append('classPhoto', {
         // @ts-ignore
         name: 'photo.jpeg',
@@ -216,23 +182,23 @@ class ManageClass extends React.Component<Props, State> {
     }
 
     axios
-      .put<Class>(`${classUrl}/${this.props.currentClass!.id}`, reqBody, {
+      .put<Class>(`${classUrl}/${props.currentClass!.id}`, reqBody, {
         headers: {
-          Authorization: `Bearer ${this.props.token}`,
+          Authorization: `Bearer ${props.token}`,
           'Content-Type': 'multipart/form-data',
         },
       })
       .then((res) => {
-        this.setState({loading: false});
+        setLoading(false);
         if (res.status !== 200) {
           throw new Error();
         }
-        this.props.updateClasses(res.data);
-        this.props.registerCurrentClass(res.data);
-        this.props.navigation.goBack();
+        props.updateClasses(res.data);
+        props.registerCurrentClass(res.data);
+        props.navigation.goBack();
       })
       .catch((e) => {
-        this.setState({loading: false});
+        setLoading(false);
         if (e.response) {
           if (e.response.status === 400) {
             return Alert.alert('Oops!', e.response.data.error);
@@ -246,32 +212,19 @@ class ManageClass extends React.Component<Props, State> {
       });
   };
 
-  shareCode = () => {
+  const shareCode = () => {
     Share.open({
       title: 'Join my class on EasyTeach',
       message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
-        this.props.currentClass!.joinCode
+        props.currentClass!.joinCode
       }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
     })
       .then(() => null)
       .catch(() => null);
   };
 
-  renderUpgradeButton = () => {
-    if (this.props.isOwner && this.props.currentClass!.planId === 'free') {
-      return (
-        <Button
-          title="Upgrade"
-          buttonStyle={{backgroundColor: eucalyptusGreen}}
-          containerStyle={{marginTop: 20}}
-          onPress={() => this.props.navigation.navigate('Checkout')}
-        />
-      );
-    }
-  };
-
-  renderNextPayDate = () => {
-    const {currentClass, premiumAllowed, isOwner} = this.props;
+  const renderNextPayDate = () => {
+    const {currentClass, premiumAllowed, isOwner} = props;
 
     if (isOwner) {
       const nextPay = currentClass!.payedOn
@@ -294,145 +247,138 @@ class ManageClass extends React.Component<Props, State> {
     }
   };
 
-  render() {
-    const {name, about, subject, lockJoin, photo, loading, lockMsg} =
-      this.state;
-    const {joinCode} = this.props.currentClass!;
-    const {isOwner, premiumAllowed} = this.props;
+  const {joinCode} = props.currentClass!;
+  const {isOwner, premiumAllowed} = props;
+  return (
+    <View style={ContainerStyles.parent}>
+      <Header
+        centerComponent={{
+          text: isOwner ? 'Manage' : 'Info',
+          style: {fontSize: 24, color: '#fff', fontWeight: '600'},
+        }}
+        leftComponent={
+          <>
+            <Icon
+              name="menu"
+              tvParallaxProperties
+              size={26}
+              onPress={props.navigation.openDrawer}
+              color="#ffff"
+            />
+            {props.unread !== 0 ? <HeaderBadge /> : null}
+          </>
+        }
+      />
 
-    return (
-      <View style={ContainerStyles.parent}>
-        <Header
-          centerComponent={{
-            text: this.props.isOwner ? 'Manage' : 'Info',
-            style: {fontSize: 24, color: '#fff', fontWeight: '600'},
-          }}
-          leftComponent={
+      <ScrollView keyboardShouldPersistTaps="handled">
+        <View style={{padding: 20}}>
+          {isOwner ? (
+            <FastImage style={ImageStyles.classImage} source={{uri: photo.uri}}>
+              <TouchableOpacity
+                style={ImageStyles.imageOverlay}
+                onPress={() => sheet.current!.open()}>
+                <MI name="camera-alt" color="#000" size={28} />
+              </TouchableOpacity>
+            </FastImage>
+          ) : (
+            <FastImage
+              style={ImageStyles.classImage}
+              source={{uri: photo.uri}}
+            />
+          )}
+
+          <Input
+            defaultValue={name}
+            disabled={loading || !isOwner}
+            label="Class Name"
+            onChangeText={setName}
+          />
+          <Input
+            value={props.currentClass!.owner.name}
+            label="Class Owner"
+            disabled
+          />
+          <Input
+            defaultValue={about}
+            label="About"
+            disabled={loading || !isOwner}
+            numberOfLines={3}
+            multiline
+            onChangeText={setAbout}
+          />
+          <Input
+            defaultValue={subject}
+            label="Subject"
+            disabled={loading || !isOwner}
+            onChangeText={setSubject}
+          />
+          {renderNextPayDate()}
+          {isOwner && (
             <>
-              <Icon
-                name="menu"
-                tvParallaxProperties
-                size={26}
-                onPress={this.props.navigation.openDrawer}
-                color="#ffff"
+              <Input
+                value={joinCode}
+                label="Join Code"
+                rightIcon={{
+                  name: 'share',
+                  type: 'material',
+                  onPress: shareCode,
+                }}
+                disabled
               />
-              {this.props.unread !== 0 ? <HeaderBadge /> : null}
+              <CheckBox
+                checked={lockMsg}
+                title="Lock Messages"
+                desc="Enabling this will not allow students to send messages."
+                onPress={() => setLockMsg((prev) => !prev)}
+              />
+              <CheckBox
+                checked={lockJoin}
+                title="Lock Join"
+                onPress={() => setLockJoin((prev) => !prev)}
+                desc="Enabling this will not allow anyone to join the class."
+              />
             </>
-          }
-        />
+          )}
 
-        <ScrollView keyboardShouldPersistTaps="handled">
-          <View style={{padding: 20}}>
-            {isOwner ? (
-              <FastImage
-                style={ImageStyles.classImage}
-                source={{uri: photo.uri}}>
-                <TouchableOpacity
-                  style={ImageStyles.imageOverlay}
-                  onPress={() => this.sheet!.open()}>
-                  <MI name="camera-alt" color="#000" size={28} />
-                </TouchableOpacity>
-              </FastImage>
-            ) : (
-              <FastImage
-                style={ImageStyles.classImage}
-                source={{uri: photo.uri}}
-              />
-            )}
-
-            <Input
-              value={name}
-              disabled={loading || !isOwner}
-              label="Class Name"
-              onChangeText={(text) => this.setState({name: text})}
-            />
-            <Input
-              value={this.props.currentClass!.owner.name}
-              label="Class Owner"
-              disabled
-            />
-            <Input
-              value={about}
-              label="About"
-              disabled={loading || !isOwner}
-              numberOfLines={3}
-              multiline
-              onChangeText={(text) => this.setState({about: text})}
-            />
-            <Input
-              value={subject}
-              label="Subject"
-              disabled={loading || !isOwner}
-              onChangeText={(text) => this.setState({subject: text})}
-            />
-            {this.renderNextPayDate()}
-            {isOwner && (
-              <>
-                <Input
-                  value={joinCode}
-                  label="Join Code"
-                  rightIcon={{
-                    name: 'share',
-                    type: 'material',
-                    onPress: this.shareCode,
-                  }}
-                  disabled
-                />
-                <CheckBox
-                  checked={lockMsg}
-                  title="Lock Messages"
-                  desc="Enabling this will not allow students to send messages."
-                  onPress={() => this.setState({lockMsg: !lockMsg})}
-                />
-                <CheckBox
-                  checked={lockJoin}
-                  title="Lock Join"
-                  onPress={() => this.setState({lockJoin: !lockJoin})}
-                  desc="Enabling this will not allow anyone to join the class."
-                />
-              </>
-            )}
-
-            {isOwner ? (
-              <>
-                <Button
-                  title="Save"
-                  onPress={this.updateClass}
-                  loading={loading}
-                  containerStyle={{marginTop: 20}}
-                />
-              </>
-            ) : (
+          {isOwner ? (
+            <>
               <Button
-                title="Unenroll"
+                title="Save"
+                onPress={updateClass}
                 loading={loading}
-                buttonStyle={{backgroundColor: flatRed}}
-                onPress={this.unEnroll}
                 containerStyle={{marginTop: 20}}
               />
-            )}
+            </>
+          ) : (
+            <Button
+              title="Unenroll"
+              loading={loading}
+              buttonStyle={{backgroundColor: flatRed}}
+              onPress={unEnroll}
+              containerStyle={{marginTop: 20}}
+            />
+          )}
 
-            {isOwner && !premiumAllowed && (
-              <Button
-                title="Upgrade"
-                containerStyle={{marginTop: 20}}
-                onPress={() => this.props.navigation.navigate('Checkout')}
-              />
-            )}
-          </View>
-        </ScrollView>
+          {isOwner && !premiumAllowed && (
+            <Button
+              title="Upgrade"
+              containerStyle={{marginTop: 20}}
+              onPress={() => props.navigation.navigate('Checkout')}
+            />
+          )}
+        </View>
+      </ScrollView>
 
-        <PhotoPicker
-          sheetRef={(ref) => (this.sheet = ref)}
-          onCameraImage={this.onImage}
-          onPickerImage={this.onImage}
-          onCameraError={this.onImageError}
-          onPickerError={this.onImageError}
-        />
-      </View>
-    );
-  }
-}
+      <PhotoPicker
+        sheetRef={sheet}
+        onCameraImage={onImage}
+        onPickerImage={onImage}
+        onCameraError={onImageError}
+        onPickerError={onImageError}
+      />
+    </View>
+  );
+};
 
 const mapStateToProps = (state: StoreState) => {
   let isOwner = false;
