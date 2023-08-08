@@ -1,6 +1,5 @@
 import {Dispatch} from 'redux';
 import axios from 'axios';
-import MMKVStorage from 'react-native-mmkv-storage';
 import {classUrl} from '../../utils/urls';
 
 /* eslint-disable no-undef */
@@ -125,27 +124,12 @@ const classesFetchedSuccess = (classes: Class[]): classFetchedAction => {
   };
 };
 
-const fetchClasses = (token: string, storage?: MMKVStorage.API) => {
+const fetchClasses = (token: string, storage?: unknown) => {
   return async (dispatch: Dispatch) => {
     let currentClass: Class | null = null;
 
-    if (storage) {
-      storage.getArray('classes', (err, result: Class[] | null | undefined) => {
-        if (!err && result) {
-          dispatch(classesFetchedSuccess(result));
-
-          if (result.length !== 0) {
-            currentClass = result[0];
-            dispatch(registerCurrentClass(result[0]));
-          }
-        }
-      });
-    }
-
     try {
-      if (!storage) {
-        dispatch(classesLoading(true));
-      }
+      dispatch(classesLoading(true));
       const classes = await axios.get<Class[]>(classUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -159,6 +143,7 @@ const fetchClasses = (token: string, storage?: MMKVStorage.API) => {
       }
 
       if (storage) {
+        // @ts-ignore
         storage.setArray('classes', classes.data);
       }
     } catch (e) {

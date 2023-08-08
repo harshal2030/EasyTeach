@@ -10,7 +10,7 @@ import {
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
-import {MMKV, dataStore} from './MMKV';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Update from 'expo-updates';
 import Config from 'react-native-config';
 
@@ -87,7 +87,7 @@ const App: React.FC<Props> = (props) => {
   };
 
   const checkToken = async () => {
-    const token = MMKV.getString('token');
+    const token = await AsyncStorage.getItem('token');
     setLoading(false);
     if (token) {
       props.registerToken(token);
@@ -113,7 +113,7 @@ const App: React.FC<Props> = (props) => {
           );
         }
 
-        props.fetchClasses(token, dataStore);
+        props.fetchClasses(token);
         Analytics.setUserId(res.data.user.username);
         props.registerProfile(res.data.user);
       } catch (e: any) {

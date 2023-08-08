@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button, Badge} from 'react-native-elements';
-import {MMKV} from '../../MMKV';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -76,7 +76,7 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const logOut = async () => {
     try {
-      MMKV.removeItem('token');
+      await AsyncStorage.removeItem('token');
       props.removeToken();
       props.removeCurrentClass();
 

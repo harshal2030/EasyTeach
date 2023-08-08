@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import {Alert} from 'react-native';
 import {connect} from 'react-redux';
-import {MMKV} from '../MMKV';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -35,7 +35,7 @@ const AuthScreen: React.FC<Props> = (props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const storeToken = (token: string) => {
-    MMKV.setString('token', token);
+    AsyncStorage.setItem('token', token);
   };
 
   const onLogin = (email: string, password: string) => {

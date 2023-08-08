@@ -9,7 +9,7 @@ import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import * as Analytics from 'expo-firebase-analytics';
-import {MMKV} from '../MMKV';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {CommonSetting} from '../../shared/components/main';
 import {PhotoPicker} from '../components/common';
@@ -54,7 +54,7 @@ const EditProfile: React.FC<Props> = (props) => {
   const sheet = useRef<RBSheet | null>(null);
 
   const storeNewToken = (token: string) => {
-    MMKV.setString('token', token);
+    AsyncStorage.setItem('token', token);
   };
 
   const updateProfile = () => {
