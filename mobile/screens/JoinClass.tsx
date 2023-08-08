@@ -139,7 +139,8 @@ class JoinClass extends React.Component<Props, State> {
       }),
     );
 
-    if (photo.uri !== 'none') {
+    if (photo.type !== '') {
+      // @ts-ignore
       reqBody.append('classPhoto', {
         // @ts-ignore
         name: 'photo.jpeg',

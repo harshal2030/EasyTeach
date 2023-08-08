@@ -10,8 +10,8 @@ import {
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
-import {MMKV} from './MMKV';
 import * as Update from 'expo-updates';
+import AsyncStorage from '@react-native-community/async-storage';
 import Config from 'react-native-config';
 
 import Loading from './Loading';
@@ -87,7 +87,7 @@ const App: React.FC<Props> = (props) => {
   };
 
   const checkToken = async () => {
-    const token = MMKV.getString('token');
+    const token = await AsyncStorage.getItem('token');
     setLoading(false);
     if (token) {
       props.registerToken(token);

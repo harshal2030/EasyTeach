@@ -125,7 +125,6 @@ class Home extends React.Component<Props, State> {
       // do nothing
     }
 
-    this.setState({message: ''});
     axios
       .post<Msg>(
         `${msgUrl}/${this.props.currentClass!.id}`,
@@ -138,8 +137,11 @@ class Home extends React.Component<Props, State> {
           },
         },
       )
-      .then(() => null)
+      .then(() => {
+        this.setState({message: ''});
+      })
       .catch(() => {
+        this.setState({message: ''});
         SnackBar.show({
           text: 'Unable to send message at the moment. Please try again later',
           backgroundColor: flatRed,

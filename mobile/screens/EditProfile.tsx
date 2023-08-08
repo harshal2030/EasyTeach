@@ -8,7 +8,7 @@ import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import {MMKV} from '../MMKV';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {CommonSetting} from '../../shared/components/main';
 import {PhotoPicker} from '../components/common';
@@ -68,7 +68,7 @@ class EditProfile extends React.Component<Props, State> {
   }
 
   storeNewToken = (token: string) => {
-    MMKV.setString('token', token);
+    AsyncStorage.setItem('token', token);
   };
 
   onImage = (image: ImageOrVideo) => {
@@ -96,6 +96,7 @@ class EditProfile extends React.Component<Props, State> {
     form.append('info', JSON.stringify({name, username}));
 
     if (avatar.uri !== `${mediaUrl}/avatar/${this.props.profile.avatar}`) {
+      // @ts-ignore
       form.append('avatar', {
         // @ts-ignore
         name: 'photo.jpeg',

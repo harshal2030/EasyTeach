@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {Alert} from 'react-native';
 import {connect} from 'react-redux';
-import {MMKV} from '../MMKV';
+import AsyncStorage from '@react-native-community/async-storage';
 import isEmail from 'validator/lib/isEmail';
 import Config from 'react-native-config';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -44,7 +44,7 @@ class AuthScreen extends React.Component<Props, State> {
   }
 
   storeToken = (token: string) => {
-    MMKV.setString('token', token);
+    AsyncStorage.setItem('token', token);
   };
 
   onLogin = (email: string, password: string) => {

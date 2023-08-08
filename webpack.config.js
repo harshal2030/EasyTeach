@@ -8,7 +8,6 @@ const BundleAnalyzerPlugin =
 const {extendDefaultPlugins} = require('svgo');
 const ImageMin = require('image-minimizer-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const Brotli = require('brotli-webpack-plugin');
 
 const ReactWebConfig =
   require('react-web-config/lib/ReactWebConfig').ReactWebConfig;
@@ -118,7 +117,6 @@ module.exports = {
     ReactWebConfig(envFilePath),
     new BundleAnalyzerPlugin(),
     new CompressionPlugin(),
-    new Brotli(),
     new ImageMin({
       minimizerOptions: {
         plugins: [
