@@ -3,7 +3,7 @@ import Config from 'react-native-config';
 const root =
   Config.env === 'production'
     ? 'https://api.easyteach.inddex.co'
-    : 'http://192.168.43.21:3000';
+    : 'https://easyteach-api.quirky-craft.com';
 
 const websiteRoot =
   Config.env === 'production'
