@@ -5,7 +5,7 @@ import {redirected} from '../shared/global/actions/token';
 import {RootStackParamList} from './navigators';
 
 export const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: ['https://easyteach.inddex.co', 'easyteach://inddex'],
+  prefixes: ['https://easyteach.quirky-craft.com', 'easyteach://inddex'],
   config: {
     screens: {
       JoinClass: 'joinclass',

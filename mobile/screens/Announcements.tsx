@@ -110,7 +110,7 @@ const Home: React.FC<Props> = (props) => {
       Linking.getInitialURL()
         .then((url) => {
           if (url) {
-            linkTo(url.replace('https://easyteach.inddex.co', ''));
+            linkTo(url.replace('https://easyteach.quirky-craft.com', ''));
           }
         })
         .catch(() => null);
@@ -224,7 +224,7 @@ const Home: React.FC<Props> = (props) => {
     try {
       Share.open({
         title: 'Join my class on EasyTeach',
-        message: `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+        message: `Join my class on EasyTeach, through this code: https://easyteach.quirky-craft.com/joinclass?c=${
           props.currentClass!.joinCode
         }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
       });

@@ -78,7 +78,7 @@ const Test: React.FC<Props> = (props) => {
   const shareTest = (quizId: string) => {
     Share.open({
       title: 'Open Test on EasyTeach',
-      message: `Open test on EasyTeach through this link https://easyteach.inddex.co/quiz/${props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+      message: `Open test on EasyTeach through this link https://easyteach.quirky-craft.com/quiz/${props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
     })
       .then(() => null)
       .catch(() => null);

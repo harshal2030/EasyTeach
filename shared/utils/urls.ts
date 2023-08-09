@@ -2,12 +2,12 @@ import Config from 'react-native-config';
 
 const root =
   Config.env === 'production'
-    ? 'https://api.easyteach.inddex.co'
+    ? 'https://easyteach-api.quirky-craft.com'
     : 'https://easyteach-api.quirky-craft.com';
 
 const websiteRoot =
   Config.env === 'production'
-    ? 'https://easyteach.inddex.co'
+    ? 'https://easyteach.quirky-craft.com'
     : 'http://192.168.43.21:8080';
 
 const signUpUrl = `${root}/users/create`;

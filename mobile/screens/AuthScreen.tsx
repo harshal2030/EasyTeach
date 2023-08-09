@@ -43,6 +43,7 @@ const AuthScreen: React.FC<Props> = (props) => {
       return Alert.alert('Invalid credentials');
     }
 
+    console.log('login', email, password, loginUrl);
     setLoading(true);
     axios
       .post<{
@@ -73,7 +74,8 @@ const AuthScreen: React.FC<Props> = (props) => {
           props.registerProfile(res.data.user);
         }
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         setLoading(false);
         Alert.alert('Invalid Credentials');
 

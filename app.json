@@ -2,6 +2,13 @@
   "name": "EasyTeach",
   "displayName": "EasyTeach",
   "expo": {
+    "android": {
+      "hermesEnabled": true
+    },
+    "jsEngine": "hermes",
+    "ios": {
+      "jsEngine": "jsc"
+    },  
     "name": "EasyTeach",
     "slug": "easy-teach",
     "packagerOpts": {
@@ -19,6 +26,15 @@
         "wasm",
         "svg"
       ]
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9131c045-fc71-4287-834d-98f6973c0c72"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/9131c045-fc71-4287-834d-98f6973c0c72"
     }
   }
 }
