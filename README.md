@@ -20,15 +20,13 @@ EasyTeach is a comprehensive educational tool designed to make teaching and lear
 This process assumes that you have node v14.17.x installed on your system.
 
 1. Clone the repo.
-<br />
 ```git clone https://github.com/harshal2030/EasyTeach.git```
 2. Navigate to the directory
-<br />
+
 ```
 cd EasyTeach
 ```
 3. Install the dependencies
-<br />
 ```
 $ yarn
 $ pnx patch-package
