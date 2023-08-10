@@ -3330,12 +3330,12 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-native@~0.64.12":
-  version "0.64.18"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.64.18.tgz#b672bbffb00103aeb84477e0e19eb5203ee8a3b5"
-  integrity sha512-irrhCPxKVr4TWyDjpf/h8YtQ9kdbKRKo+VuMLw295fnzKnFZRc5+m2oQ1BCI6V5cjfVqwLimqH7MrLCLK6Shpw==
+"@types/react-native@~0.64.4":
+  version "0.64.33"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.64.33.tgz#9947bf56cd52a11f8a95af9523d7840f281f6702"
+  integrity sha512-oHpz3R0XJKxkiUJkmFvS2FZ14me91FQ2ptz0xursn4sX47GGtaHuUPLwBHXyMRZCQHixhgKV1NMk/RuCwZCrlw==
   dependencies:
-    "@types/react" "*"
+    "@types/react" "^17"
 
 "@types/react-redux@^7.1.20":
   version "7.1.20"
@@ -3397,10 +3397,10 @@
     "@types/scheduler" "*"
     csstype "^3.0.2"
 
-"@types/react@^16.9.49":
-  version "16.14.44"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.14.44.tgz#84702caf0da7f27a09a2e6fe611c8875c149b981"
-  integrity sha512-TvEx2X0MrSioYQpUSiWe122KeHNmOm5cZd4czKroIc7/cST4IaIgoCplQQ87xucEpOmRtNykq7vR6/4fo93Y+g==
+"@types/react@^17.0.1":
+  version "17.0.63"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.63.tgz#78ca41a34b1e4fd5ba9398d33bc78a81bfd5c180"
+  integrity sha512-T+aaG8RlIkgJ4VzWLJYbMW9QX7sIAV8CcuyV6FU6Hm7yu3Bee1YBZQRu2vYEm/dU8kre+/mzl2aGYh5MFgVLaQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
