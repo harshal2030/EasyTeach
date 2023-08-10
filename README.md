@@ -43,7 +43,9 @@ MYAPP_UPLOAD_KEY_PASSWORD=<password provided for keystore>
 ```
 For more on app signing head to https://reactnative.dev/docs/signed-apk-android
 
-5. Run `yarn android` or `yarn ios` for mobile version and `yarn web` for the web version
+5. Run `yarn android` or `yarn ios` for mobile version and `yarn web` for the web version.
+
+6. You can find the backend for the app at https://github.com/harshal2030/easy-back
 
 # Usage
 - Register or log in to your account.
