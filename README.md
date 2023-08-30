@@ -29,7 +29,7 @@ cd EasyTeach
 3. Install the dependencies
 ```
 $ yarn
-$ pnx patch-package
+$ npx patch-package
 ```
 4. Setup Environment variables in file `.end.development` for running locally on your machine and `.env.production` for building it for production
 ```
