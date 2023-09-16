@@ -47,6 +47,8 @@ For more on app signing head to https://reactnative.dev/docs/signed-apk-android
 
 6. You can find the backend for the app at https://github.com/harshal2030/easy-back
 
+**Note: Please use Node 14 when running metro**
+
 # Usage
 - Register or log in to your account.
 - Navigate through the dashboard and create or join a class.
