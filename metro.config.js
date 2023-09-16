@@ -1,13 +1,21 @@
-const {getDefaultConfig} = require('metro-config');
+/**
+ * Metro configuration for React Native
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ */
+
+const {getDefaultConfig} = require('@expo/metro-config');
 
 module.exports = (async () => {
   const {
     resolver: {sourceExts, assetExts},
-  } = await getDefaultConfig();
+  } = await getDefaultConfig(__dirname);
 
   return {
     transformer: {
       babelTransformerPath: require.resolve('react-native-svg-transformer'),
+      assetPlugins: ['expo-asset/tools/hashAssetFiles'],
       getTransformOptions: async () => ({
         transform: {
           experimentalImportSupport: false,

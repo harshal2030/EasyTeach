@@ -12,7 +12,7 @@ import FastImage from 'react-native-fast-image';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import {Button, Badge} from 'react-native-elements';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import Octicons from 'react-native-vector-icons/Octicons';
@@ -30,6 +30,7 @@ import {
 } from '../../../shared/global/actions/classes';
 
 import {Avatar} from '../../../shared/components/common';
+import {SMClass} from '../../../shared/components/main';
 
 import {
   commonBackground,
@@ -41,20 +42,22 @@ import {mediaUrl, logOutUrl} from '../../../shared/utils/urls';
 import {DrawerContentComponentProps} from '@react-navigation/drawer';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList, DrawerParamList} from '../types';
 
 type HomeScreenNavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Home'>,
-  StackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
 type Props = DrawerContentComponentProps & {
   token: string | null;
   removeToken: typeof removeToken;
-  classes: Class[];
-  classIsLoading: boolean;
-  classErrored: boolean;
+  classes: {
+    loading: boolean;
+    errored: boolean;
+    classes: Class[];
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
   navigation: HomeScreenNavigationProp;
@@ -73,6 +76,10 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const logOut = async () => {
     try {
+      await AsyncStorage.removeItem('token');
+      props.removeToken();
+      props.removeCurrentClass();
+
       await axios.post(
         logOutUrl,
         {},
@@ -82,9 +89,6 @@ const DrawerContent = (props: Props): JSX.Element => {
           },
         },
       );
-      AsyncStorage.removeItem('token');
-      props.removeToken();
-      props.removeCurrentClass();
     } catch (e) {
       Alert.alert('Error', 'Unable to logout please try again later');
     }
@@ -92,32 +96,15 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <TouchableOpacity
+      <SMClass
         onPress={() => {
           props.registerCurrentClass(item);
           props.navigation.closeDrawer();
-        }}>
-        <FastImage
-          source={{
-            uri: `${mediaUrl}/class/avatar/${item.photo}`,
-          }}
-          style={avatarImageStyle}
-        />
-        {props.unread.data[item.id]?.unread ? (
-          <Badge
-            status="error"
-            value={props.unread.data[item.id]?.unread}
-            badgeStyle={{
-              position: 'absolute',
-              right: -1,
-              top: -4,
-            }}
-          />
-        ) : null}
-        <Text numberOfLines={1} style={{fontSize: 16, fontWeight: '900'}}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
+        }}
+        photo={`${mediaUrl}/class/avatar/${item.photo}`}
+        unread={props.unread.data[item.id]?.unread}
+        name={item.name}
+      />
     );
   };
 
@@ -137,17 +124,17 @@ const DrawerContent = (props: Props): JSX.Element => {
   };
 
   const renderClasses = () => {
-    if (props.classErrored) {
+    if (props.classes.errored) {
       return <Text>Errored</Text>;
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return <Text>Loading...</Text>;
     }
 
     return (
       <FlatList
-        data={props.classes}
+        data={props.classes.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         removeClippedSubviews
@@ -164,7 +151,6 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarText,
     optionText,
     optionListContainer,
-    avatarImageStyle,
     optionContainer,
   } = styles;
   return (
@@ -199,11 +185,11 @@ const DrawerContent = (props: Props): JSX.Element => {
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
                 : 'https://api.easyetach.inddex.co/noimage',
             }}
-            style={mainImage}>
-            <Text style={classText}>
-              {currentClass ? currentClass.name : 'Current Class appears here'}
-            </Text>
-          </FastImage>
+            style={mainImage}
+          />
+          <Text style={classText}>
+            {currentClass ? currentClass.name : 'Current Class appears here'}
+          </Text>
 
           <View style={avatarContainer}>
             <Avatar
@@ -222,7 +208,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
 
           <View style={optionListContainer}>
-            {props.classes.length === 0 ? null : (
+            {props.classes.classes.length === 0 ? null : (
               <>
                 <TouchableOpacity
                   style={optionContainer}
@@ -297,12 +283,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 5,
   },
-  avatarImageStyle: {
-    height: 60,
-    width: 60,
-    marginTop: 10,
-    backgroundColor: commonGrey,
-  },
   leftContainer: {
     width: 90,
     backgroundColor: commonBackground,
@@ -317,10 +297,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     padding: 5,
-    backgroundColor: 'rgba(237, 240, 242, 0.8)',
+    backgroundColor: greyWithAlpha(0.4),
   },
   mainImage: {
-    height: 200,
+    height: 170,
     width: '100%',
     justifyContent: 'flex-end',
     backgroundColor: commonGrey,
@@ -365,8 +345,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classErrored: state.classHasErrored,
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,

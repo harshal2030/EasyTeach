@@ -4,6 +4,7 @@ import {
   View,
   StyleSheet,
   FlatList,
+  Image,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
@@ -13,6 +14,9 @@ import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import Dialog from 'react-native-dialog';
 import MenuIcon from '@iconify-icons/ic/menu';
+import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
+import lockIcon from '@iconify-icons/ic/lock';
+import Modal from 'react-native-modal';
 
 import {TouchableIcon} from '../components';
 import Cross from '../../shared/images/cross.svg';
@@ -20,9 +24,16 @@ import {Avatar, HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  PeoplePayload,
+  fetchPeople,
+  removeUser,
+} from '../../shared/global/actions/people';
+
 import {mediaUrl, studentUrl} from '../../shared/utils/urls';
 import {commonBlue, greyWithAlpha} from '../../shared/styles/colors';
 import {TextStyles} from '../../shared/styles/styles';
+import {excelExtPattern} from '../../shared/utils/regexPatterns';
 
 interface Props {
   profile: {
@@ -38,6 +49,9 @@ interface Props {
   registerCurrentClass: typeof registerCurrentClass;
   premiumAllowed: boolean;
   unread: number;
+  people: PeoplePayload;
+  removeUser: typeof removeUser;
+  fetchPeople: (classId: string, offsetChange?: number) => void;
 }
 
 interface peopleProp {
@@ -47,47 +61,26 @@ interface peopleProp {
 }
 
 const People = (props: Props) => {
-  const [people, setPeople] = React.useState<peopleProp[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [alertVisible, setAlert] = React.useState<boolean>(false);
   const [user, setUser] = React.useState<{name: string; username: string}>({
     name: '',
     username: '',
   });
-  const [offset, setOffset] = React.useState(0);
+  const [visible, setVisible] = React.useState(false);
 
-  const fetchPeople = () => {
-    setPeople([]);
-    setLoading(true);
-    axios
-      .get<peopleProp[]>(`${studentUrl}/${props.currentClass!.id}`, {
-        headers: {
-          Authorization: `Bearer ${props.token!}`,
-        },
-        params: {
-          offset,
-        },
-        timeout: 20000,
-      })
-      .then((res) => {
-        setLoading(false);
-        setPeople(res.data);
-      })
-      .catch(() => {
-        setLoading(false);
-        toast.error('Unable to show people. Please try again later');
-      });
+  const fileRef = React.useRef<HTMLImageElement | null>(null);
+
+  const {users: people, offset, loading} = props.people;
+
+  const onPrevPress = () => {
+    if (offset !== 0) {
+      props.fetchPeople(props.currentClass!.id, -10);
+    }
   };
 
   const onNextPress = () => {
     if (people.length >= 10) {
-      setOffset((prevValue) => prevValue + 10);
-    }
-  };
-
-  const onPrevPress = () => {
-    if (offset !== 0) {
-      setOffset((prevValue) => prevValue - 10);
+      props.fetchPeople(props.currentClass!.id, 10);
     }
   };
 
@@ -107,10 +100,10 @@ const People = (props: Props) => {
     }
 
     if (props.currentClass) {
-      fetchPeople();
+      props.fetchPeople(classFound!.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.currentClass, classId, offset]);
+  }, [props.currentClass, classId]);
 
   const removeStudent = () => {
     setAlert(false);
@@ -123,10 +116,7 @@ const People = (props: Props) => {
       .then(() => {
         toast.info(`${user.name} removed successfully from the class`);
 
-        const newPeople = people.filter(
-          (ppl) => ppl.username !== user.username,
-        );
-        setPeople(newPeople);
+        props.removeUser(user.username, props.currentClass!.id);
       })
       .catch(() => toast.error(`Unable to remove ${user.name} at the moment`));
   };
@@ -193,6 +183,30 @@ const People = (props: Props) => {
     );
   };
 
+  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (!excelExtPattern.test(file.name)) {
+        return toast.error('Please select a valid file');
+      }
+
+      const form = new FormData();
+      form.append('sheet', file);
+
+      axios
+        .post(`${studentUrl}/${props.currentClass!.id}`, form, {
+          headers: {
+            Authorization: `Bearer ${props.token}`,
+          },
+        })
+        .then(() => {
+          setVisible(false);
+          toast.info('Sheet upload successfully');
+        })
+        .catch(() => toast.error('Unable to upload sheet'));
+    }
+  };
+
   const renderListFooter = () => {
     if (loading) {
       return <ActivityIndicator size="large" animating color={commonBlue} />;
@@ -234,6 +248,18 @@ const People = (props: Props) => {
             {props.unread !== 0 ? <HeaderBadge /> : null}
           </>
         }
+        rightComponent={
+          <>
+            {props.isOwner && (
+              <TouchableIcon
+                icon={uploadIcon}
+                size={34}
+                color="#fff"
+                onPress={() => setVisible(true)}
+              />
+            )}
+          </>
+        }
       />
       {props.currentClass ? (
         <FlatList
@@ -260,6 +286,54 @@ const People = (props: Props) => {
           </Text>
         </View>
       )}
+
+      <Modal
+        isVisible={visible}
+        onBackdropPress={() => setVisible(false)}
+        style={{justifyContent: 'center', alignItems: 'center'}}>
+        <View
+          style={{
+            backgroundColor: '#fff',
+            height: 500,
+            width: 400,
+            padding: 20,
+          }}>
+          <h2>Selective class joining</h2>
+          <Text>
+            Upload a excel sheet with pattern given below and people with given
+            email address can only join
+          </Text>
+          <Image
+            source={require('../../shared/images/people.png')}
+            style={{height: 200, width: 200, margin: 10}}
+            resizeMode="contain"
+          />
+          {props.premiumAllowed ? (
+            <Button
+              title="Upload sheet"
+              buttonStyle={{marginHorizontal: 10}}
+              onPress={() => fileRef.current!.click()}
+            />
+          ) : (
+            <Button
+              title="Upgrade Required"
+              buttonStyle={{marginHorizontal: 10}}
+              onPress={() =>
+                history.push(`/checkout/${props.currentClass?.id}`)
+              }
+              icon={<TouchableIcon icon={lockIcon} size={26} color="#fff" />}
+            />
+          )}
+        </View>
+      </Modal>
+
+      <input
+        type="file"
+        // @ts-ignore
+        ref={fileRef}
+        style={{display: 'none'}}
+        onChange={onFileSelect}
+      />
 
       <Dialog.Container visible={alertVisible}>
         <Dialog.Title>Confirm</Dialog.Title>
@@ -314,11 +388,21 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     currentClass: state.currentClass,
     profile: state.profile,
-    classes: state.classes,
+    classes: state.classes.classes,
     isOwner,
     premiumAllowed,
     unread: state.unreads.totalUnread,
+    people: state.people[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      offset: 0,
+      users: [],
+    },
   };
 };
 
-export default connect(mapStateToProps, {registerCurrentClass})(People);
+export default connect(mapStateToProps, {
+  registerCurrentClass,
+  fetchPeople,
+  removeUser,
+})(People);

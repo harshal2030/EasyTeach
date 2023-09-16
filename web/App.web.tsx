@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import {Route, Switch, RouteProps, Redirect} from 'react-router-dom';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
 import lazy from '@loadable/component';
@@ -79,7 +79,7 @@ type Props = {
   registerFCM: typeof registerFCM;
   fetchClasses: Function;
   classIsLoading: boolean;
-  currentClass: Class | null;
+  classes: Class[];
 };
 
 interface State {
@@ -168,10 +168,10 @@ class App extends React.Component<Props, State> {
   };
 
   handleRedirect = () => {
-    return !this.props.currentClass ? (
+    return this.props.classes.length === 0 ? (
       <Redirect to="/classes/home" />
     ) : (
-      <Redirect to={`/classes/home/${this.props.currentClass.id}`} />
+      <Redirect to={`/classes/home/${this.props.classes[0].id}`} />
     );
   };
 
@@ -287,8 +287,8 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
-    classIsLoading: state.classIsLoading,
-    currentClass: state.currentClass,
+    classIsLoading: state.classes.loading,
+    classes: state.classes.classes,
   };
 };
 

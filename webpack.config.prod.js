@@ -31,8 +31,7 @@ const compileNodeModules = [
   'react-native-dialog',
   'react-native-svg',
   'react-native-svg-transformer',
-  '@react-native-picker/picker',
-  'react-native-web',
+  'react-native-parsed-text',
 ].map((moduleName) => path.resolve(appDirectory, `node_modules/${moduleName}`));
 
 const babelLoaderConfiguration = {
@@ -94,7 +93,6 @@ module.exports = {
     alias: {
       'react-native-config': 'react-web-config',
       'react-native$': 'react-native-web',
-      'lottie-react-native': 'react-native-web-lottie',
     },
   },
   module: {

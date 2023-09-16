@@ -7,11 +7,12 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
+  ScrollView,
+  Image,
 } from 'react-native';
 import Dialog from 'react-native-dialog';
 import {Header, Button} from 'react-native-elements';
 import {connect} from 'react-redux';
-import LottieView from 'lottie-react-native';
 import {toast} from 'react-toastify';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
 import pencilIcon from '@iconify-icons/mdi/pencil';
@@ -25,6 +26,14 @@ import {HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
+import {
+  fetchModules,
+  ModulePayload,
+  Module as ModuleRes,
+  addModule,
+  updateModule,
+  removeModule,
+} from '../../shared/global/actions/modules';
 
 import {moduleUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -46,18 +55,14 @@ interface Props extends RouteComponentProps<{classId: string}> {
   registerCurrentClass: typeof registerCurrentClass;
   onLeftTopPress: () => void;
   unread: number;
-}
-
-interface ModuleRes {
-  id: string;
-  title: string;
-  classId: string;
+  modules: ModulePayload;
+  fetchModules: (classId: string) => void;
+  addModule: typeof addModule;
+  updateModule: typeof updateModule;
+  removeModule: typeof removeModule;
 }
 
 interface State {
-  loading: boolean;
-  errored: boolean;
-  modules: ModuleRes[];
   dialogVisible: boolean;
   moduleName: string;
   moduleId: string | null;
@@ -74,9 +79,6 @@ class Module extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: true,
-      errored: false,
-      modules: [],
       dialogVisible: false,
       moduleName: '',
       moduleId: null,
@@ -103,23 +105,28 @@ class Module extends React.Component<Props, State> {
       }
     }
     if (this.props.premiumAllowed) {
-      this.fetchModules();
+      this.props.fetchModules(classFound!.id);
     }
   }
 
   componentDidUpdate(prevProps: Props) {
+    const {classId} = this.props.match.params;
     if (
       prevProps.currentClass?.id === this.props.currentClass?.id &&
       this.props.premiumAllowed !== prevProps.premiumAllowed
     ) {
-      this.fetchModules();
+      this.props.fetchModules(classId);
       return;
     }
 
     if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchModules();
+      this.props.fetchModules(classId);
     }
   }
+
+  fetchModules = () => {
+    this.props.fetchModules(this.props.match.params.classId);
+  };
 
   Alert = (
     title: string,
@@ -140,24 +147,6 @@ class Module extends React.Component<Props, State> {
     });
   };
 
-  fetchModules = async () => {
-    try {
-      this.setState({loading: true});
-      const res = await axios.get<ModuleRes[]>(
-        `${moduleUrl}/${this.props.currentClass?.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      );
-
-      this.setState({loading: false, modules: res.data});
-    } catch (e) {
-      this.setState({loading: false, errored: true});
-    }
-  };
-
   confirmDelete = (id: string) => {
     const deleteModule = () => {
       this.setState({alertVisible: false});
@@ -168,8 +157,8 @@ class Module extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          const temp = this.state.modules.filter((val) => val.id !== id);
-          this.setState({modules: temp, moduleId: null});
+          this.props.removeModule(id, this.props.match.params.classId);
+          this.setState({moduleId: null});
         })
         .catch(() => {
           toast.error('Unable to delete module. Please try again later');
@@ -209,8 +198,8 @@ class Module extends React.Component<Props, State> {
         },
       );
 
+      this.props.addModule(res.data, this.props.match.params.classId);
       this.setState({
-        modules: [...this.state.modules, res.data],
         moduleName: '',
       });
     } catch (e) {
@@ -234,12 +223,8 @@ class Module extends React.Component<Props, State> {
         },
       );
 
-      const moduleIndex = this.state.modules.findIndex(
-        (val) => val.id === res.data.id,
-      );
-      const temp = [...this.state.modules];
-      temp[moduleIndex] = res.data;
-      this.setState({moduleId: null, modules: temp, moduleName: ''});
+      this.props.updateModule(res.data, this.props.match.params.classId);
+      this.setState({moduleName: ''});
     } catch (e) {
       this.setState({moduleId: null, moduleName: ''});
       toast.error('Unable to update. Please try again later');
@@ -293,7 +278,7 @@ class Module extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {loading, errored, modules} = this.state;
+    const {loading, errored, modules} = this.props.modules;
     const {isOwner, currentClass} = this.props;
 
     let upgradeText = '';
@@ -309,25 +294,33 @@ class Module extends React.Component<Props, State> {
 
     if (!this.props.premiumAllowed) {
       return (
-        <View style={styles.promotionView}>
-          <Text style={styles.promotionText}>{upgradeText}</Text>
-          <LottieView
-            source={require('../../shared/images/rocket.json')}
-            autoPlay
-            style={styles.rocket}
-            loop
+        <ScrollView style={ContainerStyles.padder}>
+          <Text style={styles.promoBigText}>Video lessons</Text>
+          <Text style={styles.promoInfoText}>
+            Engage with others with videos and PDFs with our free analytics
+            services
+          </Text>
+
+          <Image
+            source={require('../../shared/images/mock.jpg')}
+            style={styles.promoImage}
+            resizeMode="contain"
           />
+
+          <Text style={styles.promoUpgradeText}>{upgradeText}</Text>
+
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
               onPress={() =>
                 this.props.history.push(
-                  `/checkout/${this.props.currentClass?.id}`,
+                  `/checkout/${this.props.match.params.classId}`,
                 )
               }
+              containerStyle={styles.upgradeButton}
             />
           )}
-        </View>
+        </ScrollView>
       );
     }
 
@@ -473,6 +466,30 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  promoBigText: {
+    color: '#2089dc',
+    fontSize: 50,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  promoInfoText: {
+    color: '#2089dc',
+    fontSize: 20,
+    alignSelf: 'center',
+  },
+  promoImage: {
+    height: 200,
+    width: '100%',
+    marginVertical: 20,
+  },
+  promoUpgradeText: {
+    alignSelf: 'center',
+    fontSize: 20,
+  },
+  upgradeButton: {
+    marginHorizontal: 10,
+    marginTop: 30,
+  },
   iconContainer: {
     flexDirection: 'row',
   },
@@ -526,11 +543,22 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token!,
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
-    classes: state.classes,
+    classes: state.classes.classes,
     unread: state.unreads.totalUnread,
+    modules: state.modules[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      modules: [],
+    },
   };
 };
 
 export default withRouter(
-  connect(mapStateToProps, {registerCurrentClass})(Module),
+  connect(mapStateToProps, {
+    registerCurrentClass,
+    fetchModules,
+    removeModule,
+    addModule,
+    updateModule,
+  })(Module),
 );

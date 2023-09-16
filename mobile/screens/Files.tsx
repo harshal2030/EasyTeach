@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {Header, Button, Input, Icon, SpeedDial} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import ImagePicker from 'react-native-image-crop-picker';
 import Upload from 'react-native-background-upload';
@@ -26,6 +26,7 @@ import DocumentPicker from 'react-native-document-picker';
 import fs from 'react-native-fs';
 import PDFView from 'react-native-view-pdf';
 import {Picker} from '@react-native-picker/picker';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
@@ -41,7 +42,7 @@ import {
 import {fileUrl} from '../../shared/utils/urls';
 import {ContainerStyles} from '../../shared/styles/styles';
 
-type navigation = StackNavigationProp<RootStackParamList, 'Files'>;
+type navigation = NativeStackNavigationProp<RootStackParamList, 'Files'>;
 
 type Props = {
   navigation: navigation;
@@ -112,6 +113,11 @@ class Files extends React.Component<Props, State> {
       this.setState({files: res.data, loading: false});
     } catch (e) {
       this.setState({errored: true, loading: false});
+      await Analytics.logEvent('http_error', {
+        url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,
+        method: 'get',
+        reason: 'unk',
+      });
     }
   };
 
@@ -135,11 +141,12 @@ class Files extends React.Component<Props, State> {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.pdf],
+        allowMultiSelection: false,
       });
 
       const dest = `${fs.TemporaryDirectoryPath}/${Date.now()}.pdf`;
 
-      await fs.copyFile(res.uri, dest);
+      await fs.copyFile(res[0].uri, dest);
 
       this.setState({file: {uri: dest, type: 'pdf'}, videoModal: true});
     } catch (e) {
@@ -184,6 +191,12 @@ class Files extends React.Component<Props, State> {
         textColor: '#fff',
         duration: SnackBar.LENGTH_LONG,
       });
+
+      await Analytics.logEvent('http_error', {
+        url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}/${fileId}`,
+        method: 'get',
+        reason: 'unk',
+      });
     }
   };
 
@@ -193,7 +206,6 @@ class Files extends React.Component<Props, State> {
     }
 
     const path = this.state.file!.uri.replace('file://', '');
-    console.log(path);
 
     Upload.startUpload({
       url: `${fileUrl}/${this.props.currentClass.id}/${this.props.route.params.moduleId}`,
@@ -282,6 +294,7 @@ class Files extends React.Component<Props, State> {
             <View style={{flexDirection: 'row'}}>
               <Icon
                 name="information-outline"
+                tvParallaxProperties
                 color="#000"
                 type="material-community"
                 onPress={() =>
@@ -294,6 +307,7 @@ class Files extends React.Component<Props, State> {
               />
               <Icon
                 name="delete-outline"
+                tvParallaxProperties
                 color={flatRed}
                 type="material-community"
                 onPress={() => this.confirmDelete(item.id)}

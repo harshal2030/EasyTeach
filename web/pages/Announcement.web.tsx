@@ -22,7 +22,12 @@ import {MsgCard} from '../../shared/components/common';
 
 import {StoreState, store} from '../../shared/global/index.web';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
-import {fetchMsgs, Msg, addMsg} from '../../shared/global/actions/msgs';
+import {
+  fetchMsgs,
+  Msg,
+  addMsg,
+  removeMsg,
+} from '../../shared/global/actions/msgs';
 import {addUnread} from '../../shared/global/actions/unreads';
 
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -40,6 +45,13 @@ socket.on('message', (data: {type: string; payload: WSMsg}) => {
   store.dispatch(addMsg(data.payload, data.payload.classId));
 });
 
+socket.on(
+  'message:delete',
+  (data: {type: string; payload: {classId: string; msgId: string}}) => {
+    store.dispatch(removeMsg(data.payload.msgId, data.payload.classId));
+  },
+);
+
 type WSMsg = Msg & {
   classId: string;
 };
@@ -51,9 +63,11 @@ type Props = RouteComponentProps<{classId: string}> & {
     avatar: string;
   };
   currentClass: Class | null;
-  classHasErrored: boolean;
-  classes: Class[];
-  classIsLoading: boolean;
+  classes: {
+    classes: Class[];
+    loading: boolean;
+    errored: boolean;
+  };
   token: string | null;
   fetchMsgs(token: string, classId: string, endReached?: boolean): void;
   addMsg: typeof addMsg;
@@ -67,6 +81,7 @@ type Props = RouteComponentProps<{classId: string}> & {
   isOwner: boolean;
   onLeftTopPress: () => void;
   unread: number;
+  removeMsg: typeof removeMsg;
 };
 
 interface State {
@@ -84,9 +99,10 @@ class Home extends React.Component<Props, State> {
 
   componentDidMount() {
     const {classId} = this.props.match.params;
-    const {classes} = this.props;
+    const {classes} = this.props.classes;
 
     const classFound = classes.find((cls) => cls.id === classId);
+    console.log(classFound, this.props.classes);
 
     if (classFound) {
       this.props.registerCurrentClass(classFound);
@@ -103,7 +119,7 @@ class Home extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Props) {
     const {classId} = this.props.match.params;
-    const {classes} = this.props;
+    const {classes} = this.props.classes;
 
     const hasClassChanged = prevProps.match.params.classId !== classId;
 
@@ -154,14 +170,39 @@ class Home extends React.Component<Props, State> {
       );
   };
 
+  removeMessage = async (msgId: string, author: string) => {
+    if (!this.props.isOwner && author !== this.props.profile.username) {
+      toast.error('You cannot delete this message');
+      return;
+    }
+
+    try {
+      const res = await axios.delete<string>(
+        `${msgUrl}/${this.props.currentClass!.id}/${msgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      );
+
+      this.props.removeMsg(res.data, this.props.currentClass!.id);
+      toast.info('Message deleted');
+    } catch (e) {
+      toast.error('Unable to delete message. Please try again later');
+    }
+  };
+
   renderListItem = ({item}: {item: Msg}) => {
     return (
       <MsgCard
         avatarUrl={`${mediaUrl}/avatar/${item.user.avatar}`}
         name={item.user.name}
         username={item.user.username}
+        msgId={item.id}
         message={item.message}
         createdAt={new Date(item.createdAt)}
+        onOptionPress={this.removeMessage}
       />
     );
   };
@@ -195,7 +236,7 @@ class Home extends React.Component<Props, State> {
   renderContent = () => {
     const {props} = this;
 
-    if (props.classHasErrored) {
+    if (props.classes.errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text>
@@ -206,7 +247,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator color={commonBlue} animating size="large" />
@@ -214,7 +255,7 @@ class Home extends React.Component<Props, State> {
       );
     }
 
-    if (props.classes.length === 0) {
+    if (props.classes.classes.length === 0) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text style={ContainerStyles.padder}>
@@ -267,6 +308,55 @@ class Home extends React.Component<Props, State> {
     );
   };
 
+  renderComposer = () => {
+    if (!this.props.currentClass) {
+      return (
+        <View
+          style={{
+            backgroundColor: commonBackground,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 10,
+          }}>
+          <Text style={{color: commonGrey}}>
+            Join or create class to message
+          </Text>
+        </View>
+      );
+    }
+
+    if (this.props.currentClass.lockMsg) {
+      <View
+        style={{
+          backgroundColor: commonBackground,
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 10,
+        }}>
+        <Text style={{color: commonGrey}}>Read Only</Text>
+      </View>;
+    }
+
+    return (
+      <Input
+        placeholder="Type here..."
+        value={this.state.message}
+        errorStyle={{height: 0}}
+        returnKeyType="send"
+        onSubmitEditing={this.postMessage}
+        onChangeText={(message) => this.setState({message})}
+        rightIcon={
+          <TouchableIcon
+            icon={SendIcon}
+            onPress={this.postMessage}
+            color={commonBlue}
+            size={28}
+          />
+        }
+      />
+    );
+  };
+
   render() {
     return (
       <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
@@ -295,34 +385,7 @@ class Home extends React.Component<Props, State> {
           }}>
           {this.renderContent()}
 
-          {this.props.isOwner || !this.props.currentClass?.lockMsg ? (
-            <Input
-              placeholder="Type here..."
-              value={this.state.message}
-              errorStyle={{height: 0}}
-              returnKeyType="send"
-              onSubmitEditing={this.postMessage}
-              onChangeText={(message) => this.setState({message})}
-              rightIcon={
-                <TouchableIcon
-                  icon={SendIcon}
-                  onPress={this.postMessage}
-                  color={commonBlue}
-                  size={28}
-                />
-              }
-            />
-          ) : (
-            <View
-              style={{
-                backgroundColor: commonBackground,
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 10,
-              }}>
-              <Text style={{color: commonGrey}}>Read Only</Text>
-            </View>
-          )}
+          {this.renderComposer()}
         </View>
       </View>
     );
@@ -337,8 +400,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     profile: state.profile,
     currentClass: state.currentClass,
-    classHasErrored: state.classHasErrored,
-    classIsLoading: state.classIsLoading,
     classes: state.classes,
     token: state.token,
     msgs: state.msgs[state.currentClass?.id || 'test'] || {
@@ -356,6 +417,7 @@ export default withRouter(
   connect(mapStateToProps, {
     fetchMsgs,
     addMsg,
+    removeMsg,
     registerCurrentClass,
   })(Home),
 );

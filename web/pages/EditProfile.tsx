@@ -5,7 +5,7 @@ import {Header, Input} from 'react-native-elements';
 import {connect} from 'react-redux';
 import {toast} from 'react-toastify';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BackIcon from '@iconify-icons/ic/arrow-back';
 
 import {TouchableIcon} from '../components';

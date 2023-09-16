@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
 const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token!,
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 

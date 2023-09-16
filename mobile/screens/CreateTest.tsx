@@ -9,12 +9,13 @@ import {
   Alert,
 } from 'react-native';
 import {Header, Input, Text, Button, Icon} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import SnackBar from 'react-native-snackbar';
 import DateTimePicker, {Event} from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import {connect} from 'react-redux';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {RootStackParamList} from '../navigators/types';
 import {Chip, CheckBox} from '../../shared/components/common';
@@ -32,7 +33,10 @@ import {TextStyles, ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue, commonGrey, flatRed} from '../../shared/styles/colors';
 import {quizUrl} from '../../shared/utils/urls';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'CreateTest'>;
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'CreateTest'
+>;
 type RouteProps = RouteProp<RootStackParamList, 'CreateTest'>;
 
 interface Props {
@@ -41,7 +45,7 @@ interface Props {
   currentClass: Class | null;
   route: RouteProps;
   addQuiz: typeof addQuiz;
-  fetchQuiz(token: string, classId: string): void;
+  fetchQuiz(token: string, classId: string, updating?: boolean): void;
   removeQuiz: typeof removeQuiz;
 }
 
@@ -59,6 +63,7 @@ interface State {
   loading: boolean;
   errored: boolean;
   APILoading: boolean;
+  allowBlur: boolean;
 }
 
 class CreateTest extends React.Component<Props, State> {
@@ -83,6 +88,7 @@ class CreateTest extends React.Component<Props, State> {
       timeRange: [today, tomorrow],
       loading: false,
       errored: false,
+      allowBlur: true,
       APILoading: false,
     };
   }
@@ -110,9 +116,11 @@ class CreateTest extends React.Component<Props, State> {
             randomQue,
             questions,
             timePeriod,
+            allowBlur,
           } = res.data;
           this.setState({
             title,
+            allowBlur,
             description,
             releaseScore,
             randomOp,
@@ -127,6 +135,11 @@ class CreateTest extends React.Component<Props, State> {
         })
         .catch(() => {
           this.setState({errored: true, loading: false});
+          Analytics.logEvent('http_error', {
+            url: `${quizUrl}/${this.props.currentClass!.id}/${quizId}`,
+            method: 'get',
+            reason: 'unk',
+          });
         });
     }
   };
@@ -139,6 +152,7 @@ class CreateTest extends React.Component<Props, State> {
       description,
       timeRange,
       releaseScore,
+      allowBlur,
       randomQue,
       randomOp,
     } = this.state;
@@ -183,6 +197,7 @@ class CreateTest extends React.Component<Props, State> {
           releaseScore,
           randomQue,
           randomOp,
+          allowBlur,
         },
         {
           headers: {
@@ -192,7 +207,7 @@ class CreateTest extends React.Component<Props, State> {
       )
       .then((res) => {
         if (res.status === 200) {
-          this.props.fetchQuiz(token!, currentClass!.id);
+          this.props.fetchQuiz(token!, currentClass!.id, true);
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         }
@@ -203,6 +218,14 @@ class CreateTest extends React.Component<Props, State> {
           text: 'Unable to update quiz, Please try again later',
           duration: SnackBar.LENGTH_SHORT,
           backgroundColor: flatRed,
+        });
+
+        Analytics.logEvent('http_error', {
+          url: `${quizUrl}/${this.props.currentClass!.id}/${
+            route.params.quizId
+          }`,
+          method: 'put',
+          reason: 'unk',
         });
       });
   };
@@ -216,6 +239,7 @@ class CreateTest extends React.Component<Props, State> {
       releaseScore,
       randomQue,
       randomOp,
+      allowBlur,
     } = this.state;
 
     const start = timeRange[0].getTime(),
@@ -255,6 +279,7 @@ class CreateTest extends React.Component<Props, State> {
         timePeriod: timeRange,
         releaseScore,
         randomQue,
+        allowBlur,
         randomOp,
       }),
     );
@@ -281,7 +306,7 @@ class CreateTest extends React.Component<Props, State> {
       .then((res) => {
         this.setState({APILoading: false});
         if (res.status === 201) {
-          this.props.addQuiz(res.data);
+          this.props.addQuiz(res.data, this.props.currentClass!.id);
           return this.props.navigation.goBack();
         }
         throw new Error();
@@ -292,6 +317,11 @@ class CreateTest extends React.Component<Props, State> {
           text: 'Unable to create Test. Please try again later.',
           duration: SnackBar.LENGTH_SHORT,
           backgroundColor: flatRed,
+        });
+        Analytics.logEvent('http_error', {
+          url: `${quizUrl}/${this.props.currentClass!.id}`,
+          method: 'post',
+          reason: 'unk',
         });
       });
   };
@@ -316,7 +346,10 @@ class CreateTest extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          this.props.removeQuiz(route.params.quizId!);
+          this.props.removeQuiz(
+            route.params.quizId!,
+            this.props.currentClass!.id,
+          );
           this.setState({APILoading: false});
           this.props.navigation.goBack();
         })
@@ -326,6 +359,14 @@ class CreateTest extends React.Component<Props, State> {
             text: 'Unable to delete Test. Please try again later.',
             duration: SnackBar.LENGTH_SHORT,
             backgroundColor: flatRed,
+          });
+
+          Analytics.logEvent('http_error', {
+            url: `${quizUrl}/${this.props.currentClass!.id}/${
+              route.params.quizId
+            }`,
+            method: 'delete',
+            reason: 'unk',
           });
         });
     };
@@ -383,6 +424,7 @@ class CreateTest extends React.Component<Props, State> {
       type,
       mode,
       loading,
+      allowBlur,
       errored,
       APILoading,
     } = this.state;
@@ -433,7 +475,11 @@ class CreateTest extends React.Component<Props, State> {
               <Chip
                 text={this.props.route.params.file!.name}
                 rightIcon={
-                  <Icon name="microsoft-excel" type="material-community" />
+                  <Icon
+                    tvParallaxProperties
+                    name="microsoft-excel"
+                    type="material-community"
+                  />
                 }
               />
             </>
@@ -441,6 +487,7 @@ class CreateTest extends React.Component<Props, State> {
 
           <Input
             label="No. of questions"
+            autoCompleteType="off"
             value={questions}
             errorMessage="How many questions to be included from given set"
             errorStyle={{color: commonGrey}}
@@ -450,12 +497,14 @@ class CreateTest extends React.Component<Props, State> {
 
           <Input
             label="Title"
+            autoCompleteType="off"
             value={title}
             onChangeText={(text) => this.setState({title: text})}
           />
 
           <Input
             label="Description"
+            autoCompleteType="off"
             value={description}
             inputStyle={{maxHeight: 100}}
             multiline
@@ -491,6 +540,13 @@ class CreateTest extends React.Component<Props, State> {
               />
             )}
           </View>
+
+          <CheckBox
+            checked={allowBlur}
+            onPress={() => this.setState({allowBlur: !allowBlur})}
+            title="Allow focus blur"
+            desc="Disabling this will lock test when trying to change screen"
+          />
 
           <CheckBox
             checked={releaseScore}

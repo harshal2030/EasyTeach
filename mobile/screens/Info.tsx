@@ -2,9 +2,10 @@ import React from 'react';
 import axios from 'axios';
 import {View, Text, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
+import * as Analytics from 'expo-firebase-analytics';
 
 import {Avatar} from '../../shared/components/common';
 
@@ -18,7 +19,7 @@ import {commonBlue} from '../../shared/styles/colors';
 import {getDateAndMonth} from '../../shared/utils/functions';
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Info'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Info'>;
   route: RouteProp<RootStackParamList, 'Info'>;
   currentClass: Class;
   token: string;
@@ -69,7 +70,14 @@ class Info extends React.Component<Props, State> {
         },
       })
       .then((res) => this.setState({loading: false, info: res.data}))
-      .catch(() => this.setState({loading: false, errored: true}));
+      .catch(() => {
+        this.setState({loading: false, errored: true});
+        Analytics.logEvent('http_error', {
+          url: `${vidTrackerUrl}/${id}/${moduleId}/${videoId}`,
+          method: 'get',
+          reason: 'unk',
+        });
+      });
   };
 
   renderItem = ({item}: {item: Res}) => {

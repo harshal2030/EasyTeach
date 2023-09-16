@@ -39,9 +39,7 @@ const Home = () => {
         </View>
 
         <View style={styles.heroContent}>
-          <Text style={styles.headingText}>
-            Delightful Teaching for Everyone
-          </Text>
+          <Text style={styles.headingText}>Complete classroom toolkit</Text>
           <Text style={styles.subText}>
             Handle your classes and tests hassle free with ease of the app
           </Text>
@@ -181,7 +179,10 @@ const Home = () => {
         </View>
 
         <View style={{width: 200, marginVertical: 10}}>
-          <a href="" style={{textDecoration: 'none'}}>
+          <a
+            href="https://play.google.com/store/apps/details?id=com.hcodes.easyteach"
+            target="_blank"
+            style={{textDecoration: 'none'}}>
             <Image
               source={require('../../shared/images/google-play-badge.png')}
               style={{height: 80, width: 200}}

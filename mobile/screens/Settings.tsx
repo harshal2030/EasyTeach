@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, FlatList, ActivityIndicator} from 'react-native';
 import {Header, ListItem, Button, Text} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import {connect} from 'react-redux';
@@ -24,7 +24,7 @@ import {
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Settings'>,
-  StackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
 type Props = {
@@ -35,9 +35,11 @@ type Props = {
     username: string;
     avatar: string;
   };
-  classes: Class[];
-  classIsLoading: boolean;
-  classHasErrored: boolean;
+  classes: {
+    classes: Class[];
+    loading: boolean;
+    errored: boolean;
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
 };
@@ -76,9 +78,9 @@ class Settings extends React.PureComponent<Props> {
   };
 
   renderContent = () => {
-    const {classHasErrored, classIsLoading, classes} = this.props;
+    const {classes} = this.props;
 
-    if (classHasErrored) {
+    if (classes.errored) {
       return (
         <Text>
           We're having trouble in connecting to services. Please try again later
@@ -86,11 +88,11 @@ class Settings extends React.PureComponent<Props> {
       );
     }
 
-    if (classIsLoading) {
+    if (classes.loading) {
       return <ActivityIndicator size="large" color={commonBlue} animating />;
     }
 
-    if (classes.length === 0) {
+    if (classes.classes.length === 0) {
       return (
         <>
           <Text>
@@ -107,7 +109,7 @@ class Settings extends React.PureComponent<Props> {
 
     return (
       <FlatList
-        data={this.props.classes}
+        data={this.props.classes.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.renderItem}
         removeClippedSubviews
@@ -160,8 +162,6 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     profile: state.profile,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classHasErrored: state.classHasErrored,
     currentClass: state.currentClass,
   };
 };

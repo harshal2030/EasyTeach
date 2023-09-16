@@ -2,7 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import {connect} from 'react-redux';
 import Dialog from 'react-native-dialog';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import validator from 'validator';
 import Config from 'react-native-config';
 import {withRouter, RouteComponentProps} from 'react-router-dom';

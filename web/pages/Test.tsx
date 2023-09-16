@@ -22,7 +22,11 @@ import {QuizInfo} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
-import {QuizRes, fetchQuiz, ObQuizRes} from '../../shared/global/actions/quiz';
+import {
+  QuizRes,
+  fetchQuiz,
+  QuizPayload,
+} from '../../shared/global/actions/quiz';
 import {
   commonBackground,
   commonBlue,
@@ -38,8 +42,8 @@ type Props = RouteComponentProps<{classId: string}> & {
   currentClass: Class | null;
   quizErrored: boolean;
   quizLoading: boolean;
-  quizzes: ObQuizRes;
-  fetchQuiz(token: string, classId: string, quizType?: string): void;
+  quizzes: QuizPayload;
+  fetchQuiz(token: string, classId: string): void;
   isOwner: boolean;
   registerCurrentClass: typeof registerCurrentClass;
   classes: Class[];
@@ -123,7 +127,7 @@ class Test extends React.Component<Props, State> {
   shareTest = (quizId: string) => {
     navigator.clipboard
       .writeText(
-        `Open test on EasyTeach through this link https://easyteach.inddex.co/quiz/${this.props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+        `Open test on EasyTeach through this link https://easyteach.quirky-craft.com/quiz/${this.props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
       )
       .then(() => toast.info('Test link copied to clipboard'))
       .catch(() => toast.error('Unable to copy link to clipboard'));
@@ -172,7 +176,7 @@ class Test extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {quizLoading, quizErrored, quizzes} = this.props;
+    const {loading, errored, quizzes} = this.props.quizzes;
     const data = [
       {
         title: 'Live',
@@ -188,7 +192,7 @@ class Test extends React.Component<Props, State> {
       },
     ];
 
-    if (quizErrored) {
+    if (errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text style={{padding: 10}}>
@@ -198,7 +202,7 @@ class Test extends React.Component<Props, State> {
       );
     }
 
-    if (quizLoading) {
+    if (loading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator animating size="large" color={commonBlue} />
@@ -418,10 +422,16 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    quizLoading: state.quizLoading,
-    quizErrored: state.quizErrored,
-    quizzes: state.quizzes,
-    classes: state.classes,
+    quizzes: state.quizzes[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      quizzes: {
+        live: [],
+        expired: [],
+        scored: [],
+      },
+    },
+    classes: state.classes.classes,
     isOwner: state.currentClass!.owner.username === state.profile.username,
     unread: state.unreads.totalUnread,
   };

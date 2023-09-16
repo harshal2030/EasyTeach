@@ -1,16 +1,3 @@
 {
-  "cSpell.words": [
-    "MMKV",
-    "Subviews",
-    "Unenroll",
-    "collapsable",
-    "datetimepicker",
-    "lightbox",
-    "nodownload",
-    "padder",
-    "razorpay",
-    "toastify",
-    "unreads"
-  ],
-  "compile-hero.disable-compile-files-on-did-save-code": true,
+  "editor.acceptSuggestionOnEnter": "on"
 }

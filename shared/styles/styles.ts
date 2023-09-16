@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 import {commonBackground, commonGrey, greyWithAlpha} from './colors';
 
 const FormStyles = StyleSheet.create({
@@ -87,6 +87,12 @@ const ImageStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: greyWithAlpha(0.3),
+  },
+  classAvatarImage: {
+    height: Platform.OS === 'web' ? 70 : 60,
+    width: Platform.OS === 'web' ? 70 : 60,
+    marginTop: 10,
+    backgroundColor: commonGrey,
   },
 });
 

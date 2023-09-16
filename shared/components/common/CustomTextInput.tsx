@@ -35,7 +35,6 @@ export default class AuthTextInput extends Component<Props, State> {
             autoCapitalize={'none'}
             autoCorrect={false}
             style={[styles.textInput, {color}]}
-            maxLength={32}
             underlineColorAndroid="none"
             placeholderTextColor={'rgba(255,255,255,0.4)'}
             selectionColor={'white'}

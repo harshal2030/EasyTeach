@@ -1,10 +1,9 @@
 import React from 'react';
-// import axios from 'axios';
 import {View} from 'react-native';
 import {Header} from 'react-native-elements';
 import {WebView, WebViewMessageEvent} from 'react-native-webview';
 import {websiteRoot} from '../../shared/utils/urls';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 
@@ -19,7 +18,7 @@ import {RootStackParamList} from '../navigators/types';
 import {flatRed, eucalyptusGreen} from '../../shared/styles/colors';
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Checkout'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Checkout'>;
   token: string;
   currentClassId: string;
   updateClasses: typeof updateClasses;

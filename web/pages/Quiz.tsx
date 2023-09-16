@@ -48,6 +48,7 @@ interface State {
   questions: Questions[];
   loading: boolean;
   errored: boolean;
+  allowBlur: boolean;
   alertVisible: boolean;
   alertTitle: string;
   alertDesc: string;
@@ -67,6 +68,7 @@ class Quiz extends React.Component<Props, State> {
       alertTitle: '',
       alertDesc: '',
       alertButtons: [],
+      allowBlur: true,
     };
   }
 
@@ -112,20 +114,40 @@ class Quiz extends React.Component<Props, State> {
   }
 
   fetchQues = () => {
-    const {quizId} = this.props.match.params;
-    const {id} = this.props.currentClass!;
+    if (!this.state.allowBlur) {
+      this.postBlur();
+      this.Alert(
+        'Test locked',
+        'You have changed screen while giving test, which is violation of test rules. Hence, test is locked for you',
+        [
+          {
+            text: 'Ok',
+            onPress: this.props.history.goBack,
+          },
+        ],
+      );
+      return;
+    }
+
+    const {quizId, classId: id} = this.props.match.params;
 
     axios
-      .get<{questions: Questions[]; totalScore: number; quizId: string}>(
-        `${quizUrl}/que/${id}/${quizId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token!}`,
-          },
+      .get<{
+        questions: Questions[];
+        totalScore: number;
+        quizId: string;
+        allowBlur: boolean;
+      }>(`${quizUrl}/que/${id}/${quizId}`, {
+        headers: {
+          Authorization: `Bearer ${this.props.token!}`,
         },
-      )
+      })
       .then((res) => {
-        this.setState({loading: false, questions: res.data.questions});
+        this.setState({
+          loading: false,
+          questions: res.data.questions,
+          allowBlur: res.data.allowBlur,
+        });
         res.data.questions.forEach((ques) => {
           if (ques.attachments) {
             FastImage.prefetch(`${mediaUrl}/que/${ques.attachments}`);
@@ -148,6 +170,23 @@ class Quiz extends React.Component<Props, State> {
           }
         }
       });
+  };
+
+  postBlur = () => {
+    axios
+      .post(
+        `${quizUrl}/blur/${this.props.currentClass!.id}/${
+          this.props.match.params.quizId
+        }`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then(() => null)
+      .catch((e) => console.log(e, e.response.data));
   };
 
   updateSelected = (i: number) => {
@@ -414,7 +453,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 

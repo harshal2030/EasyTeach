@@ -3,6 +3,7 @@ import {
   RegisterTokenAction,
   RemoveTokenAction,
   RegisterFCMAction,
+  RedirectAction,
 } from '../actions/token';
 
 export const tokenReducer = (
@@ -26,6 +27,18 @@ export const fcmReducer = (
   switch (action.type) {
     case ActionTypes.registerFCM:
       return action.payload;
+    default:
+      return state;
+  }
+};
+
+export const redirected = (
+  state: boolean = false,
+  action: RedirectAction,
+): boolean => {
+  switch (action.type) {
+    case ActionTypes.redirected:
+      return true;
     default:
       return state;
   }

@@ -61,7 +61,10 @@ interface classLoadingAction {
 
 interface classFetchedAction {
   type: ActionTypes.classesFetchSuccess;
-  payload: Class[];
+  payload: {
+    classes: Class[];
+    loading: boolean;
+  };
 }
 
 interface addedClassAction {
@@ -114,26 +117,35 @@ const classesLoading = (bool: boolean): classLoadingAction => {
 const classesFetchedSuccess = (classes: Class[]): classFetchedAction => {
   return {
     type: ActionTypes.classesFetchSuccess,
-    payload: classes,
+    payload: {
+      classes,
+      loading: false,
+    },
   };
 };
 
-const fetchClasses = (token: string) => {
+const fetchClasses = (token: string, storage?: unknown) => {
   return async (dispatch: Dispatch) => {
+    let currentClass: Class | null = null;
+
     try {
       dispatch(classesLoading(true));
-
       const classes = await axios.get<Class[]>(classUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (classes.data.length !== 0) {
+
+      dispatch(classesFetchedSuccess(classes.data));
+
+      if (classes.data.length !== 0 && !currentClass) {
         dispatch(registerCurrentClass(classes.data[0]));
       }
 
-      dispatch(classesFetchedSuccess(classes.data));
-      dispatch(classesLoading(false));
+      if (storage) {
+        // @ts-ignore
+        storage.setArray('classes', classes.data);
+      }
     } catch (e) {
       dispatch(classesLoading(false));
       dispatch(classesHasErrored(true));

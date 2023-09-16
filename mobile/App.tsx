@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import axios from 'axios';
 import {Alert, BackHandler} from 'react-native';
 import * as Analytics from 'expo-firebase-analytics';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -10,8 +10,8 @@ import {
 import {connect} from 'react-redux';
 import SplashScreen from 'react-native-splash-screen';
 import {encode, decode} from 'js-base64';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Update from 'expo-updates';
-import AsyncStorage from '@react-native-community/async-storage';
 import Config from 'react-native-config';
 
 import Loading from './Loading';
@@ -26,7 +26,7 @@ import {linking} from './linking';
 
 import {RootStackParamList} from './navigators/types';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 if (!global.btoa) {
   global.btoa = encode;
@@ -59,7 +59,7 @@ interface userChecker {
 const App: React.FC<Props> = (props) => {
   const [loading, setLoading] = React.useState(true);
 
-  const navigationRef = useRef<NavigationContainerRef>();
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>();
   const routeNameRef = useRef<string>();
 
   const checkForUpdate = async () => {
@@ -116,7 +116,7 @@ const App: React.FC<Props> = (props) => {
         props.fetchClasses(token);
         Analytics.setUserId(res.data.user.username);
         props.registerProfile(res.data.user);
-      } catch (e) {
+      } catch (e: any) {
         if (e.response) {
           if (e.response.status === 401) {
             SplashScreen.hide();
@@ -170,68 +170,68 @@ const App: React.FC<Props> = (props) => {
 
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator headerMode="none">
+      <Stack.Navigator screenOptions={{headerShown: false}}>
         {props.token === null ? (
           <>
             <Stack.Screen
               name="Auth"
-              component={require('./screens/AuthScreen').default}
+              getComponent={() => require('./screens/AuthScreen').default}
             />
             <Stack.Screen
               name="Forgot"
-              component={require('./screens/Forgot').default}
+              getComponent={() => require('./screens/Forgot').default}
             />
           </>
         ) : (
           <>
             <Stack.Screen
               name="Drawer"
-              component={require('./navigators/Drawer').default}
+              getComponent={() => require('./navigators/Drawer').default}
             />
             <Stack.Screen
               name="Info"
-              component={require('./screens/Info').default}
+              getComponent={() => require('./screens/Info').default}
             />
             <Stack.Screen
               name="JoinClass"
-              component={require('./screens/JoinClass').default}
+              getComponent={() => require('./screens/JoinClass').default}
             />
             <Stack.Screen
               name="Quiz"
-              component={require('./screens/Quiz').default}
+              getComponent={() => require('./screens/Quiz').default}
             />
             <Stack.Screen
               name="EditProfile"
-              component={require('./screens/EditProfile').default}
+              getComponent={() => require('./screens/EditProfile').default}
             />
             <Stack.Screen
               name="Files"
-              component={require('./screens/Files').default}
+              getComponent={() => require('./screens/Files').default}
             />
             <Stack.Screen
               name="Video"
-              component={require('./screens/Video').default}
+              getComponent={() => require('./screens/Video').default}
             />
             <Stack.Screen
               name="PDFViewer"
-              component={require('./screens/PdfViewer').default}
+              getComponent={() => require('./screens/PdfViewer').default}
             />
             {props.isOwner && (
               <Stack.Screen
                 name="CreateTest"
-                component={require('./screens/CreateTest').default}
+                getComponent={() => require('./screens/CreateTest').default}
               />
             )}
             {props.isOwner && (
               <Stack.Screen
                 name="Checkout"
-                component={require('./screens/Checkout').default}
+                getComponent={() => require('./screens/Checkout').default}
               />
             )}
             {props.currentClass && (
               <Stack.Screen
                 name="ShowScore"
-                component={require('./screens/ShowScore').default}
+                getComponent={() => require('./screens/ShowScore').default}
               />
             )}
           </>

@@ -21,7 +21,6 @@ import backIcon from '@iconify-icons/ic/arrow-back';
 import refreshCw from '@iconify-icons/feather/refresh-ccw';
 import uploadIcon from '@iconify-icons/ic/baseline-file-upload';
 import pdfIcon from '@iconify-icons/mdi/file-pdf';
-import {Picker} from '@react-native-picker/picker';
 
 import {TouchableIcon} from '../components/TouchableIcon';
 import {Video} from '../components/Video';
@@ -147,7 +146,6 @@ class Files extends React.Component<Props, State> {
 
       this.setState({files: res.data, loading: false});
     } catch (e) {
-      console.log(e);
       this.setState({errored: true, loading: false});
     }
   };
@@ -241,7 +239,6 @@ class Files extends React.Component<Props, State> {
   onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      console.log(file.name);
       if (!(videoExtPattern.test(file.name) || pdfExtPattern.test(file.name))) {
         toast.error('File format is not supported');
         return;
@@ -409,15 +406,16 @@ class Files extends React.Component<Props, State> {
           />
         )}
 
-        <Picker
-          onValueChange={(val) => {
-            this.getModules(val);
-            this.setState({fileType: val});
-          }}
-          selectedValue={this.state.fileType}>
-          <Picker.Item label="Videos" value="video" />
-          <Picker.Item label="PDFs" value="pdf" />
-        </Picker>
+        <select
+          value={this.state.fileType}
+          onChange={(e) => {
+            this.getModules(e.target.value);
+            // @ts-ignore
+            this.setState({fileType: e.target.value});
+          }}>
+          <option value="video">Videos</option>
+          <option value="pdf">PDFs</option>
+        </select>
       </View>
     );
   };
@@ -597,7 +595,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token!,
     isOwner: state.currentClass!.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 

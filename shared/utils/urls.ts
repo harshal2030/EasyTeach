@@ -2,12 +2,12 @@ import Config from 'react-native-config';
 
 const root =
   Config.env === 'production'
-    ? 'https://api.easyteach.inddex.co'
-    : 'http://192.168.43.21:3000';
+    ? 'https://easyteach-api.quirky-craft.com'
+    : 'https://easyteach-api.quirky-craft.com';
 
 const websiteRoot =
   Config.env === 'production'
-    ? 'https://easyteach.inddex.co'
+    ? 'https://easyteach.quirky-craft.com'
     : 'http://192.168.43.21:8080';
 
 const signUpUrl = `${root}/users/create`;
@@ -26,6 +26,7 @@ const moduleUrl = `${root}/module`;
 const fileUrl = `${root}/file`;
 const vidTrackerUrl = `${root}/vidtracker`;
 const paymentUrl = `${root}/pay`;
+const discussUrl = `${root}/discuss`;
 
 export {
   root,
@@ -46,4 +47,5 @@ export {
   vidTrackerUrl,
   paymentUrl,
   websiteRoot,
+  discussUrl,
 };

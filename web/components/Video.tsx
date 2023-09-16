@@ -15,7 +15,6 @@ const Video = (props: Props) => {
   const trackerUrl = useRef(props.trackerUrl);
 
   const track = () => {
-    console.log('sent');
     const stop = new Date();
     axios
       .post(

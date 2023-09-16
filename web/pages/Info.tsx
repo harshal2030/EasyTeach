@@ -235,7 +235,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass!,
     token: state.token!,
     premiumAllowed: state.currentClass?.planId !== 'free',
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 

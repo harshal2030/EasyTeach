@@ -2,6 +2,7 @@
 import {Dispatch} from 'redux';
 import axios from 'axios';
 import {quizUrl} from '../../utils/urls';
+import {StoreState} from '../index';
 
 enum ActionTypes {
   quizFetched = 'quiz_fetched',
@@ -11,7 +12,7 @@ enum ActionTypes {
   addQuiz = 'add_quiz',
 }
 
-interface QuizRes {
+type QuizRes = {
   classId: string;
   quizId: string;
   questions: number;
@@ -25,73 +26,124 @@ interface QuizRes {
   description: string;
   randomOp: boolean;
   randomQue: boolean;
-}
+  allowBlur: boolean;
+};
 
-interface ObQuizRes {
+type ObQuizRes = {
   live: QuizRes[];
   expired: QuizRes[];
   scored: QuizRes[];
-}
+};
 
-interface Result {
+type Result = {
   correct: number;
   incorrect: number;
   totalQues: number;
   totalScore: number;
   userScored: number;
   notAnswered: number;
-}
+};
+
+type QuizPayload = {
+  loading: boolean;
+  errored: boolean;
+  quizzes: ObQuizRes;
+};
+
+type QuizState = {
+  [classId: string]: QuizPayload | undefined;
+};
 
 interface quizErroredAction {
   type: ActionTypes.quizErrored;
-  payload: boolean;
+  payload: {
+    classId: string;
+    errored: boolean;
+  };
 }
 
 interface quizLoadingAction {
   type: ActionTypes.quizLoading;
-  payload: boolean;
+  payload: {
+    classId: string;
+    loading: boolean;
+  };
 }
 
 interface quizFetchedAction {
   type: ActionTypes.quizFetched;
-  payload: ObQuizRes;
+  payload: {
+    classId: string;
+    loading: boolean;
+    quizzes: ObQuizRes;
+  };
 }
 
 interface quizAddedAction {
   type: ActionTypes.addQuiz;
-  payload: QuizRes;
+  payload: {
+    classId: string;
+    quiz: QuizRes;
+  };
 }
 
 interface quizRemoveAction {
   type: ActionTypes.removeQuiz;
-  payload: string;
+  payload: {
+    classId: string;
+    quizId: string;
+  };
 }
 
-const quizHasErrored = (errored: boolean): quizErroredAction => {
+const quizHasErrored = (
+  errored: boolean,
+  classId: string,
+): quizErroredAction => {
   return {
     type: ActionTypes.quizErrored,
-    payload: errored,
+    payload: {
+      classId,
+      errored,
+    },
   };
 };
 
-const quizIsLoading = (loading: boolean): quizLoadingAction => {
+const quizIsLoading = (
+  loading: boolean,
+  classId: string,
+): quizLoadingAction => {
   return {
     type: ActionTypes.quizLoading,
-    payload: loading,
+    payload: {
+      classId,
+      loading,
+    },
   };
 };
 
-const quizFetched = (quiz: ObQuizRes): quizFetchedAction => {
+const quizFetched = (quiz: ObQuizRes, classId: string): quizFetchedAction => {
   return {
     type: ActionTypes.quizFetched,
-    payload: quiz,
+    payload: {
+      classId,
+      loading: false,
+      quizzes: quiz,
+    },
   };
 };
 
-const fetchQuiz = (token: string, classId: string) => {
-  return async (dispatch: Dispatch) => {
+const fetchQuiz = (
+  token: string,
+  classId: string,
+  updating: boolean = false,
+) => {
+  return async (dispatch: Dispatch, getState: () => StoreState) => {
+    const state = getState();
+    if (state.quizzes[classId] && !updating) {
+      return;
+    }
     try {
-      dispatch(quizIsLoading(true));
+      dispatch(quizIsLoading(true, classId));
       const res = await axios.get<ObQuizRes>(`${quizUrl}/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -101,25 +153,31 @@ const fetchQuiz = (token: string, classId: string) => {
         },
       });
 
-      dispatch(quizIsLoading(false));
-      dispatch(quizFetched(res.data));
+      dispatch(quizFetched(res.data, classId));
     } catch (e) {
-      dispatch(quizHasErrored(true));
+      dispatch(quizIsLoading(false, classId));
+      dispatch(quizHasErrored(true, classId));
     }
   };
 };
 
-const addQuiz = (quiz: QuizRes) => {
+const addQuiz = (quiz: QuizRes, classId: string): quizAddedAction => {
   return {
     type: ActionTypes.addQuiz,
-    payload: quiz,
+    payload: {
+      quiz,
+      classId,
+    },
   };
 };
 
-const removeQuiz = (quizId: string): quizRemoveAction => {
+const removeQuiz = (quizId: string, classId: string): quizRemoveAction => {
   return {
     type: ActionTypes.removeQuiz,
-    payload: quizId,
+    payload: {
+      quizId,
+      classId,
+    },
   };
 };
 
@@ -134,4 +192,6 @@ export type {
   Result,
   QuizRes,
   ObQuizRes,
+  QuizState,
+  QuizPayload,
 };

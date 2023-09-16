@@ -13,11 +13,11 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {Header, Button, ButtonGroup} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 import LightBox from 'react-native-lightbox-v2';
-import PhotoView from 'react-native-photo-view-ex';
+// import PhotoView from 'react-native-photo-view-ex';
 
 import {StoreState} from '../../shared/global';
 import {Class, registerCurrentClass} from '../../shared/global/actions/classes';
@@ -32,7 +32,7 @@ import {
 } from '../../shared/styles/colors';
 
 interface Props {
-  navigation: StackNavigationProp<RootStackParamList>;
+  navigation: NativeStackNavigationProp<RootStackParamList>;
   route: RouteProp<RootStackParamList, 'Quiz'>;
   token: string | null;
   currentClass: Class | null;
@@ -56,6 +56,8 @@ interface State {
   loading: boolean;
   errored: boolean;
   quizTitle: string;
+  allowBlur: boolean;
+  blurred: boolean;
 }
 
 class Quiz extends React.Component<Props, State> {
@@ -69,6 +71,8 @@ class Quiz extends React.Component<Props, State> {
       loading: true,
       errored: false,
       quizTitle: '',
+      allowBlur: true,
+      blurred: false,
     };
   }
 
@@ -104,7 +108,26 @@ class Quiz extends React.Component<Props, State> {
   }
 
   appStateHandler = (state: AppStateStatus) => {
+    if (state === 'active' && !this.state.allowBlur && this.state.blurred) {
+      Alert.alert(
+        'Test locked',
+        'You have changed screen while giving test, which is violation of test rules. Hence, test is locked for you',
+        [
+          {
+            text: 'Ok',
+            onPress: this.goBack,
+          },
+        ],
+      );
+      return;
+    }
+
     if (state === 'background' || state === 'inactive') {
+      if (!this.state.allowBlur) {
+        this.postBlur();
+        this.setState({blurred: true});
+      }
+
       this.setState({currentIndex: 0});
       this.fetchQues();
     }
@@ -124,6 +147,23 @@ class Quiz extends React.Component<Props, State> {
     }
   };
 
+  postBlur = () => {
+    axios
+      .post(
+        `${quizUrl}/blur/${this.props.currentClass!.id}/${
+          this.props.route.params.quizId
+        }`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${this.props.token}`,
+          },
+        },
+      )
+      .then(() => null)
+      .catch(() => null);
+  };
+
   fetchQues = () => {
     const {quizId} = this.props.route.params;
     const id = this.props.currentClass?.id || this.props.route.params.classId;
@@ -134,6 +174,7 @@ class Quiz extends React.Component<Props, State> {
         totalScore: number;
         quizId: string;
         quizTitle: string;
+        allowBlur: boolean;
       }>(`${quizUrl}/que/${id}/${quizId}`, {
         headers: {
           Authorization: `Bearer ${this.props.token!}`,
@@ -144,6 +185,7 @@ class Quiz extends React.Component<Props, State> {
           loading: false,
           questions: res.data.questions,
           quizTitle: res.data.quizTitle,
+          allowBlur: res.data.allowBlur,
         });
         const images = res.data.questions
           .filter((que) => (que.attachments ? true : false))
@@ -253,17 +295,17 @@ class Quiz extends React.Component<Props, State> {
     );
   };
 
-  ZoomImage = () => {
-    const {currentIndex, questions} = this.state;
-    return (
-      <PhotoView
-        source={{uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`}}
-        style={{width: '100%', height: '100%'}}
-        resizeMode="contain"
-        maximumZoomScale={5}
-      />
-    );
-  };
+  // ZoomImage = () => {
+  //   const {currentIndex, questions} = this.state;
+  //   return (
+  //     <PhotoView
+  //       source={{uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`}}
+  //       style={{width: '100%', height: '100%'}}
+  //       resizeMode="contain"
+  //       maximumZoomScale={5}
+  //     />
+  //   );
+  // };
 
   renderContent = () => {
     const {loading, errored, questions, currentIndex} = this.state;
@@ -299,7 +341,7 @@ class Quiz extends React.Component<Props, State> {
         {questions[currentIndex].attachments && (
           <>
             <Text style={styles.imageText}>*click to enlarge</Text>
-            <LightBox renderContent={this.ZoomImage}>
+            <LightBox>
               <FastImage
                 source={{
                   uri: `${mediaUrl}/que/${questions[currentIndex].attachments}`,
@@ -407,8 +449,8 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    classIsLoading: state.classIsLoading,
-    classes: state.classes,
+    classes: state.classes.classes,
+    classIsLoading: state.classes.loading,
   };
 };
 

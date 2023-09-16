@@ -5,85 +5,107 @@ import {
   quizFetchedAction,
   quizAddedAction,
   quizRemoveAction,
-  QuizRes,
+  QuizState,
 } from '../actions/quiz';
 
-const quizErrored = (
-  state: boolean = false,
-  action: quizErroredAction,
-): boolean => {
-  switch (action.type) {
-    case ActionTypes.quizErrored:
-      return action.payload;
-    default:
-      return state;
-  }
-};
+type quizAction =
+  | quizFetchedAction
+  | quizAddedAction
+  | quizRemoveAction
+  | quizErroredAction
+  | quizLoadingAction;
 
-const quizLoading = (
-  state: boolean = true,
-  action: quizLoadingAction,
-): boolean => {
+const initialState: QuizState = {};
+
+const quizzesReducer = (
+  state: QuizState = initialState,
+  action: quizAction,
+): QuizState => {
+  const quiz = state[action.payload?.classId] || {
+    loading: true,
+    errored: false,
+    quizzes: {live: [], expired: [], scored: []},
+  };
+  const {loading, errored, quizzes} = quiz;
+
+  const tempState = {...state};
+
   switch (action.type) {
     case ActionTypes.quizLoading:
-      return action.payload;
-    default:
-      return state;
-  }
-};
+      tempState[action.payload.classId] = {
+        loading: action.payload.loading,
+        errored,
+        quizzes,
+      };
 
-type quizAction = quizFetchedAction | quizAddedAction | quizRemoveAction;
+      return tempState;
+    case ActionTypes.quizErrored:
+      tempState[action.payload.classId] = {
+        loading,
+        errored: action.payload.errored,
+        quizzes,
+      };
 
-type quizState = {
-  live: QuizRes[];
-  expired: QuizRes[];
-  scored: QuizRes[];
-};
-
-const quizzes = (
-  state: quizState = {live: [], expired: [], scored: []},
-  action: quizAction,
-): quizState => {
-  switch (action.type) {
+      return tempState;
     case ActionTypes.quizFetched:
-      return action.payload;
+      tempState[action.payload.classId] = {
+        loading: action.payload.loading,
+        errored,
+        quizzes: action.payload.quizzes,
+      };
+
+      return tempState;
     case ActionTypes.addQuiz:
-      const stop = new Date(action.payload.timePeriod[1].value).getTime();
+      const stop = new Date(action.payload.quiz.timePeriod[1].value).getTime();
       const now = Date.now();
 
-      let liveQuiz = [...state.live];
-      let expiredQuiz = [...state.expired];
+      let liveQuiz = [...quizzes.live];
+      let expiredQuiz = [...quizzes.expired];
 
       if (now < stop) {
-        liveQuiz = [action.payload, ...liveQuiz];
+        liveQuiz = [action.payload.quiz, ...liveQuiz];
       }
 
       if (now > stop) {
-        expiredQuiz = [action.payload, ...expiredQuiz];
+        expiredQuiz = [action.payload.quiz, ...expiredQuiz];
       }
 
-      return {
-        live: liveQuiz,
-        expired: expiredQuiz,
-        scored: state.scored,
+      tempState[action.payload.classId] = {
+        loading,
+        errored,
+        quizzes: {
+          live: liveQuiz,
+          expired: expiredQuiz,
+          scored: quizzes.scored,
+        },
       };
+
+      return tempState;
     case ActionTypes.removeQuiz:
-      const liveQ = state.live.filter((quiz) => quiz.quizId !== action.payload);
-      const expiredQ = state.expired.filter(
-        (quiz) => quiz.quizId !== action.payload,
+      const liveQ = quizzes.live.filter(
+        (qz) => qz.quizId !== action.payload.quizId,
       );
-      const scoredQ = state.scored.filter(
-        (quiz) => quiz.quizId !== action.payload,
+      const expiredQ = quizzes.expired.filter(
+        (qz) => qz.quizId !== action.payload.quizId,
+      );
+      const scoredQ = quizzes.scored.filter(
+        (qz) => qz.quizId !== action.payload.quizId,
       );
 
-      return {
-        live: liveQ,
-        expired: expiredQ,
-        scored: scoredQ,
+      tempState[action.payload.classId] = {
+        loading,
+        errored,
+        quizzes: {
+          live: liveQ,
+          expired: expiredQ,
+          scored: scoredQ,
+        },
       };
+
+      return tempState;
     default:
       return state;
   }
 };
 
-export {quizErrored, quizLoading, quizzes};
+export {quizzesReducer};

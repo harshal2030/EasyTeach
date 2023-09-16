@@ -1,5 +1,4 @@
 import React from 'react';
-import PhotoView from 'react-native-photo-view-ex';
 import LightBox from 'react-native-lightbox-v2';
 import {View, StyleSheet, Linking} from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -15,17 +14,6 @@ interface Props {
 
 const ImportExcel = (props: Props) => {
   const {container, content, secondaryText, imageStyle, expandText} = styles;
-
-  const ZoomImage = () => {
-    return (
-      <PhotoView
-        source={require('../../../shared/images/sheet.png')}
-        resizeMode="contain"
-        style={{height: '100%', width: '100%'}}
-        maximumZoomScale={4}
-      />
-    );
-  };
 
   return (
     <View style={container}>
@@ -54,7 +42,7 @@ const ImportExcel = (props: Props) => {
           Create your own test by importing excel file in given format
         </Text>
 
-        <LightBox renderContent={ZoomImage}>
+        <LightBox>
           <FastImage
             source={require('../../../shared/images/sheet.png')}
             style={imageStyle}

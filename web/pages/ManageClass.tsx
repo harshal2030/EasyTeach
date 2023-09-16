@@ -203,7 +203,7 @@ class ManageClass extends React.Component<Props, State> {
   shareCode = () => {
     navigator.clipboard
       .writeText(
-        `Join my class on EasyTeach, through this code: https://easyteach.inddex.co/joinclass?c=${
+        `Join my class on EasyTeach, through this code: https://easyteach.quirky-craft.com/joinclass?c=${
           this.props.currentClass!.joinCode
         }. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
       )
@@ -524,7 +524,7 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     isOwner,
     profile: state.profile,
-    classes: state.classes,
+    classes: state.classes.classes,
     premiumAllowed: state.currentClass?.planId !== 'free',
     unread: state.unreads.totalUnread,
   };

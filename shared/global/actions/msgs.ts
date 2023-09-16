@@ -10,6 +10,7 @@ enum ActionTypes {
   msgsErrored = 'msgs_errored',
   msgsLoading = 'msgs_loading',
   msgsFetched = 'msgs_fetched',
+  removeMsg = 'remove_msg',
   addMsgs = 'msgs_add',
   msgsEnd = 'msgs_end',
 }
@@ -76,6 +77,24 @@ interface endMsgAction {
     classId: string;
   };
 }
+
+interface removeMsgAction {
+  type: ActionTypes.removeMsg;
+  payload: {
+    msgId: string;
+    classId: string;
+  };
+}
+
+const removeMsg = (msgId: string, classId: string): removeMsgAction => {
+  return {
+    type: ActionTypes.removeMsg,
+    payload: {
+      msgId,
+      classId,
+    },
+  };
+};
 
 const msgHasEnd = (end: boolean, classId: string): endMsgAction => {
   return {
@@ -204,7 +223,7 @@ const fetchMsgs = (token: string, classId: string, endReached = false) => {
   };
 };
 
-export {ActionTypes, fetchMsgs, addMsg};
+export {ActionTypes, fetchMsgs, addMsg, removeMsg};
 
 export type {
   msgErroredAction,
@@ -214,5 +233,6 @@ export type {
   endMsgAction,
   Msg,
   MsgState,
+  removeMsgAction,
   MsgPayload,
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import {connect} from 'react-redux';
 import SnackBar from 'react-native-snackbar';
 import DocumentPicker from 'react-native-document-picker';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {CompositeNavigationProp} from '@react-navigation/native';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import AndroidPicker from 'react-native-android-dialog-picker';
@@ -27,13 +27,16 @@ import {QuizInfo, ImportExcel} from '../../shared/components/main';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
-import {QuizRes, fetchQuiz, ObQuizRes} from '../../shared/global/actions/quiz';
+import {
+  fetchQuiz,
+  QuizPayload,
+  QuizRes,
+} from '../../shared/global/actions/quiz';
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {
   commonBackground,
   commonBlue,
   flatRed,
-  greyWithAlpha,
   commonGrey,
 } from '../../shared/styles/colors';
 import {ContainerStyles} from '../../shared/styles/styles';
@@ -41,17 +44,15 @@ import {resultUrl} from '../../shared/utils/urls';
 
 type NavigationProp = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Test'>,
-  StackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
 interface Props {
   token: string | null;
   navigation: NavigationProp;
   currentClass: Class | null;
-  quizErrored: boolean;
-  quizLoading: boolean;
-  quizzes: ObQuizRes;
-  fetchQuiz(token: string, classId: string, quizType?: string): void;
+  quizzes: QuizPayload;
+  fetchQuiz(token: string, classId: string, updating?: boolean): void;
   isOwner: boolean;
   unread: number;
 }
@@ -62,67 +63,42 @@ interface State {
   excelModal: boolean;
 }
 
-class Test extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+const Test: React.FC<Props> = (props) => {
+  const [quizModal, setQuizModal] = useState<boolean>(false);
+  const [quiz, setQuiz] = useState<QuizRes | null>(null);
+  const [excelModal, setExcelModal] = useState<boolean>(false);
 
-    this.state = {
-      modalVisible: false,
-      quiz: null,
-      excelModal: false,
-    };
-  }
+  useEffect(() => {
+    if (props.currentClass) {
+      props.fetchQuiz(props.token!, props.currentClass!.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.currentClass]);
 
-  fetchQuiz = () => {
-    this.props.fetchQuiz(this.props.token!, this.props.currentClass!.id);
+  const shareTest = (quizId: string) => {
+    Share.open({
+      title: 'Open Test on EasyTeach',
+      message: `Open test on EasyTeach through this link https://easyteach.quirky-craft.com/quiz/${props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
+    })
+      .then(() => null)
+      .catch(() => null);
   };
 
-  componentDidMount() {
-    if (this.props.currentClass) {
-      this.fetchQuiz();
-    }
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.currentClass!.id !== this.props.currentClass!.id) {
-      this.fetchQuiz();
-    }
-  }
-
-  onCardPress = (title: string, quiz: QuizRes) => {
-    if (title === 'Live') {
-      this.setState({modalVisible: true, quiz});
-    }
-
-    if (title === 'Expired') {
-      SnackBar.show({
-        text: 'This test has expired',
-        backgroundColor: flatRed,
-        duration: SnackBar.LENGTH_SHORT,
-      });
-    }
-
-    if (title === 'Scored') {
-      this.props.navigation.navigate('ShowScore', {
-        quizId: quiz.quizId,
-        title: quiz.title,
-        questions: quiz.questions,
-      });
-    }
-  };
-
-  ImportSheet = async () => {
+  const importSheet = async () => {
     try {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.xls, DocumentPicker.types.xlsx],
+        allowMultiSelection: false,
       });
 
-      this.setState({excelModal: false});
-      this.props.navigation.navigate('CreateTest', {
+      setExcelModal(false);
+      props.navigation.navigate('CreateTest', {
         file: {
-          name: res.name,
-          type: res.type,
-          uri: res.uri,
+          name: res[0].name,
+          type:
+            res[0].type ||
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          uri: res[0].uri,
         },
       });
     } catch (e) {
@@ -135,17 +111,8 @@ class Test extends React.Component<Props, State> {
     }
   };
 
-  shareTest = (quizId: string) => {
-    Share.open({
-      title: 'Open Test on EasyTeach',
-      message: `Open test on EasyTeach through this link https://easyteach.inddex.co/quiz/${this.props.currentClass?.id}/${quizId}. Download app from https://play.google.com/store/apps/details?id=com.hcodes.easyteach`,
-    })
-      .then(() => null)
-      .catch(() => null);
-  };
-
-  onGearPress = (quizId: string) => {
-    const {navigation} = this.props;
+  const onGearPress = (quizId: string) => {
+    const {navigation, currentClass} = props;
     if (Platform.OS === 'android') {
       AndroidPicker.show(
         {
@@ -160,14 +127,12 @@ class Test extends React.Component<Props, State> {
           }
 
           if (index === 1) {
-            Linking.openURL(
-              `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
-            );
+            Linking.openURL(`${resultUrl}/file/${currentClass!.id}/${quizId}`);
             return;
           }
 
           if (index === 2) {
-            this.shareTest(quizId);
+            shareTest(quizId);
             return;
           }
         },
@@ -191,12 +156,12 @@ class Test extends React.Component<Props, State> {
 
           if (index === 1) {
             return Linking.openURL(
-              `${resultUrl}/file/${this.props.currentClass!.id}/${quizId}`,
+              `${resultUrl}/file/${currentClass!.id}/${quizId}`,
             );
           }
 
           if (index === 2) {
-            this.shareTest(quizId);
+            shareTest(quizId);
             return;
           }
         },
@@ -204,7 +169,30 @@ class Test extends React.Component<Props, State> {
     }
   };
 
-  renderItem = ({
+  const onCardPress = (title: string, quiz: QuizRes) => {
+    if (title === 'Live') {
+      setQuizModal(true);
+      setQuiz(quiz);
+    }
+
+    if (title === 'Expired') {
+      SnackBar.show({
+        text: 'This test has expired',
+        backgroundColor: flatRed,
+        duration: SnackBar.LENGTH_SHORT,
+      });
+    }
+
+    if (title === 'Scored') {
+      props.navigation.navigate('ShowScore', {
+        quizId: quiz.quizId,
+        title: quiz.title,
+        questions: quiz.questions,
+      });
+    }
+  };
+
+  const renderItem = ({
     item,
     section: {title},
   }: {
@@ -215,15 +203,15 @@ class Test extends React.Component<Props, State> {
       <Card
         title={item.title}
         containerStyle={{margin: 10}}
-        onPress={() => this.onCardPress(title, item)}
+        onPress={() => onCardPress(title, item)}
         expiresOn={new Date(item.timePeriod[1].value)}
-        isOwner={this.props.isOwner}
-        onGearPress={() => this.onGearPress(item.quizId)}
+        isOwner={props.isOwner}
+        onGearPress={() => onGearPress(item.quizId)}
       />
     );
   };
 
-  renderSectionHeader = ({
+  const renderSectionHeader = ({
     section: {title, data},
   }: {
     section: {title: string; data: QuizRes[]};
@@ -235,8 +223,8 @@ class Test extends React.Component<Props, State> {
     return null;
   };
 
-  renderContent = () => {
-    const {quizLoading, quizErrored, quizzes} = this.props;
+  const renderContent = () => {
+    const {loading, errored, quizzes} = props.quizzes;
     const data = [
       {
         title: 'Live',
@@ -252,7 +240,7 @@ class Test extends React.Component<Props, State> {
       },
     ];
 
-    if (quizErrored) {
+    if (errored) {
       return (
         <View style={ContainerStyles.centerElements}>
           <Text style={{padding: 10}}>
@@ -262,7 +250,7 @@ class Test extends React.Component<Props, State> {
       );
     }
 
-    if (quizLoading) {
+    if (loading) {
       return (
         <View style={ContainerStyles.centerElements}>
           <ActivityIndicator animating size="large" color={commonBlue} />
@@ -285,9 +273,9 @@ class Test extends React.Component<Props, State> {
     return (
       <SectionList
         sections={data}
-        renderItem={this.renderItem}
+        renderItem={renderItem}
         keyExtractor={(item) => item.quizId}
-        renderSectionHeader={this.renderSectionHeader}
+        renderSectionHeader={renderSectionHeader}
         ListFooterComponent={<View style={{height: 80}} />}
         style={{marginBottom: 30, paddingBottom: 30}}
         stickySectionHeadersEnabled
@@ -295,95 +283,81 @@ class Test extends React.Component<Props, State> {
     );
   };
 
-  render() {
-    const {unread} = this.props;
-    return (
-      <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
-        <Header
-          centerComponent={{
-            text: 'Tests',
-            style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
-          }}
-          leftComponent={
-            <>
-              <Icon
-                name="menu"
-                size={26}
-                onPress={this.props.navigation.openDrawer}
-                color="#ffff"
-              />
-              {unread !== 0 ? <HeaderBadge /> : null}
-            </>
-          }
-        />
-        {this.renderContent()}
-        {this.props.isOwner && (
-          <View style={styles.footerTextContainer}>
-            <Text style={styles.footerText}>
-              Scheduled tests are shown under live for owners
-            </Text>
-          </View>
-        )}
+  const {unread} = props;
+  return (
+    <View style={[ContainerStyles.parent, {backgroundColor: '#fff'}]}>
+      <Header
+        centerComponent={{
+          text: 'Tests',
+          style: {fontSize: 24, color: '#ffff', fontWeight: '600'},
+        }}
+        leftComponent={
+          <>
+            <Icon
+              name="menu"
+              tvParallaxProperties
+              size={26}
+              onPress={props.navigation.openDrawer}
+              color="#ffff"
+            />
+            {unread !== 0 ? <HeaderBadge /> : null}
+          </>
+        }
+      />
+      {renderContent()}
+      {props.isOwner && (
+        <View style={styles.footerTextContainer}>
+          <Text style={styles.footerText}>
+            Scheduled tests are shown under live for owners
+          </Text>
+        </View>
+      )}
 
-        {this.props.isOwner && (
-          <Button
-            icon={<Octicons name="plus" size={26} color={commonBlue} />}
-            containerStyle={styles.FABContainer}
-            // eslint-disable-next-line react-native/no-inline-styles
-            buttonStyle={{backgroundColor: '#ffff'}}
-            onPress={() => this.setState({excelModal: true})}
-          />
-        )}
-        <Modal
-          isVisible={this.state.modalVisible}
-          style={styles.modalStyle}
-          hideModalContentWhileAnimating
-          onBackButtonPress={() => this.setState({modalVisible: false})}>
-          <QuizInfo
-            quiz={this.state.quiz!}
-            onButtonPress={() => {
-              this.setState({modalVisible: false});
-              this.props.navigation.navigate('Quiz', {
-                quizId: this.state.quiz!.quizId,
-                title: this.state.quiz!.title,
-              });
-            }}
-            onBackPress={() => this.setState({modalVisible: false})}
-          />
-        </Modal>
-
-        <Modal
-          isVisible={this.state.excelModal}
-          animationIn="slideInLeft"
-          animationOut="slideOutLeft"
-          hideModalContentWhileAnimating
-          onBackButtonPress={() => this.setState({excelModal: false})}
+      {props.isOwner && (
+        <Button
+          icon={<Octicons name="plus" size={26} color={commonBlue} />}
+          containerStyle={styles.FABContainer}
           // eslint-disable-next-line react-native/no-inline-styles
-          style={{margin: 0}}>
-          <ImportExcel
-            onBackPress={() => this.setState({excelModal: false})}
-            onImportPress={this.ImportSheet}
-          />
-        </Modal>
-      </View>
-    );
-  }
-}
+          buttonStyle={{backgroundColor: '#ffff'}}
+          onPress={() => setExcelModal(true)}
+        />
+      )}
+      <Modal
+        isVisible={quizModal}
+        style={styles.modalStyle}
+        hideModalContentWhileAnimating
+        onBackButtonPress={() => setQuizModal(false)}>
+        <QuizInfo
+          quiz={quiz!}
+          onButtonPress={() => {
+            setQuizModal(false);
+            props.navigation.navigate('Quiz', {
+              quizId: quiz!.quizId,
+              title: quiz!.title,
+            });
+          }}
+          onBackPress={() => setQuizModal(false)}
+        />
+      </Modal>
+
+      <Modal
+        isVisible={excelModal}
+        animationIn="slideInLeft"
+        animationOut="slideOutLeft"
+        hideModalContentWhileAnimating
+        onBackButtonPress={() => setExcelModal(false)}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{margin: 0}}>
+        <ImportExcel
+          onBackPress={() => setExcelModal(false)}
+          onImportPress={importSheet}
+        />
+      </Modal>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  collapseContainer: {
-    marginLeft: 30,
-    flexDirection: 'row',
-  },
-  collapseButton: {
-    marginHorizontal: 5,
-    padding: 3,
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: greyWithAlpha(0.8),
-    backgroundColor: greyWithAlpha(0.2),
-    borderRadius: 2,
-  },
   collapseText: {
     fontSize: 17,
     fontWeight: '600',
@@ -441,9 +415,15 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     currentClass: state.currentClass,
-    quizLoading: state.quizLoading,
-    quizErrored: state.quizErrored,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      quizzes: {
+        live: [],
+        expired: [],
+        scored: [],
+      },
+    },
     isOwner: state.currentClass!.owner.username === state.profile.username,
     unread: state.unreads.totalUnread,
   };

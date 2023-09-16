@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import {Header} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import PDFView from 'react-native-view-pdf';
 
@@ -10,7 +10,7 @@ import {ContainerStyles} from '../../shared/styles/styles';
 import {commonBlue} from '../../shared/styles/colors';
 
 type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'PDFViewer'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'PDFViewer'>;
   route: RouteProp<RootStackParamList, 'PDFViewer'>;
 };
 

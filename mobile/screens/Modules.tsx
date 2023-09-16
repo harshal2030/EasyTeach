@@ -7,21 +7,30 @@ import {
   FlatList,
   TouchableHighlight,
   StyleSheet,
+  ScrollView,
   Alert,
 } from 'react-native';
+import Image from 'react-native-fast-image';
 import Dialog from 'react-native-dialog';
 import {Header, Icon, Button} from 'react-native-elements';
 import {CompositeNavigationProp} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {DrawerNavigationProp} from '@react-navigation/drawer';
 import SnackBar from 'react-native-snackbar';
 import {connect} from 'react-redux';
-import LottieView from 'lottie-react-native';
 
 import {HeaderBadge} from '../../shared/components/common';
 
 import {StoreState} from '../../shared/global';
 import {Class} from '../../shared/global/actions/classes';
+import {
+  fetchModules,
+  ModulePayload,
+  Module as ModuleRes,
+  addModule,
+  updateModule,
+  removeModule,
+} from '../../shared/global/actions/modules';
 
 import {RootStackParamList, DrawerParamList} from '../navigators/types';
 import {moduleUrl} from '../../shared/utils/urls';
@@ -37,7 +46,7 @@ import {bytesToGB} from '../../shared/utils/functions';
 
 type navigation = CompositeNavigationProp<
   DrawerNavigationProp<DrawerParamList, 'Modules'>,
-  StackNavigationProp<RootStackParamList>
+  NativeStackNavigationProp<RootStackParamList>
 >;
 
 interface Props {
@@ -47,18 +56,14 @@ interface Props {
   isOwner: boolean;
   premiumAllowed: boolean;
   unread: number;
-}
-
-interface ModuleRes {
-  id: string;
-  title: string;
-  classId: string;
+  modules: ModulePayload;
+  fetchModules: (classId: string) => void;
+  addModule: typeof addModule;
+  updateModule: typeof updateModule;
+  removeModule: typeof removeModule;
 }
 
 interface State {
-  loading: boolean;
-  errored: boolean;
-  modules: ModuleRes[];
   dialogVisible: boolean;
   moduleName: string;
   moduleId: string | null;
@@ -69,9 +74,6 @@ class Module extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      loading: true,
-      errored: false,
-      modules: [],
       dialogVisible: false,
       moduleName: '',
       moduleId: null,
@@ -80,7 +82,7 @@ class Module extends React.Component<Props, State> {
 
   componentDidMount() {
     if (this.props.premiumAllowed) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
     }
   }
 
@@ -89,32 +91,16 @@ class Module extends React.Component<Props, State> {
       prevProps.currentClass?.id === this.props.currentClass?.id &&
       this.props.premiumAllowed !== prevProps.premiumAllowed
     ) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
       return;
     }
 
     if (prevProps.currentClass?.id !== this.props.currentClass?.id) {
-      this.fetchModules();
+      this.props.fetchModules(this.props.currentClass!.id);
     }
   }
 
-  fetchModules = async () => {
-    try {
-      this.setState({loading: true});
-      const res = await axios.get<ModuleRes[]>(
-        `${moduleUrl}/${this.props.currentClass?.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${this.props.token}`,
-          },
-        },
-      );
-
-      this.setState({loading: false, modules: res.data});
-    } catch (e) {
-      this.setState({loading: false, errored: true});
-    }
-  };
+  fetchModules = () => this.props.fetchModules(this.props.currentClass!.id);
 
   confirmDelete = (id: string) => {
     const deleteModule = () => {
@@ -125,8 +111,8 @@ class Module extends React.Component<Props, State> {
           },
         })
         .then(() => {
-          const temp = this.state.modules.filter((val) => val.id !== id);
-          this.setState({modules: temp, moduleId: null});
+          this.props.removeModule(id, this.props.currentClass!.id);
+          this.setState({moduleId: null});
         })
         .catch(() => {
           SnackBar.show({
@@ -170,8 +156,8 @@ class Module extends React.Component<Props, State> {
       );
 
       this.closeDialog();
+      this.props.addModule(res.data, this.props.currentClass!.id);
       this.setState({
-        modules: [...this.state.modules, res.data],
         moduleName: '',
       });
     } catch (e) {
@@ -194,12 +180,8 @@ class Module extends React.Component<Props, State> {
       );
 
       this.closeDialog();
-      const moduleIndex = this.state.modules.findIndex(
-        (val) => val.id === res.data.id,
-      );
-      const temp = [...this.state.modules];
-      temp[moduleIndex] = res.data;
-      this.setState({moduleId: null, modules: temp, moduleName: ''});
+      this.props.updateModule(res.data, this.props.currentClass!.id);
+      this.setState({moduleId: null, moduleName: ''});
     } catch (e) {
       this.setState({moduleId: null, moduleName: ''});
       SnackBar.show({
@@ -232,6 +214,7 @@ class Module extends React.Component<Props, State> {
             <View style={styles.iconContainer}>
               <Icon
                 name="pencil"
+                tvParallaxProperties
                 type="material-community"
                 color="#000"
                 onPress={() =>
@@ -244,6 +227,7 @@ class Module extends React.Component<Props, State> {
               />
               <Icon
                 name="delete-outline"
+                tvParallaxProperties
                 type="material-community"
                 color={flatRed}
                 onPress={() => this.confirmDelete(item.id)}
@@ -256,7 +240,7 @@ class Module extends React.Component<Props, State> {
   };
 
   renderContent = () => {
-    const {loading, errored, modules} = this.state;
+    const {loading, errored, modules} = this.props.modules;
     const {isOwner, currentClass} = this.props;
 
     let upgradeText = '';
@@ -267,26 +251,34 @@ class Module extends React.Component<Props, State> {
     } else if (!isOwner) {
       upgradeText = 'Ask class owner to unlock video lessons';
     } else {
-      upgradeText = 'Upgrade your class to unlock video lessons';
+      upgradeText = 'Upgrade to unlock full potential to your space';
     }
 
     if (!this.props.premiumAllowed) {
       return (
-        <View style={styles.promotionView}>
-          <Text style={styles.promotionText}>{upgradeText}</Text>
-          <LottieView
-            source={require('../../shared/images/rocket.json')}
-            autoPlay
-            style={styles.rocket}
-            loop
+        <ScrollView style={ContainerStyles.padder}>
+          <Text style={styles.promoBigText}>Video lessons</Text>
+          <Text style={styles.promoInfoText}>
+            Engage with others with videos and PDFs with our free analytics
+            services
+          </Text>
+
+          <Image
+            source={require('../../shared/images/mock.jpg')}
+            style={styles.promoImage}
+            resizeMode="contain"
           />
+
+          <Text style={styles.promoUpgradeText}>{upgradeText}</Text>
+
           {this.props.isOwner && (
             <Button
               title="Upgrade Now"
               onPress={() => this.props.navigation.navigate('Checkout')}
+              containerStyle={styles.upgradeButton}
             />
           )}
-        </View>
+        </ScrollView>
       );
     }
 
@@ -339,6 +331,7 @@ class Module extends React.Component<Props, State> {
             <>
               <Icon
                 name="menu"
+                tvParallaxProperties
                 size={26}
                 onPress={this.props.navigation.openDrawer}
                 color="#ffff"
@@ -420,20 +413,29 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: 'row',
   },
-  promotionText: {
-    fontSize: 18,
-    padding: 10,
-    fontWeight: '800',
+  promoBigText: {
+    color: '#2089dc',
+    fontSize: 50,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+  },
+  promoInfoText: {
+    color: '#2089dc',
+    fontSize: 20,
     alignSelf: 'center',
   },
-  rocket: {
-    position: 'relative',
-    height: 450,
+  promoImage: {
+    height: 200,
     width: '100%',
-    alignSelf: 'center',
+    marginVertical: 20,
   },
-  promotionView: {
-    padding: 20,
+  promoUpgradeText: {
+    alignSelf: 'center',
+    fontSize: 20,
+  },
+  upgradeButton: {
+    marginHorizontal: 10,
+    marginTop: 30,
   },
   bottomView: {
     padding: 5,
@@ -471,7 +473,17 @@ const mapStateToProps = (state: StoreState) => {
     isOwner: state.currentClass?.owner.username === state.profile.username,
     premiumAllowed: state.currentClass?.planId !== 'free',
     unread: state.unreads.totalUnread,
+    modules: state.modules[state.currentClass?.id || 'test'] || {
+      loading: true,
+      errored: false,
+      modules: [],
+    },
   };
 };
 
-export default connect(mapStateToProps)(Module);
+export default connect(mapStateToProps, {
+  fetchModules,
+  removeModule,
+  addModule,
+  updateModule,
+})(Module);

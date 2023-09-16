@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {
   View,
   StyleSheet,
@@ -20,7 +20,7 @@ type Props = {
   isOwner: boolean;
 };
 
-const Card = (props: Props) => {
+const _Card = (props: Props) => {
   return (
     <View style={[styles.main, props.containerStyle]}>
       <TouchableWithoutFeedback onPress={props.onPress}>
@@ -44,6 +44,19 @@ const Card = (props: Props) => {
     </View>
   );
 };
+
+const Card = memo(_Card, (prevProps, nextProps) => {
+  if (
+    prevProps.title === nextProps.title &&
+    prevProps.expiresOn === nextProps.expiresOn &&
+    prevProps.isOwner === nextProps.isOwner &&
+    prevProps.containerStyle === nextProps.containerStyle
+  ) {
+    return true;
+  }
+
+  return false;
+});
 
 const styles = StyleSheet.create({
   main: {

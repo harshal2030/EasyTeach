@@ -4,6 +4,7 @@ import {
   msgLoadingAction,
   msgFetchedAction,
   addMsgAction,
+  removeMsgAction,
   MsgState,
   endMsgAction,
 } from '../actions/msgs';
@@ -13,6 +14,7 @@ type Action =
   | addMsgAction
   | msgFetchedAction
   | endMsgAction
+  | removeMsgAction
   | msgLoadingAction;
 
 const initialState: MsgState = {};
@@ -83,6 +85,17 @@ const msgsReducer = (
       };
 
       tempState[action.payload.classId] = tempAddMsg;
+
+      return tempState;
+    case ActionTypes.removeMsg:
+      const removedMsgs = {
+        loading,
+        errored,
+        end,
+        msgs: msgs.filter((msg) => msg.id !== action.payload.msgId),
+      };
+
+      tempState[action.payload.classId] = removedMsgs;
 
       return tempState;
     default:

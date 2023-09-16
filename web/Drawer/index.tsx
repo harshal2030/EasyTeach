@@ -7,16 +7,17 @@ import {
   TouchableOpacity,
   FlatList,
   Alert,
-  Image as FastImage,
-  ImageBackground,
+  Image,
 } from 'react-native';
 import {useRouteMatch, useHistory} from 'react-router-dom';
 import {Button, Badge} from 'react-native-elements';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connect} from 'react-redux';
 import axios from 'axios';
 import {InlineIcon} from '@iconify/react';
 import ModuleIcon from '@iconify-icons/ic/view-module';
+
+import {SMClass} from '../../shared/components/main';
 
 import LogOut from '../../shared/images/log-out.svg';
 import Plus from '../../shared/images/plus-36.svg';
@@ -48,9 +49,11 @@ import {mediaUrl, logOutUrl} from '../../shared/utils/urls';
 type Props = {
   token: string | null;
   removeToken: typeof removeToken;
-  classes: Class[];
-  classIsLoading: boolean;
-  classErrored: boolean;
+  classes: {
+    classes: Class[];
+    loading: boolean;
+    errored: boolean;
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
   profile: {
@@ -91,31 +94,16 @@ const DrawerContent = (props: Props): JSX.Element => {
 
   const renderSMClass = ({item}: {item: Class}) => {
     return (
-      <TouchableOpacity
+      <SMClass
         onPress={() => {
           props.registerCurrentClass(item);
           props.onOptionPress();
           history.push(`${url}/home/${item.id}`);
-        }}>
-        <FastImage
-          source={{
-            uri: `${mediaUrl}/class/avatar/${item.photo}`,
-          }}
-          style={avatarImageStyle}
-        />
-        {props.unread.data[item.id]?.unread ? (
-          <Badge
-            status="error"
-            value={props.unread.data[item.id]?.unread}
-            badgeStyle={{
-              position: 'absolute',
-              right: -1,
-              top: -4,
-            }}
-          />
-        ) : null}
-        <Text style={{fontSize: 16, fontWeight: '900'}}>{item.name}</Text>
-      </TouchableOpacity>
+        }}
+        photo={`${mediaUrl}/class/avatar/${item.photo}`}
+        unread={props.unread.data[item.id]?.unread}
+        name={item.name}
+      />
     );
   };
 
@@ -130,17 +118,17 @@ const DrawerContent = (props: Props): JSX.Element => {
   };
 
   const renderClasses = () => {
-    if (props.classErrored) {
+    if (props.classes.errored) {
       return <Text>Errored</Text>;
     }
 
-    if (props.classIsLoading) {
+    if (props.classes.loading) {
       return <Text>Loading...</Text>;
     }
 
     return (
       <FlatList
-        data={props.classes}
+        data={props.classes.classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={renderSMClass}
         removeClippedSubviews
@@ -158,7 +146,6 @@ const DrawerContent = (props: Props): JSX.Element => {
     avatarText,
     optionText,
     optionListContainer,
-    avatarImageStyle,
     optionContainer,
   } = styles;
   return (
@@ -184,17 +171,17 @@ const DrawerContent = (props: Props): JSX.Element => {
       </View>
       <View style={styles.rightContainer}>
         <ScrollView>
-          <ImageBackground
+          <Image
             source={{
               uri: currentClass
                 ? `${mediaUrl}/class/avatar/${currentClass.photo}`
                 : 'https://easyteach.harshall.codes/noimage',
             }}
-            style={mainImage}>
-            <Text style={classText}>
-              {currentClass ? currentClass.name : 'Current Class appears here'}
-            </Text>
-          </ImageBackground>
+            style={mainImage}
+          />
+          <Text style={classText}>
+            {currentClass ? currentClass.name : 'Current Class appears here'}
+          </Text>
 
           <View style={avatarContainer}>
             <Avatar
@@ -213,7 +200,7 @@ const DrawerContent = (props: Props): JSX.Element => {
           </View>
 
           <View style={optionListContainer}>
-            {props.classes.length === 0 ? null : (
+            {props.classes.classes.length === 0 ? null : (
               <>
                 <TouchableOpacity
                   style={optionContainer}
@@ -306,12 +293,6 @@ const styles = StyleSheet.create({
     padding: 5,
     marginBottom: 5,
   },
-  avatarImageStyle: {
-    height: 70,
-    width: 70,
-    marginTop: 10,
-    backgroundColor: commonGrey,
-  },
   leftContainer: {
     width: 100,
     backgroundColor: commonBackground,
@@ -327,7 +308,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 30,
     padding: 5,
-    backgroundColor: 'rgba(237, 240, 242, 0.8)',
+    backgroundColor: greyWithAlpha(0.3),
   },
   mainImage: {
     height: 200,
@@ -375,8 +356,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     token: state.token,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classErrored: state.classHasErrored,
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,

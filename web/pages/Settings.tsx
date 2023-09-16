@@ -25,9 +25,11 @@ type Props = RouteComponentProps & {
     username: string;
     avatar: string;
   };
-  classes: Class[];
-  classIsLoading: boolean;
-  classHasErrored: boolean;
+  classes: {
+    loading: boolean;
+    errored: boolean;
+    classes: Class[];
+  };
   currentClass: Class | null;
   registerCurrentClass: typeof registerCurrentClass;
 };
@@ -66,9 +68,9 @@ class Settings extends React.PureComponent<Props> {
   };
 
   renderContent = () => {
-    const {classHasErrored, classIsLoading, classes} = this.props;
+    const {classes, errored, loading} = this.props.classes;
 
-    if (classHasErrored) {
+    if (errored) {
       return (
         <Text>
           We're having trouble in connecting to services. Please try again later
@@ -76,7 +78,7 @@ class Settings extends React.PureComponent<Props> {
       );
     }
 
-    if (classIsLoading) {
+    if (loading) {
       return <ActivityIndicator size="large" color={commonBlue} animating />;
     }
 
@@ -97,7 +99,7 @@ class Settings extends React.PureComponent<Props> {
 
     return (
       <FlatList
-        data={this.props.classes}
+        data={classes}
         keyExtractor={(_item, i) => i.toString()}
         renderItem={this.renderItem}
         removeClippedSubviews
@@ -146,8 +148,6 @@ const mapStateToProps = (state: StoreState) => {
     token: state.token,
     profile: state.profile,
     classes: state.classes,
-    classIsLoading: state.classIsLoading,
-    classHasErrored: state.classHasErrored,
     currentClass: state.currentClass,
   };
 };

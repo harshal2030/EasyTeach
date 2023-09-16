@@ -9,7 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import {Header, Button} from 'react-native-elements';
-import {StackNavigationProp} from '@react-navigation/stack';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RouteProp} from '@react-navigation/native';
 import {connect} from 'react-redux';
 
@@ -22,7 +22,10 @@ import {RootStackParamList} from '../navigators/types';
 import {commonBlue} from '../../shared/styles/colors';
 import {ContainerStyles, TextStyles} from '../../shared/styles/styles';
 
-type NavigationProp = StackNavigationProp<RootStackParamList, 'ShowScore'>;
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'ShowScore'
+>;
 type Route = RouteProp<RootStackParamList, 'ShowScore'>;
 interface Props {
   navigation: NavigationProp;

@@ -190,7 +190,7 @@ const mapStateToProps = (state: StoreState) => {
     currentClass: state.currentClass,
     profile: state.profile,
     isOwner,
-    classes: state.classes,
+    classes: state.classes.classes,
   };
 };
 
