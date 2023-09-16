@@ -53,3 +53,5 @@ For more on app signing head to https://reactnative.dev/docs/signed-apk-android
 - Register or log in to your account.
 - Navigate through the dashboard and create or join a class.
 - Collaborate, teach, and learn
+
+You can also use the mobile app available on [Google Play](https://play.google.com/store/apps/details?id=com.hcodes.easyteach)
